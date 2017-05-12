@@ -1,0 +1,100 @@
+<dom-module id="poi-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      paper-dropdown-menu {
+        width: 100%;
+      }
+    </style>
+    <paper-dropdown-menu id="poisFilter" label="{{label}}" placeholder="Choose the type" on-iron-select="_typeDropdownSelect">
+      <paper-listbox id="poisFilterDropdownListBox" class="dropdown-content">
+        <template is="dom-repeat" items="{{_poisTypes}}">
+          <paper-item value="[[item.id]]">[[item.name]]</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'poi-filter',
+
+      properties: {
+        label: {
+          type: String
+        },
+        pois: {
+          type: Array,
+          observer: '_poisChange'
+        },
+        selectedFilter: {
+          type: String,
+          notify: true
+        },
+        _poisTypes: {
+          type: Array
+        }
+      },
+
+      clearFilter: function() {
+        this.$.poisFilter._setSelectedItem();
+        this.$.poisFilterDropdownListBox.selected = -1;
+      },
+      
+      _poisChange: function(newPois) {
+        if (newPois && newPois.length > 0) {
+          var poiTypesMap = {};
+          var actualPoiTypes;
+
+          this._poisTypes = [];
+          this.push('_poisTypes', {id: '', name: 'All'});
+
+          for (var indexPoi = 0; indexPoi < newPois.length; indexPoi++) {
+            if (newPois[indexPoi].types && newPois[indexPoi].types.length > 0) {
+              actualPoiTypes = newPois[indexPoi].types;
+
+              for (var indexType = 0; indexType < actualPoiTypes.length; indexType++) {
+                if (!poiTypesMap[actualPoiTypes[indexType]]) {
+                  var poiType = this._getPoiTypeObj(actualPoiTypes[indexType]);
+                  poiTypesMap[poiType.id] = poiType.name;
+                  this.push('_poisTypes', poiType);
+                }
+              }
+            }
+          }
+        }
+      },
+
+      _getPoiTypeObj: function(poiType) {
+        var poiTypeDivision = poiType.split('_');
+        var poiName = '';
+
+        for (var indexWord = 0; indexWord < poiTypeDivision.length; indexWord++) {
+          poiName += poiTypeDivision[indexWord][0].toUpperCase() + poiTypeDivision[indexWord].substring(1) + ' ';
+        }
+
+        poiName = poiName.substring(0, poiName.length - 1);
+
+        return {
+          id: poiType,
+          name: poiName
+        };
+      },
+
+      _typeDropdownSelect: function(event) {
+        var selectedItem = event.target.selectedItem;
+        var selectedFilterId;
+
+        if (selectedItem) {
+          this.selectedFilter = selectedItem.value;
+          console.log(this.selectedFilter);
+        }
+      }
+    });
+  })();
+  </script>
+</dom-module>

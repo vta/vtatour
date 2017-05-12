@@ -1,0 +1,69 @@
+<dom-module id="route-details">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+    </style>
+
+    <firebase-document
+      app-name="vta"
+      id="routeDetails"
+      data="{{_routeDetailsOrigin}}">
+    </firebase-document>
+    <firebase-document
+      app-name="vta"
+      id="routeInfo"
+      data="{{_routeInfoOrigin}}">
+    </firebase-document>
+
+    <h2 class="page-title">Route Details</h2>
+
+    <div class="route-details-wrapper">
+      <p><b>Number:</b> [[code]]</p>
+      <p><b>Departure:</b> [[_routeInfoOrigin.departure]]</p>
+      <p><b>Destination:</b> [[_routeInfoOrigin.destination]]</p>
+    </div>
+
+    <div class="directions-wrapper">
+      <paper-tabs selected="{{selectedDirection}}">
+        <paper-tab>Direction A</paper-tab>
+        <paper-tab>Direction B</paper-tab>
+      </paper-tabs>
+
+      <iron-pages selected="{{selectedDirection}}">
+        <route-direction-details route-direction="{{_routeDetailsOrigin.a}}"></route-direction-details>
+        <route-direction-details route-direction="{{_routeDetailsOrigin.b}}"></route-direction-details>
+      </iron-pages>
+
+      <a href="{{baseUrl}}routes/[[code]]/edit" tabindex="-1">
+        <paper-fab title="Edit route" icon="editor:mode-edit"></paper-fab>
+      </a>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'route-details',
+
+      properties: {
+        code: {
+          type: String,
+          observer: '_codeChange'
+        },
+        selectedDirection: {
+          type: Number,
+          value: 0
+        }
+      },
+
+      _codeChange: function(newCode) {
+        if (newCode && newCode !== '') {
+          this.$.routeDetails.path = '/route-details/' + this.code;
+          this.$.routeInfo.path = '/routes/' + this.code;
+        }
+      }
+    });
+  })();
+  </script>
+</dom-module>

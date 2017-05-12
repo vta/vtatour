@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteBase "/backoffice"
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule "^(.*)$" "/backoffice/index.html" [L]

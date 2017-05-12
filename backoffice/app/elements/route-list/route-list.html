@@ -1,0 +1,237 @@
+<dom-module id="route-list">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      .item-wrapper,
+      .header {
+        border-bottom: 1px solid #ccc;
+      }
+
+      .item-wrapper:hover {
+        background-color: var(--vta-light-gray);
+      }
+
+      .item-wrapper.active:hover {
+        background-color: var(--vta-white);
+      }
+
+      .item {
+        padding: 12px 5% 0;
+        @apply(--layout-horizontal);
+        font-size: 1.05em;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .item {
+        color: var(--primary-color);
+      }
+
+      .header {
+        padding: 20px 5% 18px;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+
+      .route-code {
+        min-width: 10%;
+        padding: 0 20px;
+        font-weight: bold;
+      }
+
+      .item-wrapper.active .route-name {
+        margin-bottom: 20px;
+      }
+
+      .route-details {
+        @apply(--layout-flex);
+      }
+
+      .route-operations {
+        padding: 0 20px;
+        margin-top: -12px;
+      }
+
+      paper-fab {
+        position: absolute;
+        right: 8%;
+        top: -28px;
+      }
+
+      paper-button {
+        top: 2px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+      }
+
+      paper-button iron-icon {
+        --iron-icon-height: 40px;
+        --iron-icon-width: 40px;
+      }
+
+      .route-departure-destination {
+        margin-bottom: 20px;
+        display: none;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .route-departure-destination {
+        @apply(--layout-horizontal);
+      }
+
+      .route-departure,
+      .route-destination {
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+      }
+
+      .route-detail-header {
+        font-weight: bold;
+        margin-right: 30px;
+      }
+
+      .edit-route-operation {
+        display: none;
+        padding: 21px 5%;
+        font-size: 1.4em;
+        text-transform: capitalize;
+        text-align: right;
+      }
+
+      .item-wrapper.active paper-button iron-icon.expand,
+      .item-wrapper paper-button iron-icon.collapse,
+      .route-map-template,
+      .item-wrapper route-map {
+        display: none;
+      }
+
+      .item-wrapper paper-button iron-icon.expand,
+      .item-wrapper.active paper-button iron-icon.collapse,
+      .item-wrapper.active route-map,
+      .item-wrapper.active .edit-route-operation {
+        display: block;
+      }
+    </style>
+
+    <firebase-query
+      app-name="vta"
+      id="query"
+      path="/routes"
+      data="{{_routes}}">
+    </firebase-query>
+
+    <firebase-document
+      app-name="vta"
+      id="videoGeoPoints"
+      data="{{_videoGeoPointsOrigin}}">
+    </firebase-document>
+
+    <div class="inner-content">
+      <h2 class="page-title">Routes</h2>
+
+      <paper-material elevation="1">
+        <div class="item header">
+          <div class="route-code">Code</div>
+          <div class="route-details">Route name</div>
+          <div class="route-operations">
+            <a href="{{baseUrl}}routes/add" tabindex="-1">
+              <paper-fab title="Add route" icon="icons:add"></paper-fab>
+            </a>
+          </div>
+        </div>
+
+        <template is="dom-repeat" items="[[_routes]]" as="route">
+          <div class="item-wrapper" data-route-index$="[[index]]" data-route-code$="[[route.code]]">
+            <div class="item route">
+              <div class="route-code">[[route.code]]</div>
+              <div class="route-details">
+                <div class="route-name">[[route.name]]</div>
+                <div class="route-departure-destination">
+                  <div class="route-departure">
+                    <div class="route-detail-header">Departure</div>
+                    <div class="route-detail-value">[[route.departure]]</div>
+                  </div>
+                  <div class="route-destination">
+                    <div class="route-detail-header">Destination</div>
+                    <div class="route-detail-value">[[route.destination]]</div>
+                  </div>
+                </div>
+              </div>
+              <div class="route-operations">
+                <paper-button on-click="_toggleRoute" data-route-index$="[[index]]">
+                  <iron-icon class="expand" icon="icons:expand-more"></iron-icon>
+                  <iron-icon class="collapse" icon="icons:expand-less"></iron-icon>
+                </paper-button>
+              </div>
+            </div>
+            <div class="route-map"></div>
+            <div class="edit-route-operation">
+              <a href="{{baseUrl}}routes/{{_activeRouteCode}}/edit" tabindex="-1">
+                <paper-button>Edit</paper-button>
+              </a>
+            </div>
+          </div>
+        </template>
+
+        <div class="route-map-template">
+          <route-map id="routeMap" geo-points="{{_videoGeoPointsOrigin}}"></route-map>
+        </div>
+      </paper-material>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'route-list',
+
+      properties: {
+        _routes: {
+          type: Array
+        },
+        _activeRouteCode: {
+          type: String,
+          value: ''
+        }
+      },
+
+      _toggleRoute: function(e) {
+        var oldActiveRoute = Polymer.dom(this.root).querySelector('.item-wrapper.active');
+        var paperButton;
+        var routeIndex;
+        var activeRoute;
+
+        if (e.srcElement.localName === 'iron-icon') {
+          paperButton = e.srcElement.parentNode;
+        } else {
+          paperButton = e.srcElement;
+        }
+
+        // Get the info of the selected route
+        routeIndex = paperButton.getAttribute('data-route-index');
+        activeRoute = Polymer.dom(this.root).querySelector('.item-wrapper[data-route-index="' + routeIndex + '"]');
+
+        // Remove the active class
+        if (oldActiveRoute) {
+          oldActiveRoute.classList.remove('active');
+        }
+
+        // Check if the same route was collapsed
+        if (oldActiveRoute !== activeRoute) {
+          var routeMap = Polymer.dom(this.root).querySelector('#routeMap');
+
+          activeRoute.classList.add('active');
+
+          // Append the map element
+          Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
+          this._activeRouteCode = activeRoute.getAttribute('data-route-code');
+
+          this.$.videoGeoPoints.path = '/route-details/' + this._activeRouteCode + '/a/videoGeoPoints';
+        }
+      }
+    });
+  })();
+  </script>
+</dom-module>

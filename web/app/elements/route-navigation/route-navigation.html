@@ -1,0 +1,833 @@
+<dom-module id="route-navigation">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+      }
+
+      paper-progress {
+        --paper-progress-active-color: var(--vta-red);
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .video-controls {
+        @apply(--layout-horizontal);
+        background-color: var(--primary-color);
+        width: 100%;
+        height: 56px;
+        position: fixed;
+        bottom: 0;
+      }
+
+      .video-controls paper-button {
+        @apply(--layout-flex);
+        background-color: var(--primary-color);
+        display: block;
+        margin: 0;
+        padding: 0.5em;
+        text-align: center;
+        text-transform: none;
+      }
+
+      .video-controls paper-button[disabled] {
+        opacity: 0.5;
+      }
+
+      .video-controls paper-button .button-copy {
+        display: block;
+        width: 100%;
+      }
+
+      google-map {
+        height: 300px;
+      }
+
+      poi-list,
+      poi-detail {
+        background-color: var(--vta-light-gray);
+        display: none;
+        position: absolute;
+        top: -29px;
+        left: 0;
+        width: 100%;
+        min-height: 110%;
+        margin-bottom: 56px;
+      }
+
+      poi-list.active,
+      poi-detail.active {
+        display: block;
+      }
+
+      @media all and (min-width: 361px) and (orientation: landscape) {
+        .navigation-wrapper {
+          @apply(--layout-horizontal);
+          margin: 48px 62px;
+        }
+
+        .video-player-wrapper,
+        .map-wrapper {
+          @apply(--layout-flex);
+        }
+
+        .video-player-wrapper {
+          margin-right: 10px;
+        }
+      }
+
+      /* Styles of the POI list and details for desktop version */
+      @media all and (min-width: 600px) and (orientation: landscape) {
+        .poi-wrapper{
+          position: absolute;
+          top: -20px;
+          left: 0;
+          width: 100%;
+          @apply(--layout-horizontal);
+          background-color: var(--vta-light-gray);
+        }
+
+        poi-list,
+        poi-detail {
+          position: relative;
+        }
+
+        poi-list{
+          width: 30%;
+          min-width: 300px;
+          max-height: 900px;
+          overflow-y: auto;
+
+        }
+        poi-detail {
+          @apply(--layout-flex);
+          margin-left: 16px;
+          min-height: 500px;
+        }
+      }
+    </style>
+      <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
+      <firebase-document
+        app-name="vta"
+    	  id="routeDetails"
+        data="{{_routeDetailsOrigin}}"></firebase-document>
+      <firebase-document
+        app-name="vta"
+        id="routeInfo"
+        data="{{_routeInfoOrigin}}"></firebase-document>
+
+      <div class="inner-content">
+      	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
+      </div>
+
+      <div class="navigation-wrapper">
+        <div class="video-player-wrapper">
+          <google-youtube
+            id="routeVideo"
+            video-id="{{_routeDetails.videoId}}"
+            playsinline="1"
+            webkit-playsinline
+            fluid
+            state="{{_videoState}}"
+            chromeless
+            currenttime="{{_videoCurrentTime}}"
+            currenttimeformatted="{{_currentTimeFormatted}}"
+            duration="{{_duration}}"
+            durationformatted="{{_durationFormatted}}"
+            on-google-youtube-ready="_onYoutubeReady"
+            playsupported="{{_playsupported}}"
+            autoplay="1"
+            >
+          </google-youtube>
+          <paper-progress value="{{_progressBarValue}}" on-click="_videoProgressClick"></paper-progress>
+        </div>
+
+        <div class="map-wrapper">
+          <google-map-search
+            id="search"
+            map="[[_map]]"
+            api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"
+            radius="3000"
+            results="{{_pois}}"
+            mapType="satellite"
+            >
+          </google-map-search>
+
+          <google-map id="map"
+            map="{{_map}}"
+            api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"
+            additional-map-options='{"zoomControl":"true"}'
+            mapType="satellite"
+            disable-zoom>
+            <google-map-marker id="marker" icon="/images/fa-bus.png"
+              latitude="{{_currentLat}}" longitude="{{_currentLng}}">    
+            </google-map-marker>
+
+            <google-map-marker
+              id="departureMarker"
+              latitude="[[_departureStop.lat]]"
+              longitude="[[_departureStop.lng]]"
+              icon="/images/fa-map-marker-origin.png"
+              click-events
+              on-google-map-marker-click="_onPoiClick">
+              <h3>{{_departureStop.name}}</h3>
+            </google-map-marker>
+            <google-map-marker
+              id="destinationMarker"
+              latitude="[[_destinationStop.lat]]"
+              longitude="[[_destinationStop.lng]]"
+              icon="/images/fa-map-marker-destination.png"
+              click-events
+              on-google-map-marker-click="_onPoiClick">
+              <h3>{{_destinationStop.name}}</h3>
+            </google-map-marker>
+            <google-map-marker
+              id="nextStopMarker"
+              latitude="[[_nextStopGeoPoint.lat]]"
+              longitude="[[_nextStopGeoPoint.lng]]"
+              icon="/images/fa-map-marker-stop.png"
+              click-events
+              on-google-map-marker-click="_onPoiClick"
+              hidden>
+            </google-map-marker>
+
+            <template is="dom-repeat" items="{{_pois}}" as="poi">
+              <google-map-marker latitude="{{poi.latitude}}" longitude="{{poi.longitude}}"
+                click-events on-google-map-marker-click="_onPoiClick" icon="/images/poi-pointer.png">
+                <h2>{{poi.name}}</h2>
+                <span>{{poi.formatted_address}}</span>
+              </google-map-marker>
+            </template>
+          </google-map>
+        </div>
+        <google-maps-api api-key="AIzaSyALqCogus7yIJJ0OE48RwBtmteqybWvZ6g" library-loaded="{{_mapsApiLoaded}}" on-api-load="_onMapsApiLoad"></google-maps-api>
+      </div>
+
+      <div class="poi-wrapper">
+        <poi-list id="pois" pois="{{_pois}}" selected="{{_selectedPoi}}"></poi-list>
+        <poi-detail id="poiDetails" place-details="{{_selectedPoiDetails}}"
+          lat-origin="{{_nextStopGeoPoint.lat}}" lng-origin="{{_nextStopGeoPoint.lng}}"></poi-detail>
+      </div>
+
+      <div class="video-controls" hidden$="{{!_playsupported}}">
+        <paper-button id="restartVideo" on-click="_restartVideo" disabled>
+          <iron-icon icon="vta-icons:restart"></iron-icon>
+          <span class="button-copy">Restart</span>
+        </paper-button>
+        <paper-button id="playVideo" on-click="_playVideo" hidden$="{{_shouldHidePlay}}">
+          <iron-icon icon="vta-icons:play"></iron-icon>
+          <span class="button-copy">Play</span>
+        </paper-button>
+        <paper-button id="pauseVideo" on-click="_pauseVideo" hidden$="{{!_isVideoPlaying}}">
+          <iron-icon icon="vta-icons:pause"></iron-icon>
+          <span class="button-copy">Pause</span>
+        </paper-button>
+        <paper-button id="stopVideo" on-click="_stopVideo" disabled>
+          <iron-icon icon="vta-icons:stop"></iron-icon>
+          <span class="button-copy">View POIs</span>
+        </paper-button>
+      </div>
+      <maps-utils id="mapsUtils" on-pois-loaded="_poisLoaded"></maps-utils>
+    </template>
+</dom-module>
+
+<script>
+	(function() {
+    'use strict';
+
+    Polymer({
+      is: 'route-navigation',
+      properties: {
+      	code: {
+      		type: String,
+      		observer: '_initialPropertyChange'
+      	},
+        direction: {
+      		type: String,
+      		observer: '_initialPropertyChange'
+      	},
+      	departureStopId: {
+      	  type: String,
+      	  observer: '_initialPropertyChange'
+      	},
+      	destinationStopId: {
+          type: String,
+          observer: '_initialPropertyChange'
+      	},
+        _departure: {
+          type: Object
+        },
+        _destination: {
+          type: Object
+        },
+        _nextStopGeoPoint: {
+          type: Object,
+          value: {
+            lat: null,
+            lng: null
+          }
+        },
+        _playsupported: {
+          type: Boolean,
+          observer: '_playsupportedChange'
+        },
+        _shouldHidePlay : {
+          type: Boolean,
+          value: true
+        },
+        _isVideoPlaying: {
+          type: Boolean,
+          value: false,
+          observer: '_isVideoPlayingChange'
+        },
+        _map : {
+          type: Object
+        },
+      	_tempRouteParams: {
+      	  type: Object,
+      	  value: {}
+      	},
+      	_routeDetails : {
+      	  type: Object,
+          value: null,
+      	  observer: '_routeDetailsChange'
+      	},
+        _routeDetailsOrigin : {
+          type: Object,
+          value: null,
+          observer: '_routeDetailsOriginChange'
+        },
+      	_routeInfo : {
+      	  type: Object,
+      	  observer: '_routeInfoChange'
+      	},
+        _routeInfoOrigin : {
+          type: Object,
+          observer: '_routeInfoOriginChange'
+        },
+      	_videoStartTime: {
+      	  type: Number,
+      	  value: 0
+      	},
+        _videoEndTime: {
+          type: Number,
+          value: -1
+        },
+      	_videoCurrentTime: {
+      	  type: Number,
+      	  observer: '_videoCurrentTimeChange'
+      	},
+      	_videoState: {
+      	  type: Number,
+      	  observer: '_videoStateChange'
+      	},
+        _progressBarValue: {
+          type: Number
+        },
+        _isDragging: {
+          type: Boolean,
+          value: false
+        },
+        _pois: {
+          type: Array,
+          value: []
+        },
+        _selectedPoi: {
+          type: Object,
+          observer: '_selectedPoiChange'
+        },
+        _selectedPoiMarker: {
+          type : Object
+        },
+        _currentLat: {
+          type: Number
+        },
+        _currentLng: {
+          type: Number
+        },
+      },
+
+      SECONDS_INTERVAL_FOR_STOPS : 10,
+
+      clearRouteSelection: function() {
+        this.code = null;
+        this.departureStopId = null;
+        this.destinationStopId = null;
+        this._videoCurrentTime = 0;
+        this._routeDetails = null;
+        this._routeInfo = null;
+        this.$.routeDetails.path = null;
+        this.$.routeInfo.path = null;
+        this._pois = [];
+
+        if (this._mapPolyline) {
+          this._mapPolyline.setMap(null);
+        }
+      },
+
+      _initialPropertyChange: function() {
+        // Load the route details and information from Firebase only when the
+        // code, direction, departure stop ID and destination stop ID are set
+        if (this.code && this.direction && this.departureStopId && this.destinationStopId) {
+          var routePath = this.code + '/' + this.direction;
+
+          // Set the proper attributes to load the route data from Firebase
+          this.$.routeDetails.path = '/route-details/' + routePath;
+          this.$.routeInfo.path = '/routes/' + this.code;
+        }
+      },
+
+      _routeDetailsChange: function(newRouteDetails) {
+        if (!newRouteDetails || (!this.departureStopId && !this.destinationStopId)) {
+          return;
+        }
+
+        // Get the departure and destination points based on the closest points to the stops
+        var departurePoint = this.$.mapsUtils.getClosestPoint(newRouteDetails.stops[this.departureStopId].lat,
+          newRouteDetails.stops[this.departureStopId].lng, newRouteDetails.videoGeoPoints);
+        var destinationPoint = this.$.mapsUtils.getClosestPoint(newRouteDetails.stops[this.destinationStopId].lat,
+          newRouteDetails.stops[this.destinationStopId].lng, newRouteDetails.videoGeoPoints);
+
+        var departurePointInt = parseInt(departurePoint.key);
+        var destinationPointInt = parseInt(destinationPoint.key);
+
+        // Get the tour slot based on the start and end points
+        var tourSlot = this.getRouteSlot(newRouteDetails.videoGeoPoints, departurePointInt, destinationPointInt);
+
+        // Set the names of the departure and destination stops
+        this._departureStop = newRouteDetails.stops[this.departureStopId];
+        this._destinationStop = newRouteDetails.stops[this.destinationStopId];
+        this.$.departureMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._departureStop.name + '</h3>');
+        this.$.destinationMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._destinationStop.name + '</h3>');
+
+        // Set the start and end times of the video based on the departure and destination stops
+        this._videoStartTime = departurePoint.key;
+        this._videoEndTime = destinationPoint.key;
+
+        // Set the next stop
+        if(this.departureStopId < this.destinationStopId){
+          this._stopsSlot = newRouteDetails.stops.slice(this.departureStopId, parseInt(this.destinationStopId) + 1);
+        }else{
+          this._stopsSlot = newRouteDetails.stops.slice(this.destinationStopId, parseInt(this.departureStopId) + 1).reverse();
+        }
+
+        this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
+
+        // Load the route path with the tour slot select by the user
+        this._loadRoutePath(tourSlot);
+
+      },
+
+      _routeDetailsOriginChange: function(newRouteDetailsOrigin) {
+        if (newRouteDetailsOrigin && newRouteDetailsOrigin.videoId) {
+          this._routeDetails = newRouteDetailsOrigin;
+        }
+      },
+
+      _routeInfoChange: function(newRouteInfo) {
+        if (newRouteInfo) {
+          var routeDirectionName = '';
+
+          if (this.direction === 'a') {
+            routeDirectionName = newRouteInfo.directionAName;
+          } else if (this.direction === 'b') {
+            routeDirectionName = newRouteInfo.directionBName;
+          }
+
+          this._routeDirection = routeDirectionName;
+        }
+      },
+
+      _routeInfoOriginChange: function(newRouteInfoOrigin) {
+        if (newRouteInfoOrigin && newRouteInfoOrigin.name) {
+          this._routeInfo = newRouteInfoOrigin;
+        }
+      },
+
+      _calculateMapHeight: function() {
+        var getElementHeight = function(element) {
+            var elmHeight, elmMargin;
+
+            if (document.all) {// IE
+              elmHeight = element.currentStyle.height;
+              elmMargin = parseInt(element.currentStyle.marginTop, 10) + parseInt(element.currentStyle.marginBottom, 10);
+            } else {// Mozilla
+              var computedStyle = document.defaultView.getComputedStyle(element, '');
+
+              elmHeight = element.offsetHeight;
+              elmMargin = parseInt(computedStyle.getPropertyValue('margin-top')) + parseInt(computedStyle.getPropertyValue('margin-bottom'));
+            }
+
+            return (elmHeight + elmMargin);
+        }
+
+        var windowHeight = window.outerHeight;
+        var mainToolbarHeight = Polymer.dom(document).querySelector('#mainToolbar').offsetHeight;
+        var pageTitleHeight = getElementHeight(Polymer.dom(this.root).querySelector('.page-title'));
+        var videoHeight = Polymer.dom(this.root).querySelector('#routeVideo').offsetHeight;
+        var videoProggressHeight = Polymer.dom(this.root).querySelector('paper-progress').offsetHeight;
+        var videoControlsHeight = Polymer.dom(this.root).querySelector('.video-controls').offsetHeight;
+
+        return windowHeight - mainToolbarHeight - pageTitleHeight - videoHeight - videoProggressHeight - videoControlsHeight;
+      },
+
+      _videoCurrentTimeChange: function(newVideoCurrentTime) {
+        if (!this._routeDetails) {
+          return;
+        }
+
+        // Check if the video reaches the end of the tour
+        if (newVideoCurrentTime >= this._videoEndTime) {
+          this.$.routeVideo.pause();
+          return;
+        }
+
+        var point = this._routeDetails.videoGeoPoints[newVideoCurrentTime - 1];
+
+        // Calculate the progress bar value
+        this._progressBarValue = this._calculateVideoProgress(this._videoStartTime, this._videoEndTime, newVideoCurrentTime);
+
+        if (point) {
+          this._currentLat = point.lat;
+          this._currentLng = point.lng;
+          this._map.panTo(point)
+          if(this._map.getZoom() < 16){
+            this._map.setZoom(16);
+          }
+        }
+
+        // Check if the video current time is in the range of the next stop
+        if (newVideoCurrentTime >= this._nextStop.sec &&
+            newVideoCurrentTime < this._nextStop.endSec &&
+            this.$.nextStopMarker.hidden === true) {
+          this._nextStopGeoPoint.lat = parseFloat(this._nextStop.lat);
+          this._nextStopGeoPoint.lng = parseFloat(this._nextStop.lng);
+          this.notifyPath('_nextStopGeoPoint.lat', this._nextStop.lat);
+          this.notifyPath('_nextStopGeoPoint.lng', this._nextStop.lng);
+          this._enableNextStop();
+        } else if (newVideoCurrentTime > this._nextStop.endSec) {
+          this._nextStop = this._calculateNextStop(this._stopsSlot, newVideoCurrentTime);
+          this._disableNextStop();
+        }
+      },
+
+      _calculateVideoProgress: function(start, end, actual) {
+        var total = end - start;
+        var current = actual - start;
+        return current * 100 / total;
+      },
+
+      _calculateVideoSeconds: function(start, end, percentage) {
+        var startNumber = parseInt(start);
+        var endNumber = parseInt(end);
+        var total = endNumber - startNumber;
+        var seconds = total * percentage / 100;
+        return seconds + startNumber;
+      },
+
+      _videoStateChange: function(newVideoState, oldVideoState) {
+        // Check if the video hasn't been started to search for the first position
+        if (oldVideoState === -1 && (newVideoState === 1 || newVideoState === 3)) {
+          var second = Math.round(this._videoStartTime);
+          this.$.routeVideo.seekTo(second, false);
+        }
+        // Check each state of the video to see which buttons to enable/disable
+        if (newVideoState !== -1) { // unstarted
+          this.$.restartVideo.disabled = false;
+          if (newVideoState === 1) { // playing
+            this.$.playVideo.disabled = true;
+            this._isVideoPlaying = true;
+            // resize the map on play
+            this._adjustMapSize();
+          } else {
+            this.$.playVideo.disabled = false;
+            this._isVideoPlaying = false;
+          }
+        }
+      },
+
+      _isVideoPlayingChange: function(){
+        this._shouldHidePlay = !this._canShowPlay();
+      },
+
+      _playsupportedChange: function(){
+        this._shouldHidePlay = !this._canShowPlay();
+        if(this._playsupported){
+          this._adjustMapSize();
+        }
+      },
+
+      _canShowPlay : function(){
+        return this._playsupported && !this._isVideoPlaying;
+      },
+
+      _restartVideo: function() {
+        this.$.routeVideo.seekTo(this._videoStartTime);
+        this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
+
+        // Send the event to Google Analytics
+        ga('send', 'event', 'Tour', 'restart', this._routeInfo.name);
+      },
+
+
+      _playVideo: function() {
+        // If its on poi list or detail go back to navigation page.
+        this._back();
+        this.$.routeVideo.play();
+
+        if (this._pois) {
+          this._pois = null;
+        }
+
+        // Send the event to Google Analytics
+        ga('send', 'event', 'Tour', 'play', this._routeInfo.name);
+      },
+      
+      _pauseVideo: function() {
+        this.$.routeVideo.pause();
+        this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+
+        // Send the event to Google Analytics
+        ga('send', 'event', 'Tour', 'pause', this._routeInfo.name);
+      },
+
+      _stopVideo: function() {
+        var self = this;
+
+        this.$.routeVideo.pause();
+        this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+
+        // Send the event to Google Analytics
+        ga('send', 'event', 'Tour', 'stop', this._routeInfo.name);
+
+        page(page.current + "/pois");
+      },
+
+      _videoProgressClick: function(progressBar) {
+        var clickPercentage = progressBar.layerX * 100 / progressBar.srcElement.clientWidth;
+        var progressSeconds = this._calculateVideoSeconds(this._videoStartTime, this._videoEndTime, clickPercentage);
+        this._nextStop = this._calculateNextStop(this._stopsSlot, progressSeconds);
+        this.$.routeVideo.seekTo(progressSeconds);
+      },
+
+      /**
+       * Method to handle the maps api load event.
+       * Binds the mousedown listener to move the marker.
+       * Disable the marker's move when the user is dragging inside the map.
+       */
+      _onMapsApiLoad : function(){
+        var self = this;
+        google.maps.event.addListener(this._map, 'mouseup', function(event){
+          if(!self._isDragging){
+            self._moveMarker(event.latLng);
+          }
+        });
+
+        google.maps.event.addListener(this._map, 'dragstart', function(event){
+          self._isDragging = true;
+        });
+
+        google.maps.event.addListener(this._map, 'dragend', function(event){
+          self._isDragging = false;
+        });
+      },
+
+      /**
+       * Draw a line in the map using the route geo points. Centers the map in the line.
+       *
+       * @param points array with the geo points
+       */
+      _loadRoutePath : function(points){
+        var length = points.length;
+        var cords = [];
+        var bounds = new google.maps.LatLngBounds();
+
+        // Build a cords array from the points
+        for (var key in points) {
+          var point = points[key];
+          cords.push(point);
+          bounds.extend(new google.maps.LatLng(point.lat, point.lng));
+        }
+
+        this._mapPolyline = new google.maps.Polyline({
+          path: cords,
+          geodesic: true,
+          strokeColor: '#009FDD',
+          strokeOpacity: 1.0,
+          strokeWeight: 2
+        });
+
+        // Draw the route line
+        this._mapPolyline.setMap(this._map);
+        this._map.fitBounds(bounds);
+
+        var self = this;
+        google.maps.event.addListener(this._mapPolyline, 'mouseup', function(event){
+          if(!self._isDragging){
+            self._moveMarker(event.latLng);
+          }
+        });
+      },
+
+      /**
+       * Method to move the marker
+       * Move the marker to the closest point based on the click position
+       * and seek the video to point's second
+       * @param latLng Object with latitude and longitude of the click
+       */
+      _moveMarker : function(latLng){
+        var point = this.$.mapsUtils.getClosestPoint(latLng.lat(), latLng.lng(), this._routeDetails.videoGeoPoints);
+        this._currentLat = point.latLng.lat;
+        this._currentLng = point.latLng.lng;
+        this.$.routeVideo.seekTo(point.key);
+        this._nextStop = this._calculateNextStop(this._stopsSlot, point.key);
+      },
+
+      _onYoutubeReady: function() {
+        this._adjustMapSize();
+      },
+
+      getRouteSlot: function(videoGeoPoints, departurePointKey, destinationPointKey) {
+        var slotVideoPoints = {};
+
+        for (var indexPoint = departurePointKey; indexPoint <= destinationPointKey; indexPoint++) {
+          if (videoGeoPoints[indexPoint]) {
+            slotVideoPoints[indexPoint] = videoGeoPoints[indexPoint];
+          }
+        }
+
+        return slotVideoPoints;
+      },
+
+      _adjustMapSize : function(){
+        if(!this._mapsApiLoaded){
+          return;
+        }
+        var mapHeight;
+
+        // Check if the device is in landscape or is a high resolution screen to resize the google map to the same size that the map
+        if (window.matchMedia("(min-width: 361px) and (orientation: landscape)").matches) {
+          mapHeight = this.$.routeVideo.offsetHeight;
+        } else {
+          // Calculate the map height
+          mapHeight = this._calculateMapHeight();
+        }
+
+        this.$.map.style.height = mapHeight+ 'px';
+        google.maps.event.trigger(this._map, 'resize');
+      },
+
+      _enableNextStop: function() {
+        this.$.nextStopMarker.hidden = false;
+        this.$.stopVideo.disabled = false;
+      },
+
+      _disableNextStop: function() {
+        this.$.nextStopMarker.hidden = true;
+        this.$.stopVideo.disabled = true;
+      },
+
+      _calculateNextStop: function(stopsSlot, videoCurrentTime) {
+        // Get the next stop according to the actual time
+        var nextStopOrigin = this._getNextStop(stopsSlot, videoCurrentTime);
+        var nextStopSec = parseInt(nextStopOrigin.sec);
+        var nextStop = {
+          lat: nextStopOrigin.lat,
+          lng: nextStopOrigin.lng,
+          name: nextStopOrigin.name,
+          sec: nextStopSec - this.SECONDS_INTERVAL_FOR_STOPS,
+          endSec: nextStopSec + this.SECONDS_INTERVAL_FOR_STOPS
+        };
+
+        this._disableNextStop();
+
+        return nextStop;
+      },
+
+      _getNextStop: function(stops, currentTime) {
+        if (stops && stops.length > 0) {
+          var nextStop = stops[0];
+
+          if (stops.length > 1) {
+            for (var indexStop = 1; indexStop < stops.length; indexStop++) {
+              if (parseInt(stops[indexStop].sec) > currentTime) {
+                return stops[indexStop];
+              }
+            }
+          }
+        }
+      },
+
+      _poisLoaded: function(event) {
+        this._pois = event.detail;
+      },
+
+      _onPoiClick : function(e){
+        if(this._selectedPoiMarker){
+          this._selectedPoiMarker.open = false;
+        }
+
+        this._selectedPoiMarker = e.srcElement;
+      },
+
+      _selectedPoiChange: function(newSelectedPoi) {
+        if (newSelectedPoi) {
+          var getDetailsPromise = this.$.search.getDetails(newSelectedPoi.place_id);
+          var self = this;
+
+          getDetailsPromise.then(function(data) {
+            self._selectedPoiDetails = data;
+
+            // When is mobile hide the poi list and show the poi details
+            if(!self.isDesktop){
+              page(page.current + "/detail");
+            }
+          }).catch(function(error) {
+            console.log(error)
+          });
+
+          // Send the event to Google Analytics
+          ga('send', 'event', 'POI', 'selected', newSelectedPoi.name);
+        }
+      },
+
+      showTour : function(){
+        this._selectedPoi = null;
+        this._selectedPoiDetails = null;
+        this.$.poiDetails.classList.remove('active');
+        this.$.pois.classList.remove('active');
+      },
+
+      showPois : function(){
+        this.$.poiDetails.classList.remove('active');
+        this.$.pois.classList.add('active');
+        if(this.isDesktop){
+          this.$.poiDetails.classList.add('active');
+        }
+        app.condenseHeader();
+      },
+
+      showPoiDetails : function(){
+        this.$.poiDetails.classList.add('active');
+        this.$.pois.classList.remove('active');
+        app.condenseHeader();
+      },
+
+      /**
+       * Goes back to the navigation page when its on poi list or poi details
+       */
+      _back : function(){
+        if(page.current.indexOf('/pois') != -1){
+          var navPage = page.current.replace("/detail" , "");
+          navPage = navPage.replace("/pois", "");
+          if(page.current.indexOf('/detail') != -1){
+            page.back(navPage);
+          }
+          page.back(navPage);
+        }
+      }
+    });
+  })();
+</script>

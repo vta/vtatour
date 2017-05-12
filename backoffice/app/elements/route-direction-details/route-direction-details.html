@@ -1,0 +1,166 @@
+<dom-module id="route-direction-details">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      paper-button {
+        background-color: var(--vta-medium-gray);
+      }
+
+      paper-material {
+        margin: 0;
+        padding: 20px;
+        width: calc(98.66% - 26px);
+      }
+
+      google-youtube {
+        width: 60%;
+        margin: 0 auto;
+      }
+
+      google-map {
+        height: 300px;
+      }
+
+      .collapse-heading {
+        @apply(--layout-horizontal);
+        @apply(--layout-start-justified);
+        margin: 0;
+      }
+
+      section {
+        margin-bottom: 10px;
+      }
+
+      iron-collapse .content {
+        padding: 15px;
+        border: 1px solid #dedede;
+        border-top: none;
+        @apply(--shadow-elevation-2dp);
+      }
+    </style>
+
+    <paper-material elevation="1">
+      <div class="direction-wrapper">
+        <section class="video-wrapper">
+          <paper-button class="collapse-heading" aria-expanded$="[[_isExpanded(video)]]" aria-controls="video"
+            on-click="_toggleCollapse">Video</paper-button>
+
+          <iron-collapse id="video" tabindex="0" opened="{{video}}">
+            <div class="content">
+              <p><b>Video URL:</b> [[routeDirection.videoUrl]]</p>
+              <google-youtube
+                id="routeVideo"
+                video-id="[[routeDirection.videoId]]"
+                fluid
+                chromeless>
+              </google-youtube>
+            </div>
+          </iron-collapse>
+        </section>
+
+        <section class="map-wrapper">
+          <paper-button class="collapse-heading" aria-expanded$="[[_isExpanded(map)]]" aria-controls="map"
+            on-click="_toggleCollapse">Map</paper-button>
+
+          <iron-collapse id="map" tabindex="0" opened="{{map}}">
+            <div class="content">
+              <div class="map-wrapper-inner">
+                <google-map id="map" map="{{_map}}" api-key="AIzaSyALqCogus7yIJJ0OE48RwBtmteqybWvZ6g" disable-default-ui="true" disable-zoom="true">
+                  <google-map-marker id="marker" icon="http://gis.yohman.com/up206b/files/2011/04/bus.png"></google-map-marker>
+                </google-map>
+              </div>
+              <google-maps-api api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"></google-maps-api>
+            </div>
+          </iron-collapse>
+        </section>
+
+        <section class="stops-wrapper">
+          <paper-button class="collapse-heading" aria-expanded$="[[_isExpanded(stops)]]" aria-controls="stops"
+            on-click="_toggleCollapse">Stops</paper-button>
+
+          <iron-collapse id="stops" tabindex="0" opened="{{stops}}">
+            <div class="content">
+              <stop-list stops="[[routeDirection.stops]]"></stop-list>
+            </div>
+          </iron-collapse>
+        </section>
+      </div>
+    </paper-material>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'route-direction-details',
+
+      properties: {
+        routeDirection: {
+          type: Object,
+          observer: '_routeDirectionChange'
+        },
+
+        _map : {
+          type: Object
+        }
+      },
+
+      _routeDirectionChange: function(newRouteDirection) {
+        this.$.map.removeAttribute('data-initialized');
+      },
+
+      /**
+       * Draw a line in the map using the route geo points. Centers the map in the line.
+       */
+      _loadRoutePath : function() {
+        if (this.routeDirection) {
+          var points = this.routeDirection.videoGeoPoints;
+          var length = points.length;
+          var cords = [];
+          var bounds = new google.maps.LatLngBounds();
+          var self = this;
+
+          // Build a cords array from the points
+          for(var key in points){
+            var point = points[key];
+            cords.push(point);
+            bounds.extend(new google.maps.LatLng(point.lat, point.lng));
+          }
+          this._mapPolyline = new google.maps.Polyline({
+            path: cords,
+            geodesic: true,
+            strokeColor: '#FF0000', // TODO: change the color to match the design
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
+
+          this._mapPolyline.setMap(this._map);
+          this._map.fitBounds(bounds);
+        }
+      },
+
+      _toggleCollapse: function(event) {
+        var collapseId = event.srcElement.getAttribute('aria-controls');
+        var collapsibleElement = this.$[collapseId];
+
+        collapsibleElement.toggle();
+
+        if (collapseId === 'map') {
+          if (collapsibleElement.opened) {
+            var isMapInitialized = collapsibleElement.getAttribute('data-initialized') === 'true';
+
+            if (!isMapInitialized) {
+              this._loadRoutePath();
+              collapsibleElement.setAttribute('data-initialized', 'true');
+            }
+          }
+        }
+      },
+
+      _isExpanded: function(opened) {
+        return String(opened);
+      }
+    });
+  })();
+  </script>
+</dom-module>

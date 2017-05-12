@@ -1,0 +1,89 @@
+<dom-module id="kml-parser">
+  <template>
+  </template>
+  <script>
+    Polymer({
+      is: 'kml-parser',
+
+      properties : {
+        file : {
+          type : Object,
+        },
+        result : {
+          type : Object,
+          notify: true
+        }
+      },
+
+      parse : function(){
+        var reader = new FileReader();
+        var self = this;
+
+        reader.onload = function() {
+         self._parseRouteShootKML(this.result, self);
+        }
+        
+        reader.readAsText(this.file);
+      },
+
+      /**
+       * Method to parse a KML from the RouteShoot application
+       * 
+       * @param file the KML to be parsed
+       * @param Polymer actual element
+       */
+      _parseRouteShootKML : function(file, self) {
+        var xml = new DOMParser().parseFromString(file, "text/xml");
+        var elements = xml.getElementsByTagName('SchemaData');
+        var length = elements.length;
+        var initTime;
+        var result = {};
+
+        for (var i = 0; i < length; i++) {
+          var cord = this._getRouteShootCord(initTime, elements[i]);
+          result[cord.second] = {lat : Number(cord.lat), lng: Number(cord.lng)};
+
+          if (!initTime) {
+            initTime = cord.time;
+          }
+        }
+
+        self.result = result;
+      },
+
+      /**
+       * Method to get the coordinates from a SchemaData element of a RouteShoot KML
+       * @param element an SchemaData element, source of the SimpleData elements
+       * @return an object with the properties second, lat (latitude) and lon (longitude)
+       */
+      _getRouteShootCord : function(initTime, element){
+        var attrs = element.getElementsByTagName('SimpleData');
+        var attrsLength = attrs.length;
+        var cord = {};
+
+        for (var j = 0; j < attrsLength; j++) {
+          var attr = attrs[j];
+
+          if (attr.hasAttribute('name')) {
+            if (attr.getAttribute('name') === 'Lat') {
+              cord.lat = attr.innerHTML;
+            } else if (attr.getAttribute('name') === 'Lon') {
+              cord.lng = attr.innerHTML;
+            } else if (attr.getAttribute('name') === 'UTC_Date') {
+              var time = moment(attr.innerHTML + ' ' + attr.nextElementSibling.innerHTML, 'DD/MM/YYYY hh:mm:ss');
+
+              if (!initTime) {
+                cord.second = 1;
+                cord.time = time;
+              } else {
+                cord.second = time.diff(initTime, 'seconds');
+              }
+            }
+          }
+        }
+
+        return cord;
+      }
+    });
+  </script>
+</dom-module>

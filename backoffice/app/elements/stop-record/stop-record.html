@@ -1,0 +1,68 @@
+<dom-module id="stop-record">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      .stop-operations {
+        @apply(--layout-horizontal);
+      }
+
+      .stop-operations paper-button {
+        @apply(--layout-flex);
+        margin: 0 3px;
+        min-width: inherit;
+      }
+    </style>
+    
+    <div class="stop-item">
+      <div class="stop-name">[[stop.name]]</div>
+      <div class="stop-lat">[[stop.lat]]</div>
+      <div class="stop-lng">[[stop.lng]]</div>
+      <div class="stop-sec">[[stop.sec]]</div>
+      <template is="dom-if" if="{{showOperations}}">
+        <div class="stop-operations">
+          <paper-button on-click="_orderUp">
+            <iron-icon icon="icons:arrow-upward"></iron-icon>
+          </paper-button>
+          <paper-button on-click="_orderDown">
+            <iron-icon icon="icons:arrow-downward"></iron-icon>
+          </paper-button>
+          <paper-button on-click="_delete">
+            <iron-icon icon="icons:delete"></iron-icon>
+          </paper-button>
+        </div>
+      </template>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'stop-record',
+
+      properties: {
+        stop: {
+          type: Object
+        },
+
+        showOperations: {
+          type: Boolean,
+          value: true
+        }
+      },
+
+      _orderUp: function() {
+        this.fire('order-up', this.stop.$key);
+      },
+
+      _orderDown: function() {
+        this.fire('order-down', this.stop.$key);
+      },
+
+      _delete: function() {
+        this.fire('delete', this.stop.$key);
+      }
+    });
+  })();
+  </script>
+</dom-module>

@@ -1,0 +1,66 @@
+<dom-module id="splash-screen">
+	<template>
+  	<style is="custom-style" include="shared-styles"></style>
+  	<style>
+  		.tour-description {
+  			padding: 10px 0;
+  		}
+
+  		.tour-description .tour-description-copy {
+  			width: 70%;
+  			margin: 0 auto;
+  			color: var(--secondary-text-color);
+  			line-height: 1.4em;
+				font-size: 1.1em;
+  		}
+
+			.tour-description	.image-wrapper {
+  			text-align: center;
+  		}
+
+  		.tour-description .tour-description-image {
+				width: 250px;
+				height: 180px;
+  		}
+
+  		@media all and (min-width: 481px) {
+  			.tour-description .tour-description-image {
+					width: 350px;
+					height: 250px;
+	  		}
+  		}
+  	</style>
+
+    <div class="page-title"></div>
+  	<div class="page-subtitle-panel">1. Where do you want to go?</div>
+  	<div class="tour-description">
+  		<p class="tour-description-copy">Take the virtual tour of Valley Transportation Authority</p>
+  		<div class="image-wrapper">
+  			<iron-image class="tour-description-image" sizing="contain" src="../../images/splash-step-1.jpg" alt="Tour description 1"></iron-image>
+  		</div>
+  	</div>
+
+  	<div class="page-subtitle-panel">2. What is interesting there?</div>
+  	<div class="tour-description">
+  		<p class="tour-description-copy">Pause the navigation any moment to know more about the interesting places around</p>
+  		<div class="image-wrapper">
+  			<iron-image class="tour-description-image" sizing="contain" src="../../images/splash-step-2.jpg" alt="Tour description 2"></iron-image>
+  		</div>
+  	</div>
+
+  	<div class="actions-panel">
+  		<a href="{{baseUrl}}routes" tabindex="-1">
+			  <paper-button raised>Start Navigation</paper-button>
+			</a>
+		</div>
+	</template>
+</dom-module>
+
+<script>
+    (function() {
+    'use strict';
+    Polymer({
+      is: 'splash-screen'
+    });
+  })();
+</script>

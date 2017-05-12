@@ -1,0 +1,65 @@
+<dom-module id="route-stops">
+  <template>
+    <style>
+      google-map {
+        height: 700px;
+      }
+
+      .container{
+        margin-bottom: 48px;
+        @apply(--layout-horizontal)
+
+      }
+
+      .list{
+        width: 250px;
+      }
+
+      .map{
+        @apply(--layout-flex);
+      }
+    </style>
+  <firebase-document
+      location="https://vtavirtualtransit-7c904.firebaseio.com/route-details/[[code]]/a"
+      data="{{routeDetails}}"> 
+    </firebase-document>
+  <h1 class="page-title" tabindex="-1">Route Details</h1>
+    <h3>Departure</h3>
+    <paper-input-autocomplete label="Stops" search-property="name" value="{{departure}}" source={{routeDetails.stops}} suggestions-in-overlay="true"></paper-input-autocomplete>
+    <h3>Destination</h3>
+    <paper-input-autocomplete label="Stops" search-property="name" value="{{destination}}" source={{routeDetails.stops}} suggestions-in-overlay="true"></paper-input-autocomplete>
+    <br>
+    <a href="{{baseUrl}}routes/[[code]]/navigation/[[departureId]]/[[destinationId]]" tabindex="-1">
+      <paper-button>Start</paper-button>
+    </a>
+  </template>
+</dom-module>
+
+<script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'route-stops',
+      properties: {
+        code: {
+          type: String
+        },
+        departure: {
+            type: Object,
+            observer: '_onDepartureChange'
+        },
+        destination: {
+            type: Object,
+            observer: '_onDestinationChange'
+        }
+      },
+      _onDepartureChange: function(newDeparture) {
+        this.departureId = this.routeDetails.stops.indexOf(newDeparture);
+      },
+      _onDestinationChange: function(newDestination) {
+        this.destinationId = this.routeDetails.stops.indexOf(newDestination);
+      }
+    });
+  })();
+</script>

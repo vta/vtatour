@@ -1,0 +1,17 @@
+#!/bin/bash
+rm -R dist/
+mkdir dist
+mkdir dist/web
+mkdir dist/backoffice
+cd web
+bower update
+gulp
+cp -R dist/* ../dist/
+cp .htaccess ../dist/
+cd ..
+cd backoffice
+bower update
+gulp
+cp -R dist/* ../dist/backoffice
+cp .htaccess ../dist/backoffice/
+#cp -R dist/ ../dist/

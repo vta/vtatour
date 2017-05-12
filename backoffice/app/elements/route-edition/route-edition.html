@@ -1,0 +1,669 @@
+<dom-module id="route-edition">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      hr {
+        margin: 0 5%;
+        border-color: var(--primary-color);
+      }
+
+      .container {
+        margin-bottom: 40px;
+      }
+
+      .item {
+        padding: 12px 5% 0;
+        @apply(--layout-horizontal);
+        font-size: 1.05em;
+        color: var(--secondary-text-color);
+      }
+
+      .item.no-padding {
+        padding: 0;
+      }
+
+      .header {
+        padding: 20px 5% 18px;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+
+      .route-code {
+        width: 15%;
+        padding: 0 20px 0 0;
+        font-weight: bold;
+      }
+
+      .route-details,
+      .column2 {
+        @apply(--layout-flex);
+      }
+
+      .column1 {
+        width: 35%;
+        padding: 0 20px 0 0;
+      }
+
+      .column-container {
+        width: 35%;
+      }
+
+      .operations {
+        text-transform: capitalize;
+        text-align: right;
+      }
+
+      .edit-route-operation {
+        padding: 21px 5%;
+        font-size: 1.4em;
+      }
+
+      .delete-route{
+        font-size: 0.5em;
+        text-align: left;
+        float:left;
+        color: var(--secondary-color);
+        top: 5px;
+      }
+
+      paper-button {
+        top: 2px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+      }
+
+      paper-button.primary {
+        color: var(--primary-color);
+      }
+
+      .direction-wrapper {
+        margin-bottom: 20px;
+      }
+
+      stop-list {
+        margin-bottom: 10px;
+      }
+
+      .add-stop-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+      }
+
+      .add-stop-wrapper paper-button {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.5em 1em;
+      }
+
+      google-map {
+        height: 300px;
+      }
+
+      #stopsModal {
+        width: 50%;
+      }
+
+      .buttons paper-button {
+        padding: 10px 15px;
+      }
+
+      #saveOperationResultModal {
+        width: auto;
+        background-color: transparent;
+        color: var(--vta-white);
+        box-shadow: none;
+      }
+
+      #saveOperationResultModal .icon {
+        text-align: center;
+      }
+
+      #saveOperationResultModal iron-icon {
+        width: 140px;
+        height: 140px;
+        padding: 20px;
+        text-align: center;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+      }
+
+      #saveOperationResultModal .message-wrapper.success iron-icon {
+        background-color: var(--primary-color);
+      }
+
+      #saveOperationResultModal .message-wrapper.error iron-icon {
+        background-color: var(--secondary-color);
+      }
+
+      #saveOperationResultModal .message {
+        text-align: center;
+        font-size: 2.5em;
+        line-height: 1;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+    </style>
+
+    <firebase-query
+      app-name="vta"
+      id="stops"
+      path="/stops"
+      data="{{_stopsOrigin}}">
+    </firebase-query>
+    <firebase-document
+      app-name="vta"
+      id="routeInfo"
+      data="{{_routeInfoOrigin}}">
+    </firebase-document>
+    <firebase-document
+      app-name="vta"
+      id="routeDetails"
+      data="{{_routeDetailsOrigin}}">
+    </firebase-document>
+
+    <div class="inner-content">
+      <template is="dom-if" if="{{_isNewRoute}}">
+        <h2 class="page-title">New route</h2>
+      </template>
+      <template is="dom-if" if="{{!_isNewRoute}}">
+        <h2 class="page-title">Edit route</h2>
+      </template>
+
+      <paper-material elevation="1">
+        <div class="item header">
+          <div class="column1">
+            <div class="item no-padding">
+              <div class="route-code">Code</div>
+              <div class="route-details">Route name</div>
+            </div>
+          </div>
+          <div class="column2">
+            <div class="operations">
+              <a href="{{baseUrl}}routes" tabindex="-1">
+                <paper-button>Cancel</paper-button>
+              </a>
+              <paper-button class="primary" on-click="_captureRouteData">Save</paper-button>
+            </div>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="item">
+          <div class="column1">
+            <div class="item no-padding">
+              <div class="route-code">
+                <paper-input id="code" value="{{_code}}" placeholder="Number" required></paper-input>
+              </div>
+              <div class="route-details">
+                <paper-input id="name" value="{{_routeInfo.name}}" placeholder="Text" required></paper-input>
+              </div>
+            </div>
+
+            <paper-input id="departure" value="{{_routeInfo.departure}}" label="Departure" placeholder="Text" required></paper-input>
+            <paper-input id="destination" value="{{_routeInfo.destination}}" label="Destination" placeholder="Text" required></paper-input>
+
+          </div>
+          <div class="column2">
+            <route-map id="routeMap" geo-points="{{_routeDetails.a.videoGeoPoints}}"></route-map>
+          </div>
+        </div>
+
+        <div class="container item">
+          <div class="column1">
+            <h3>Direction A - Info</h3>
+            <paper-input id="directionAName" value="{{_routeInfo.directionAName}}" placeholder="Direction A Name" required></paper-input>
+            <paper-input id="videoA" value="{{_routeDetails.a.videoUrl}}" label="Video Direction A" placeholder="YouTube Video URL" required></paper-input>
+            <paper-input id="kmlFileA" label="KML File Direction A" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChange"></paper-input>
+
+            <template is="dom-if" if="{{_displayStops}}">
+              <div class="stops-wrapper">
+                <h3>Direction A - Stops</h3>
+                <stop-list stops="{{_routeDetails.a.stops}}" show-operations></stop-list>
+                <div class="add-stop-wrapper">
+                  <paper-button on-click="_openAddStopModal" data-route-direction="a">
+                    <iron-icon icon="icons:add"></iron-icon>Add stop
+                  </paper-button>
+                </div>
+              </div>
+            </template>
+          </div>
+          <div class="column1">
+            <h3>Direction B - Info</h3>
+            <paper-input id="directionBName" value="{{_routeInfo.directionBName}}" placeholder="Direction B Name" required></paper-input>
+            <paper-input id="videoB" value="{{_routeDetails.b.videoUrl}}" label="Video Direction B" placeholder="YouTube Video URL" required></paper-input>
+            <paper-input id="kmlFileB" label="KML File Direction B" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChange"></paper-input>
+
+            <template is="dom-if" if="{{_displayStops}}">
+              <div class="stops-wrapper">
+                <h3>Direction B - Stops</h3>
+                <stop-list stops="{{_routeDetails.b.stops}}" show-operations></stop-list>
+                <div class="add-stop-wrapper">
+                  <paper-button on-click="_openAddStopModal" data-route-direction="b">
+                    <iron-icon icon="icons:add"></iron-icon>Add stop
+                  </paper-button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="operations edit-route-operation">
+          <paper-button class="delete-route" on-click="_openDeleteRouteModal">Delete This Route</paper-button>
+          <a href="{{baseUrl}}routes" tabindex="-1">
+            <paper-button>Cancel</paper-button>
+          </a>
+          <paper-button class="primary" on-click="_captureRouteData">Save</paper-button>
+        </div>
+      </paper-material>
+    </div>
+
+    <kml-parser id="kmlParserA" result="{{_kmlParserAResult}}"></kml-parser>
+    <kml-parser id="kmlParserB" result="{{_kmlParserBResult}}"></kml-parser>
+
+    <paper-dialog id="stopsModal" modal>
+      <paper-input-autocomplete id="stopAutocompleteA" label="Stop" placeholder="Type your stop"
+          search-property="backofficeName" value="{{_selectedStop}}" source={{_stopsOrigin}} suggestions-in-overlay="true"
+          autocomplete-search-length="5">
+      </paper-input-autocomplete>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus class="primary" on-click="_addStop">Add</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="saveOperationResultModal" modal>
+      <template is="dom-if" if="{{_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:check"></iron-icon>
+          </div>
+          <div class="message">Saved</div>
+        </div>
+      </template>
+      <template is="dom-if" if="{{!_operationSuccess}}">
+        <div class="message-wrapper error">
+          <div class="icon">
+            <iron-icon icon="icons:clear"></iron-icon>
+          </div>
+          <div class="message">Error</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+    </paper-dialog>
+
+    <paper-dialog id="deleteRouteModal" modal>
+      <h2>Delete this route</h2>
+      <div class="message">Do you want to delete route {{_code}} {{_routeInfo.name}}?</div>
+
+      <div class="buttons">
+        <paper-button dialog-dismiss>No</paper-button>
+        <paper-button dialog-confirm autofocus class="primary" on-click="_deleteRoute">Yes, delete route</paper-button>
+      </div>
+    </paper-dialog>
+
+    <maps-utils id="mapsUtils"></maps-utils>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'route-edition',
+
+      properties: {
+        _stops: {
+          type: Array
+        },
+        _isNewRoute: {
+          type: Boolean,
+          value: true
+        },
+        code: {
+          type: String,
+          value: null,
+          observer: '_codeChange'
+        },
+        _routeInfoOrigin: {
+          type: Object,
+          observer: '_routeInfoOriginChange'
+        },
+        _routeInfo: {
+          type: Object,
+          value: {}
+        },
+        _routeDetailsOrigin: {
+          type: Object,
+          observer: '_routeDetailsOriginChange'
+        },
+        _routeDetails: {
+          type: Object,
+          value: {
+            a: {
+              stops: [],
+              videoGeoPoints: {},
+              videoId: null,
+              videoUrl: null
+            },
+            b: {
+              stops: [],
+              videoGeoPoints: {},
+              videoId: null,
+              videoUrl: null
+            }
+          }
+        },
+        _kmlParserAResult: {
+          type: Object,
+          observer: '_kmlParserAResultChange'
+        },
+        _kmlParserBResult: {
+          type: Object,
+          observer: '_kmlParserBResultChange'
+        },
+        _displayStops: {
+          type: Boolean,
+          value: true
+        },
+        _map : {
+          type: Object
+        },
+      },
+
+      clear: function() {
+        var baseRouteDetails = {
+          a: {
+            stops: [],
+            videoGeoPoints: {},
+            videoId: null,
+            videoUrl: null
+          },
+          b: {
+            stops: [],
+            videoGeoPoints: {},
+            videoId: null,
+            videoUrl: null
+          }
+        };
+
+        this._code = null;
+        this.$.kmlFileA.value = '';
+        this.$.kmlFileA.type = '';
+        this.$.kmlFileA.type = 'file';
+        this.$.kmlFileB.value = '';
+        this.$.kmlFileB.type = '';
+        this.$.kmlFileB.type = 'file';
+        this.$.routeInfo.reset();
+        this.$.routeDetails.reset();
+        this._routeInfo = {};
+        this._routeDetails = baseRouteDetails;
+        this._displayStops = false;
+        this._isNewRoute = true;
+      },
+
+      _codeChange: function(newCode) {
+        if (newCode) { // A route will be edited
+          var self = this;
+          this._code = newCode;
+          this._isNewRoute = false;
+
+          this.$.routeInfo.getStoredValue('/routes/' + newCode)
+            .then(function(data) {
+              self._routeInfoOrigin = data;
+
+              return self.$.routeDetails.getStoredValue('/route-details/' + newCode);
+            }).then(function(data) {
+              self._routeDetailsOrigin = data;
+              self._displayStops = true;
+            }).catch(function(error) {
+              console.log(error);
+            });
+        } else {
+          this.clear();
+        }
+      },
+
+      _routeInfoOriginChange: function(newRouteInfo) {
+        if (this._jsonHasKeys(newRouteInfo)) {
+          this._routeInfo = newRouteInfo;
+        }
+      },
+
+      _routeDetailsOriginChange: function(newRouteDetails) {
+        if (this._jsonHasKeys(newRouteDetails)) {
+          this._routeDetails = newRouteDetails;
+        }
+      },
+
+      _onKmlFileAChange: function(event) {
+        this._kmlFileA = event.target.files[0];
+
+        if (this._kmlFileA) {
+          this.$.kmlParserA.file = this._kmlFileA;
+          this.$.kmlParserA.parse();
+        }
+      },
+
+      _onKmlFileBChange: function(event) {
+        this._kmlFileB = event.target.files[0];
+
+        if (this._kmlFileB) {
+          this.$.kmlParserB.file = this._kmlFileB;
+          this.$.kmlParserB.parse();
+        }
+      },
+
+      _kmlParserAResultChange: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+
+        this._routeDetails.a.videoGeoPoints = newKmlParserResultChange;
+
+        // notifyPath method is used to notify the change of the inner object
+        this.notifyPath('_routeDetails.a.videoGeoPoints', newKmlParserResultChange);
+        this._checkVideoGeoPoints();
+      },
+
+      _kmlParserBResultChange: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+
+        this._routeDetails.b.videoGeoPoints = newKmlParserResultChange;
+        this._checkVideoGeoPoints();
+      },
+
+      _checkVideoGeoPoints: function() {
+        var videoGeoPointsA = this._routeDetails.a.videoGeoPoints;
+        var videoGeoPointsB = this._routeDetails.b.videoGeoPoints;
+
+        this._displayStops = this._jsonHasKeys(this._routeDetails.a.videoGeoPoints) &&
+          this._jsonHasKeys(this._routeDetails.b.videoGeoPoints);
+      },
+
+      _openAddStopModal: function(e) {
+        this._directionToAddStop = this._getClickedAddStopDirection(e);
+        this.$.stopsModal.open();
+      },
+
+      _getClickedAddStopDirection: function(event) {
+        var buttonElement = event.srcElement;
+
+        if (buttonElement.localName === 'iron-icon') {
+          buttonElement = buttonElement.parentElement;
+        }
+
+        return buttonElement.getAttribute('data-route-direction');
+      },
+
+      _addStop: function() {
+        if (this._routeDetails[this._directionToAddStop].videoGeoPoints &&
+            this._jsonHasKeys(this._routeDetails[this._directionToAddStop].videoGeoPoints)) {
+          var newStop = this._getStopObj(this._selectedStop);
+
+          // Get the closests point to the selected stop for the selected direction
+          var point = this.$.mapsUtils.getClosestPoint(newStop.lat, newStop.lng, this._routeDetails[this._directionToAddStop].videoGeoPoints);
+
+          var stopsPath = '_routeDetails.' + this._directionToAddStop + '.stops';
+          var newStopPosition = 0;
+
+          if (!this._routeDetails[this._directionToAddStop].stops) {
+            this._routeDetails[this._directionToAddStop].stops = [];
+            this.notifyPath(stopsPath);
+          }
+
+          newStop.sec = point.key;
+
+          // Find the new stop position
+          newStopPosition = this._findNewStopPosition(this._routeDetails[this._directionToAddStop].stops, newStop);
+
+          // Add the new stop in the proper position
+          this.splice(stopsPath, newStopPosition, 0, newStop);
+        }
+      },
+
+      _findNewStopPosition: function(stopsList, newStop) {
+        for (var indexStop = stopsList.length - 1; indexStop >= 0; indexStop--) {
+          if ((newStop.sec - stopsList[indexStop].sec) > 0) {
+            return indexStop + 1;
+          }
+        }
+      },
+
+      _captureRouteData: function() {
+        // Check if the values are well included
+        if (!this._validateForm()) {
+          return;
+        }
+
+        this._routeInfo.code = this._code;
+
+        if (this._routeDetails.a.videoUrl) {
+          this._routeDetails.a.videoId = this._getYouTubeVideoId(this._routeDetails.a.videoUrl);
+        }
+
+        if (this._routeDetails.b.videoUrl) {
+          this._routeDetails.b.videoId = this._getYouTubeVideoId(this._routeDetails.b.videoUrl);
+        }
+
+        this._saveRoute();
+      },
+
+      _validateForm: function() {
+        var fields = [
+          this.$.code,
+          this.$.name,
+          this.$.videoA,
+          this.$.videoB,
+          this.$.directionAName,
+          this.$.directionBName,
+          this.$.departure,
+          this.$.destination
+        ];
+
+        var isFormValid = true;
+        var actualValidation;
+
+        // This allows the validation of all the fields at once
+        for (var indexField = 0; indexField < fields.length; indexField++) {
+          actualValidation = fields[indexField].validate();
+          isFormValid = isFormValid && actualValidation;
+        }
+
+        isFormValid = isFormValid && this._routeDetails.a && this._jsonHasKeys(this._routeDetails.a.videoGeoPoints);
+        isFormValid = isFormValid && this._routeDetails.b && this._jsonHasKeys(this._routeDetails.b.videoGeoPoints);
+
+        return isFormValid;
+      },
+
+      _getYouTubeVideoId: function(videoUrl) {
+        var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+        var match = videoUrl.match(regExp);
+
+        if (match && match[7].length == 11) {
+          return match[7];
+        } else {
+          return false;
+        }
+      },
+
+      _saveRoute: function() {
+        var self = this;
+
+        this._routeInfoOrigin = this._routeInfo;
+        this._routeDetailsOrigin = this._routeDetails;
+
+        this.$.routeInfo.save('/routes', this._code)
+          .then(function() {
+            return self.$.routeDetails.save('/route-details', self._code);
+          }).then(function() {
+            self._showOperationResultModal(true);
+          }).catch(function(error) {
+            self._showOperationResultModal(false, error);
+            console.log(error);
+          });
+      },
+
+      _showOperationResultModal: function(isSuccess, operationDetailMessage) {
+        var self = this;
+        this._operationSuccess = isSuccess;
+        this.$.saveOperationResultModal.open();
+        this._operationMessageDetail = operationDetailMessage;
+
+        setTimeout(function() {
+          self.$.saveOperationResultModal.close();
+        }, 2500)
+      },
+
+      _getStopObj: function(baseStop) {
+        var newStopObj = {
+          name: baseStop.name,
+          lat: baseStop.lat,
+          lng: baseStop.lng
+        };
+
+        return newStopObj;
+      },
+
+      _jsonHasKeys: function(json) {
+        if (json) {
+          for (var key in json) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+
+      _openDeleteRouteModal : function(){
+        this.$.deleteRouteModal.open();
+      },
+
+      _deleteRoute : function(){
+        var self = this;
+        this._routeInfo = null;
+        this._routeDetails = null;
+        this._routeInfoOrigin = this._routeInfo;
+        this._routeDetailsOrigin = this._routeDetails;
+
+        // Delete the route using document save method
+        this.$.routeInfo.save('/routes', this._code)
+          .then(function() {
+            return self.$.routeDetails.save('/route-details', self._code);
+          }).then(function() {
+            page('/routes');
+          }).catch(function(error) {
+            self._showOperationResultModal(false, error);
+            console.log(error);
+          });
+      }
+    });
+  })();
+  </script>
+</dom-module>

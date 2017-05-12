@@ -1,0 +1,109 @@
+<dom-module id="route-map">
+  <template>
+    <style>
+      google-map {
+        height: 300px;
+      }
+    </style>
+
+    <google-map 
+      api-key="AIzaSyALqCogus7yIJJ0OE48RwBtmteqybWvZ6g"
+      id="map" 
+      map="{{_map}}" 
+      disable-default-ui="true" 
+      disable-zoom="true">
+      <google-map-marker 
+        latitude="[[_departure.lat]]" 
+        longitude="[[_departure.lng]]" 
+        icon="/images/fa-map-marker-origin.png">
+      </google-map-marker>
+      <google-map-marker 
+        latitude="[[_destination.lat]]" 
+        longitude="[[_destination.lng]]" 
+        icon="/images/fa-map-marker-destination.png">
+      </google-map-marker>
+    </google-map>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'route-map',
+
+      properties: {
+        geoPoints: {
+          type: Object,
+          observer: '_geoPointsChange'
+        },
+        _map : {
+          type: Object
+        },
+        _departure: {
+          type: Object
+        },
+        _destination: {
+          type: Object
+        }
+      },
+
+      _geoPointsChange: function(newVideoGeoPoints) {
+        if (newVideoGeoPoints) {
+          var videoKeys = this._getJsonKeys(newVideoGeoPoints);
+
+          if (videoKeys && videoKeys.length > 0) {
+            this._loadRoutePath();
+            this._departure = newVideoGeoPoints[videoKeys[0]];
+            this._destination = newVideoGeoPoints[videoKeys[videoKeys.length - 1]];
+          }
+        }
+      },
+
+      /**
+       * Draw a line in the map using the route geo points. Centers the map in the line.
+       */
+      _loadRoutePath : function() {
+        if (this.geoPoints) {
+          var points = this.geoPoints;
+          var length = points.length;
+          var cords = [];
+          var bounds = new google.maps.LatLngBounds();
+          var self = this;
+
+          // Build a cords array from the points
+          for (var key in points) {
+            var point = points[key];
+            cords.push(point);
+            bounds.extend(new google.maps.LatLng(point.lat, point.lng));
+          }
+
+          if (this._mapPolyline) {
+            this._mapPolyline.setMap(null);
+          }
+
+          this._mapPolyline = new google.maps.Polyline({
+            path: cords,
+            geodesic: true,
+            strokeColor: '#009FDD',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
+
+          this._mapPolyline.setMap(this._map);
+          this._map.fitBounds(bounds);
+        }
+      },
+
+      _getJsonKeys: function(json) {
+        var keys = [];
+
+        for (var key in json) {
+          keys.push(key);
+        }
+
+        return keys;
+      }
+    });
+  })();
+  </script>
+</dom-module>

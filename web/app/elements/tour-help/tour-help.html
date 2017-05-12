@@ -1,0 +1,256 @@
+<dom-module id="tour-help">
+  <script src="../../bower_components/Swipe/swipe.js"></script>
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      paper-dialog {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        width: 100%;
+        height: 85%;
+        padding-top: 30px;
+        color: var(--secondary-text-color);
+        text-align: center;
+      }
+
+      paper-dialog > * {
+        padding: 0;
+      }
+
+      .swipe {
+        overflow: hidden;
+        visibility: hidden;
+        position: relative;
+        margin-bottom: 35%;
+      }
+
+      .swipe-wrap {
+        overflow: hidden;
+        position: relative;
+      }
+
+      .swipe-wrap > div {
+        float: left;
+        width: 100%;
+        position: relative;
+      }
+
+      .slider-wrapper {
+        padding: 0 40px;
+      }
+
+      h3 {
+        color: var(--secondary-color);
+        text-transform: uppercase;
+      }
+
+      iron-image {
+        width: 245px;
+        height: 245px;
+        max-width: 100%;
+      }
+
+      .pagination {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+        position: absolute;
+        width: 100%;
+        bottom: 15%;
+        left: 0;
+      }
+
+      .pagination .circle {
+        background-color: var(--primary-color);
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        width: 10px;
+        height: 10px;
+        margin: 0 3px;
+        cursor: pointer;
+      }
+
+      .pagination .circle[disabled] {
+        background-color: var(--vta-medium-light-gray);
+      }
+
+      #dontShowAgain {
+        background-color: var(--primary-color);
+        color: var(--title-text-color);
+        position: absolute;
+        width: 100%;
+        height: 56px;
+        left: 0;
+        bottom: 0;
+        margin: 0;
+        border-radius: 0
+      }
+
+      #dontShowAgain[disabled] {
+        background-color: var(--title-text-color);
+        color: var(--vta-medium-light-gray);
+      }
+
+      .chevron {
+        display: none;
+      }
+
+      @media (min-width: 601px) {
+        paper-dialog {
+          width: 70%;
+          padding-top: 50px;
+        }
+
+        .swipe {
+          margin-bottom: 25%;
+        }
+
+        .chevron {
+          display: block;
+          position: absolute;
+          top: 60%;
+          background-color: transparent;
+          color: var(--vta-gray);
+          width: 48px;
+          height: 48px;
+        }
+
+        .chevron iron-icon{
+          --iron-icon-height: 40px;
+          --iron-icon-width: 40px;
+        }
+
+        .chevron.right {
+          right: 16px;
+        }
+
+        .chevron.left {
+          left: 16px;
+        }
+      }
+
+      @media all and (max-width: 840px) and (orientation: landscape) {
+        iron-image {
+          width: 100px;
+          height: 100px;
+        }
+
+        #dontShowAgain {
+          height: 40px;
+        }
+      }
+    </style>
+
+    <paper-dialog id="dialog" class="size-position">
+      <div id='slider' class='swipe'>
+        <div class='swipe-wrap'>
+          <div class="slide">
+            <div class="slider-wrapper">
+              <h3>Where do you want to go?</h3>
+              <p>Take the virtual tour of Valley Transportation Authority</p>
+              <iron-image src="/images/walkthrough_1.svg" ></iron-image>
+            </div>
+            <paper-button class="chevron right" on-click="_openItem">
+              <iron-icon data-item="1" icon="icons:chevron-right"></iron-icon>
+            </paper-button>
+          </div>
+          <div class="slide">
+            <div class="slider-wrapper">
+              <h3>What is interesting there?</h3>
+              <p>Pause the navigation any moment to know more about the intersting places around</p>
+              <iron-image src="/images/walkthrough_2.svg" ></iron-image>
+            </div>
+            <paper-button class="chevron left" on-click="_openItem">
+              <iron-icon data-item="0" icon="icons:chevron-left"></iron-icon>
+            </paper-button>
+            <paper-button class="chevron right" on-click="_openItem">
+              <iron-icon data-item="2" icon="icons:chevron-right"></iron-icon>
+            </paper-button>
+          </div>
+          <div class="slide">
+            <div class="slider-wrapper">
+              <h3>Do you want to get off the tour?</h3>
+              <p>When you are getting closer to a Stop, you can get off the tour and see the places nearby</p>
+              <iron-image src="/images/walkthrough_3.svg" ></iron-image>
+            </div>
+            <paper-button class="chevron left" on-click="_openItem">
+              <iron-icon data-item="1" icon="icons:chevron-left"></iron-icon>
+            </paper-button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagination">
+        <div class="circle" data-item="0" on-click="_openItem"></div>
+        <div class="circle" data-item="1" on-click="_openItem" disabled></div>
+        <div class="circle" data-item="2" on-click="_openItem" disabled></div>
+      </div>
+
+      <paper-button id="dontShowAgain" on-click="_dontShowAgain" disabled>Don't show me again</paper-button>
+    </paper-dialog>
+
+    <polymer-cookie id="tourCookie" name="tourCookie" value="true" time="7" format="d"></polymer-cookie>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'tour-help',
+
+      properties: {
+        selected: {
+          type: Number,
+          value: 0
+        }
+      },
+
+      attached: function() {
+        var self = this;
+        var cookieValue = this.$.tourCookie.readCookie();
+
+        if (cookieValue !== 'true') {
+          setTimeout(function() {
+            self.$.dialog.open();
+
+            // Timeout to build the slider
+            setTimeout(function() {
+              self._slider = Swipe(document.getElementById('slider'), {
+                callback: function(index, elem) {
+                  self._managePagination(index, elem, self);
+                }
+              });
+            }, 100);
+          }, 2000);
+        }
+      },
+
+      _openItem: function(e) {
+        var item = e.target.getAttribute('data-item');
+
+        this._slider.slide(parseInt(item));
+      },
+
+      _managePagination: function(index, element, self) {
+        var circles = document.getElementsByClassName('circle');
+
+        for (var indexCircle = 0; indexCircle < circles.length; indexCircle++) {
+          if (indexCircle === index) {
+            circles[indexCircle].removeAttribute('disabled');
+          } else {
+            circles[indexCircle].setAttribute('disabled', 'true');
+          }
+        }
+
+        if (index === circles.length -1) {
+          self.$.dontShowAgain.removeAttribute('disabled');
+        }
+      },
+
+      _dontShowAgain: function() {
+        this.$.tourCookie.createCookie();
+        this.$.dialog.close();
+      }
+    });
+  })();
+  </script>
+</dom-module>

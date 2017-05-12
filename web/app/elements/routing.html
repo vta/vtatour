@@ -1,0 +1,123 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<script src="../bower_components/page/page.js"></script>
+<script>
+  window.addEventListener('WebComponentsReady', function() {
+
+    // We use Page.js for routing. This is a Micro
+    // client-side router inspired by the Express router
+    // More info: https://visionmedia.github.io/page.js/
+
+    // Removes end / from app.baseUrl which page.base requires for production
+    if (window.location.port === '') {  // if production
+      page.base(app.baseUrl.replace(/\/$/, ''));
+    }
+
+    // Middleware
+    function scrollToTop(ctx, next) {
+      app.scrollPageToTop();
+      next();
+    }
+
+    function setFocus(selected){
+      document.querySelector('section[data-route="' + selected + '"] .page-title').focus();
+    }
+
+    function openRoutesScreen() {
+      app.route = 'route-selection';
+      setFocus(app.route);
+    }
+
+    // Routes
+    page('*', scrollToTop, function(ctx, next) {
+      var routeNavigation = document.querySelector('route-navigation');
+      app.hideBackBtn();
+      app.resetAppName();
+      next();
+    });
+
+    page('/', function() {
+      var routeNavigation = document.querySelector('route-navigation');
+      routeNavigation.clearRouteSelection();
+      openRoutesScreen();
+    });
+
+    page(app.baseUrl, function() {
+      var routeNavigation = document.querySelector('route-navigation');
+      routeNavigation.clearRouteSelection();
+      openRoutesScreen();
+    });
+
+    page('/routes', function() {
+      var routeNavigation = document.querySelector('route-navigation');
+      routeNavigation.clearRouteSelection();
+      openRoutesScreen();
+    });
+
+    page('/routes/:code/navigation/:direction/:departureStopId/:destinationStopId', function(data) {
+      var routeNavigation = document.querySelector('route-navigation');
+
+      app.showBackBtn();
+      app.route = 'route-navigation';
+      app.params = data.params;
+      routeNavigation.code = data.params.code;
+      routeNavigation.departureStopId = data.params.departureStopId;
+      routeNavigation.direction = data.params.direction;
+      routeNavigation.destinationStopId = data.params.destinationStopId;
+      setFocus(app.route);
+      app.condenseHeader();
+      // Sets the page full screen when the device is a phone.
+      if (window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches && !app.$.fsapi.fullscreen) {
+        app.$.fsapi.toggleFullscreen();
+      }
+
+      routeNavigation.showTour();
+    });
+
+    page('/routes/:code/navigation/:direction/:departureStopId/:destinationStopId/pois', function(data) {
+      var routeNavigation = document.querySelector('route-navigation');
+      if(routeNavigation.code){
+        app.showBackBtn();
+        routeNavigation.showPois();
+      }else{
+        page.redirect(page.current.replace('/pois', ''));
+      }
+    });
+
+    page('/routes/:code/navigation/:direction/:departureStopId/:destinationStopId/pois/detail', function(data) {
+      var routeNavigation = document.querySelector('route-navigation');
+      if(routeNavigation.code){
+        app.showBackBtn();
+        routeNavigation.showPoiDetails();
+      }else{
+        page.redirect(page.current.replace('/pois/detail', ''));
+      }
+    });
+
+    page('/poi-detail', function() {
+      app.route = 'poi-detail';
+      setFocus(app.route);
+    });
+
+    // 404
+    page('*', function() {
+      app.$.toast.text = 'Can\'t find: ' + window.location.href  + '. Redirected you to Home Page';
+      app.$.toast.show();
+      page.redirect(app.baseUrl);
+    });
+
+    // add #! before urls
+    page({
+      // hashbang: true
+    });
+
+  });
+</script>

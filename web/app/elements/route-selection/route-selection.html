@@ -1,0 +1,202 @@
+<dom-module id="route-selection">
+    <template>
+      <style is="custom-style" include="shared-styles"></style>
+      <style>
+        paper-dropdown-menu {
+          width: 100%;
+        }
+
+        .route-selection-message {
+          color: var(--secondary-color);
+        }
+      </style>
+      <firebase-query
+          app-name="vta"
+          id="query"
+          path="/routes"
+          data="{{_routes}}">
+      </firebase-query>
+      <firebase-document
+        app-name="vta"
+        id="routeDetailsDoc">
+      </firebase-document>
+
+      <div class="inner-content">
+        <h2 class="page-title" tabindex="-1">Choose your Route</h2>
+
+        <paper-input-autocomplete id="routesAutocomplete" label="Routes" placeholder="Type your route"
+          search-property="name" value="{{_selectedRoute}}" source={{_routes}} suggestions-in-overlay="true"
+          display-options-on-focus="true"></paper-input-autocomplete>
+
+        <paper-dropdown-menu id="directionDropdown" label="Direction" placeholder="Choose direction of the route"
+          disabled on-iron-select="_directionDropdownSelect">
+          <paper-listbox id="directionDropdownListBox" class="dropdown-content">
+            <paper-item value="[[_directions.a]]">[[_selectedRoute.directionAName]]</paper-item>
+            <paper-item value="[[_directions.b]]">[[_selectedRoute.directionBName]]</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+
+        <paper-dropdown-menu id="departureDropdown" label="Departure" placeholder="Choose departure point"
+          disabled on-iron-select="_departureDropdownSelect">
+          <paper-listbox id="departureDropdownListBox" class="dropdown-content">
+            <template is="dom-repeat" items="[[_selectedRouteDetails.stops]]">
+              <paper-item value="{{index}}">[[item.name]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+
+        <paper-dropdown-menu id="destinationDropdown" label="Destination" placeholder="Choose destination point"
+          disabled on-iron-select="_destinationDropdownSelect">
+          <paper-listbox id="destinationDropdownListBox" class="dropdown-content">
+            <template is="dom-repeat" items="[[_selectedRouteDetails.stops]]">
+              <paper-item value="{{index}}">[[item.name]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+
+        <template is="dom-if" if="{{_sameStops}}">
+          <div class="route-selection-message">
+            Please select different departure and destination stops to start the tour.
+          </div>
+        </template>
+      </div>
+
+      <paper-fab id="viewRide" label="Go" raised disabled on-click="_onGoClick"></paper-fab>
+    </template>
+</dom-module>
+
+<script>
+	(function() {
+    'use strict';
+    Polymer({
+      is: 'route-selection',
+
+      properties: {
+        _directions: {
+          type: Object,
+          value: {a: 'a', b: 'b'}
+        },
+        _routes: {
+          type: Array
+        },
+        _selectedRoute: {
+          type: Object,
+          observer: '_selectedRouteChange'
+        },
+        _selectedRouteDetails: {
+          type: Object,
+          observer: '_selectedRouteDetailsChange'
+        },
+        _sameStops: {
+          type: Boolean,
+          value: false
+        }
+      },
+
+      clearRoute: function() {
+        this.$.routesAutocomplete.clear();
+        this._clearStopsDropdowns();
+        this._routeDetailsPath = null;
+      },
+
+      _clearStopsDropdowns: function() {
+        this.$.directionDropdown._setSelectedItem();
+        this.$.directionDropdownListBox.selected = -1;
+        this.$.departureDropdown._setSelectedItem();
+        this.$.departureDropdownListBox.selected = -1;
+        this.$.destinationDropdown._setSelectedItem();
+        this.$.destinationDropdownListBox.selected = -1;
+      },
+
+      _selectedRouteChange: function(newSelectedRoute) {
+        // Clears the selected route details
+        this._direction = null;
+        this._selectedRouteDetails = null;
+        this._departureStopId = null;
+        this._destinationStopId = null;
+
+        // Check if the selected route is selected to enable the proper elements
+        if (typeof newSelectedRoute === 'object') {
+          this._selectedRouteCode = newSelectedRoute.$key;
+          this.$.directionDropdown.disabled = false;
+        } else {
+          this._selectedRouteCode = null;
+          this.$.directionDropdown.disabled = true;
+          this.$.departureDropdown.disabled = true;
+          this.$.destinationDropdown.disabled = true;
+          this._clearStopsDropdowns();
+        }
+
+        this._checkViewRideAvailability();
+      },
+
+      _directionDropdownSelect: function(event) {
+        this._direction = this._getDropdownSelectedValue(event);
+
+        if (this._direction) {
+          var self = this;
+
+          // Get the route details from the selected route
+          this.$.routeDetailsDoc.getStoredValue('/route-details/' + this._selectedRouteCode + '/' + this._direction)
+            .then(function(data) {
+              self._selectedRouteDetails = data;
+            }).catch(function(error) {
+              console.log(error);
+            });
+        }
+      },
+
+      _selectedRouteDetailsChange: function(newSelectedRouteDoc) {
+        if (typeof newSelectedRouteDoc === 'object') {
+          this.$.departureDropdown.disabled = false;
+          this.$.destinationDropdown.disabled = false;
+        }
+      },
+
+      _departureDropdownSelect: function(event) {
+        this._departureStopId = this._getDropdownSelectedValue(event);
+        this._checkViewRideAvailability();
+      },
+
+      _destinationDropdownSelect: function(event) {
+        this._destinationStopId = this._getDropdownSelectedValue(event);
+        this._checkViewRideAvailability();
+      },
+
+      _getDropdownSelectedValue : function(event) {
+        var selectedItem = event.target.selectedItem;
+
+        if (selectedItem) {
+          return selectedItem.value;
+        } else {
+          return null;
+        }
+      },
+
+      _checkViewRideAvailability: function() {
+        var validStops = this._departureStopId != null && this._destinationStopId != null;
+
+        if (validStops && this._departureStopId === this._destinationStopId) {
+          this._sameStops = true;
+          this.$.viewRide.disabled = true;
+        } else {
+          this._sameStops = false;
+          this.$.viewRide.disabled = !(this._selectedRouteCode != null && this._direction != null && validStops);
+        }
+      },
+
+      _onGoClick : function(){
+        var originDestinationPath = this._departureStopId + '/' + this._destinationStopId;
+        var goPage = '/routes/' + this._selectedRouteCode + '/navigation/' + this._direction + '/';
+
+        if (this._departureStopId > this._destinationStopId) {
+          originDestinationPath = this._destinationStopId + '/' + this._departureStopId;
+        }
+
+        goPage += originDestinationPath;
+        
+        page(goPage);
+      }
+    });
+  })();
+</script>

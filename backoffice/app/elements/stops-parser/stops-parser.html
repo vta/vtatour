@@ -1,0 +1,132 @@
+<dom-module id="stops-parser">
+  <template>
+    <style>
+    </style>
+
+    <firebase-document
+      app-name="vta"
+      id="stop">
+    </firebase-document>
+
+    <h2 class="page-title">Stops KML Parser</h2>
+
+    <paper-input id="kmlFile" label="KML File" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileChange"></paper-input>
+    <paper-button raised on-click="parse">Parse</paper-button>
+
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'stops-parser',
+
+      properties: {
+        _kmlParserResult: {
+          type: Object,
+          observer: '_kmlParserResultChange'
+        },
+        _stopsList: {
+          type: Array
+        }
+      },
+
+      _onKmlFileChange: function(event) {
+        this.file = event.target.files[0];
+      },
+
+      parse : function() {
+        var reader = new FileReader();
+        var self = this;
+
+        reader.onload = function() {
+         self._parseStopsKML(this.result, self);
+        }
+
+        reader.readAsText(this.file);
+      },
+
+      /**
+       * Method to parse a KML with the stops from VTA
+       *
+       * @param file the KML to be parsed
+       * @param Polymer actual element
+       */
+      _parseStopsKML : function(file, self) {
+        var xml = new DOMParser().parseFromString(file, "text/xml");
+        var elements = xml.getElementsByTagName('Placemark');
+        var length = elements.length;
+        var result = {};
+
+        this._stopsList = [];
+
+        for (var i = 0; i < length; i++) {
+          var stopInfo = this._getStopFromElement(elements[i]);
+          this._stopsList.push([stopInfo[0], stopInfo[1]]);
+          console.log([stopInfo[0], stopInfo[1]]);
+        }
+
+        this._saveStops();
+      },
+
+      _saveStops: function() {
+        this._saveStop(0, this);
+      },
+
+      _saveStop: function(indexStopSave, self) {
+        if (indexStopSave < self._stopsList.length) {
+          self.$.stop.data = self._stopsList[indexStopSave][1];
+          self.$.stop.save('/stops', self._stopsList[indexStopSave][0])
+            .then(function() {
+              console.log(self._stopsList[indexStopSave][0], self._stopsList[indexStopSave][1]);
+              self.$.stop.reset();
+              self._saveStop(indexStopSave + 1, self);
+            }).catch(function(error) {
+              console.log(error);
+            });
+        } else {
+          console.log("** Stops Saved **");
+        }
+      },
+
+      _getStopFromElement: function(element) {
+        var descriptionTag = element.getElementsByTagName('description');
+
+        // Convert the text to HTML
+        var descriptionHtml = this._decodeHTML(descriptionTag[0].innerHTML);
+
+        // Parse the stops data
+        var html = this._stringToHtml(descriptionHtml);
+        var attrs = html.getElementsByTagName('li');
+        var lat = attrs[0].getElementsByClassName('atr-value')[0].innerText;
+        var lng = attrs[1].getElementsByClassName('atr-value')[0].innerText;
+        var id = attrs[3].getElementsByClassName('atr-value')[0].innerText;
+        var name = attrs[attrs.length - 2].getElementsByClassName('atr-value')[0].innerText;
+        var idFullValue = attrs[attrs.length - 1].getElementsByClassName('atr-value')[0].innerText;
+        var backofficeName = id + ' - ' + name;
+
+        var result = [];
+
+        result.push(id);
+        result.push({lat: lat, lng: lng, name: name, backofficeName: backofficeName});
+
+        return result;
+      },
+
+      _decodeHTML: function(string) {
+        return string.replace(/&apos;/g, "'")
+                   .replace(/&quot;/g, '"')
+                   .replace(/&gt;/g, '>')
+                   .replace(/&lt;/g, '<')
+                   .replace(/&amp;/g, '&');
+      },
+
+      _stringToHtml: function(string) {
+        var d = document.createElement('div');
+        d.innerHTML = string;
+        return d;
+      }
+    });
+  })();
+  </script>
+</dom-module>

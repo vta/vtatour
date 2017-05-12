@@ -1,0 +1,59 @@
+<dom-module id="maps-utils">
+  <template>
+    <style>
+    </style>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'maps-utils',
+
+      properties: {
+      },
+
+      /**
+       * Method to get the closest point in the point list to given latLng object.
+       *
+       * @param latLng Object containing the latitude and longitude
+       * @param points Source on geo points to fix the result point
+       */
+      getClosestPoint : function(lat, lng, points) {
+        var distances = new Array();
+        var distance_keys = new Array();
+        var R = 6371; // Earth radio in km
+        var rLat = this._toRad(lat);
+        var rLng = this._toRad(lng);
+        var minDistance;
+        var minKey;
+
+        for (var key in points) {
+          var point = points[key];
+          var dLat = this._toRad(point.lat-lat);
+          var dLng = this._toRad(point.lng-lng);
+          var pLat = this._toRad(point.lat);
+
+          var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.sin(dLng/2) * Math.sin(dLng/2) * Math.cos(rLat) * Math.cos(pLat);
+          var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          var d = R * c;
+
+          if (!minDistance || d < minDistance) {
+            minDistance = d;
+            minKey = key;
+          }
+        }
+        return { key : minKey, latLng : points[minKey] };
+      },
+
+      /**
+       * Method to convert the degrees to radians
+       */
+      _toRad : function(degrees){
+        return degrees * Math.PI / 180;
+      }
+    });
+  })();
+  </script>
+</dom-module>

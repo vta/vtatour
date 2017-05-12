@@ -1,0 +1,100 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<!-- shared styles for all elements and index.html -->
+<dom-module id="shared-styles">
+  <template>
+    <style>
+      h2 {
+        font-size: 1.5em;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      paper-material {
+        border-radius: 2px;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 16px 0;
+        background: white;
+      }
+
+      paper-button {
+        background-color: var(--secondary-color);
+        color: var(--button-text-color);
+        font-weight: bold;
+      }
+
+      paper-button[disabled] {
+        background-color: var(--vta-medium-gray);
+      }
+
+      paper-input,
+      paper-dropdown-menu,
+      paper-input-autocomplete {
+        --paper-input-container-focus-color: var(--secondary-color);
+      }
+
+      paper-menu a > *, paper-menu paper-item > *, paper-menu paper-icon-item > * {
+        pointer-events: none;
+      }
+
+      .page-title {
+        color: var(--primary-color);
+        margin: 20px 0 5px;
+      }
+
+      .page-subtitle-panel {
+        background-color: var(--secondary-color);
+        color: var(--title-text-color);
+        text-transform: uppercase;
+        padding: 24px 40px;
+        margin: 2px 0;
+        font-size: 1.1em;
+        font-weight: normal;
+      }
+
+      .app-menu {
+        --paper-menu-selected-item: {
+          color: var(--vta-white);
+          background: var(--light-primary-color);
+        }
+      }
+
+      .inner-content {
+        margin: 0 16px;
+      }
+
+      .actions-panel {
+        text-align: right;
+        padding: 0 30px;
+      }
+
+      .back-btn {
+        color: var(--vta-white);
+      }
+
+      paper-fab {
+        background-color: var(--primary-color);
+        position: fixed;
+        bottom: 20px;
+        right: 16px;
+        text-transform: uppercase;
+      }
+
+      paper-fab[disabled] {
+        background-color: var(--vta-medium-gray);
+        color: var(--vta-light-gray);
+      }
+
+      @media (min-width: 601px) {
+        .inner-content {
+          margin: 48px 62px;
+        }
+      }
+    </style>
+  </template>
+</dom-module>

@@ -1,0 +1,60 @@
+<dom-module id="stop-list">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-item:hover {
+        background-color: var(--vta-medium-light-gray);
+      }
+
+      paper-item-body {
+        text-align: right;
+      }
+    </style>
+
+    <div class="stop-list">
+      <div role="listbox">
+        <template is="dom-repeat" items="{{stops}}" as="stop">
+          <paper-item>
+            <paper-item-body>[[stop.name]]</paper-item-body>
+            <paper-icon-button icon="icons:delete" alt="Delete" on-click="_deleteStop" data-stop-index$="[[index]]"></paper-icon-button>
+          </paper-item>
+        </template>
+      </div>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'stop-list',
+
+      properties: {
+        stops: {
+          type: Array,
+          notify: true
+        }
+      },
+
+      _deleteStop: function(event) {
+        var deleteButton = event.srcElement;
+        var stopPosition;
+
+        if (deleteButton.localName === 'iron-icon') {
+          deleteButton = event.srcElement.parentElement;
+        }
+
+        stopPosition = deleteButton.getAttribute('data-stop-index');
+
+        if (stopPosition) {
+          this.splice('stops', stopPosition, 1);
+        }
+      }
+    });
+  })();
+  </script>
+</dom-module>

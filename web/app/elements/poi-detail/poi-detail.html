@@ -1,0 +1,237 @@
+<dom-module id="poi-detail">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .header-wrapper {
+        background-color: var(--vta-medium-light-gray);
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        margin-bottom: 35px;
+        text-align: center;
+      }
+
+      .poi-image {
+        height: 160px;
+        width: 100%
+      }
+
+      paper-fab {
+        background-color: var(--primary-color);
+        position: absolute;
+        right: 16px;
+        bottom: -28px;
+      }
+
+      .page-title {
+        margin: 0;
+        text-align: center;
+        color: var(--vta-gray);
+        font-weight: normal;
+      }
+
+      .line-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        margin: 0 8px 8px;
+        color: var(--vta-gray);
+        font-weight: 300;
+      }
+
+      .icon-wrapper {
+        width: 15%;
+        text-align: center;
+        color: var(--vta-medium-gray);
+      }
+
+      .text-wrapper {
+        @apply(--layout-flex);
+        word-break: break-word;
+      }
+
+      .text-wrapper.border {
+        padding: 15px 0;
+        margin-top: 12px;
+        margin-bottom: 10px;
+        border: 1px solid var(--vta-medium-light-gray);
+        border-width: 1px 0;
+        color: var(--vta-light-blue);
+      }
+
+      .text-wrapper a {
+        color: var(--vta-gray);
+      }
+
+      .center-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+      }
+
+      @media all and (min-width: 600px) and (orientation: landscape) {
+        .poi-image {
+          height: 230px;
+          width: 100%
+        }
+      }
+    </style>
+    <template is="dom-if" if="{{_placeDetailsInfo}}">
+      <div class="header-wrapper">
+        <iron-image class="poi-image" src="{{_placeDetailsInfo.imageUrl}}" sizing="cover"></iron-image>
+
+        <a href="{{_directionsUrl}}" tabindex="-1" target="_blank">
+          <paper-fab id="getDirections" icon="maps:directions-walk" raised></paper-fab>
+        </a>
+      </div>
+
+      <h2 class="page-title">{{_placeDetailsInfo.name}}</h2>
+
+      <template is="dom-if" if="{{_placeDetailsInfo.rating}}">
+        <div class="center-wrapper">
+          <icon-rate rate="{{_placeDetailsInfo.rating}}"></icon-rate>
+        </div>
+      </template>
+
+      <div class="line-wrapper">
+        <div class="icon-wrapper">
+        </div>
+        <div class="text-wrapper border">
+          {{_walkingDistance}} - {{_walkingTime}}
+        </div>
+      </div>
+
+      <template is="dom-if" if="{{_placeDetailsInfo.scheduleInfo}}">
+        <div class="line-wrapper">
+          <div class="icon-wrapper">
+            <iron-icon icon="maps:store-mall-directory"></iron-icon>
+          </div>
+          <template is="dom-if" if="{{_placeDetailsInfo.openNow}}">
+            <div class="text-wrapper">Open Now</div>
+          </template>
+          <template is="dom-if" if="{{!_placeDetailsInfo.openNow}}">
+            <div class="text-wrapper">Closed Now</div>
+          </template>
+        </div>
+      </template>
+
+      <template is="dom-if" if="{{_placeDetailsInfo.formatedAddress}}">
+        <div class="line-wrapper">
+          <div class="icon-wrapper">
+            <iron-icon icon="maps:place"></iron-icon>
+          </div>
+          <div class="text-wrapper">{{_placeDetailsInfo.formatedAddress}}</div>
+        </div>
+      </template>
+
+      <template is="dom-if" if="{{_placeDetailsInfo.formatedPhoneNumber}}">
+        <div class="line-wrapper">
+          <div class="icon-wrapper">
+            <iron-icon icon="maps:local-phone"></iron-icon>
+          </div>
+          <div class="text-wrapper">
+            <a href="tel:{{_placeDetailsInfo.formatedPhoneNumber}}">{{_placeDetailsInfo.formatedPhoneNumber}}</a>
+          </div>
+        </div>
+      </template>
+
+      <template is="dom-if" if="{{_placeDetailsInfo.website}}">
+        <div class="line-wrapper">
+          <div class="icon-wrapper">
+            <iron-icon icon="icons:language"></iron-icon>
+          </div>
+          <div class="text-wrapper">
+            <a href="{{_placeDetailsInfo.website}}" target="_blank">View Website</a>
+          </div>
+        </div>
+      </template>
+    </template>
+
+    <google-map-directions
+      id="mapDirections"
+      api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"
+      end-address="{{_placeDetailsInfo.formatedAddress}}"
+      travel-mode="WALKING"
+      response="{{directionsResponse}}"
+      on-google-map-response="_googleMapResponse"
+    ></google-map-directions>
+
+    <maps-utils id="mapsUtils"></maps-utils>
+
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'poi-detail',
+
+      properties: {
+        latOrigin: {
+          type: Number
+        },
+        lngOrigin: {
+          type: Number
+        },
+        placeDetails: {
+          type: Object,
+          value: null,
+          observer: '_placeDetailsChange'
+        },
+        _placeDetailsInfo: {
+          type: Object,
+          value: null
+        }
+      },
+
+      _placeDetailsChange: function(newPlaceDetails) {
+        if (newPlaceDetails) {
+          var DEFAULT_POI_IMAGE = '/images/poi-detail-default.svg';
+          var poiImage = newPlaceDetails.photos && newPlaceDetails.photos[0].getUrl({'maxHeight': 230, 'maxWidth': window.outerWidth});
+
+
+          this._placeDetailsInfo = {
+            name : newPlaceDetails.name,
+            rating: newPlaceDetails.rating,
+            imageUrl: poiImage || DEFAULT_POI_IMAGE,
+            formatedAddress : newPlaceDetails['formatted_address'],
+            formatedPhoneNumber : newPlaceDetails['formatted_phone_number'],
+            website: newPlaceDetails['website'],
+            scheduleInfo: newPlaceDetails['opening_hours'],
+            openNow: newPlaceDetails['opening_hours'] && newPlaceDetails['opening_hours']['open_now']
+          };
+
+          this.$.mapDirections.startAddress = this.$.mapsUtils.getLatLngObj(this.latOrigin, this.lngOrigin);
+        } else{
+          this._placeDetailsInfo = null;
+          this.$.mapDirections.startAddress = null;
+        }
+      },
+
+      _googleMapResponse: function(event, responseWrapper) {
+        if (responseWrapper.response && responseWrapper.response.routes && responseWrapper.response.routes.length > 0) {
+          var route = responseWrapper.response.routes[0];
+
+          if (route.legs && route.legs.length > 0) {
+            var leg = route.legs[0];
+
+            this._walkingDistance = leg.distance.text;
+            this._walkingTime = leg.duration.text;
+            this._directionsUrl = 'https://www.google.com/maps/dir/' +
+              this.latOrigin + ',' +
+              this.lngOrigin + '/' +
+              this._placeDetailsInfo.formatedAddress.replace(/ /g, '+') +
+              '/data=!4m2!4m1!3e2';
+          }
+        }
+      },
+
+      _computeRating : function(rating) {
+        return !rating ? 0 : Math.floor(rating);
+      },
+    });
+  })();
+  </script>
+</dom-module>

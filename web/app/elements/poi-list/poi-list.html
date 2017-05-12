@@ -1,0 +1,125 @@
+<dom-module id="poi-list">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        text-align: left;
+      }
+
+      .poi-filter-wrapper {
+        margin: 16px 16px 0;
+      }
+
+      poi-filter {
+        width: 100%;
+      }
+
+      paper-item {
+        @apply(--layout-horizontal);
+        border-bottom: 1px solid var(--vta-medium-light-gray);
+        padding: 15px 16px;
+      }
+
+      paper-item-body {
+        @apply(--layout-flex);
+      }
+
+      iron-image {
+        width: 96px;
+        height: 72px;
+        margin-right: 8px;
+        background-color: var(--vta-medium-light-gray);
+      }
+
+      .name {
+        font-size: 1.1em;
+        margin-right: 16px;
+      }
+
+      paper-button {
+        position: absolute;
+        right: 0;
+        top: 31%;
+        margin: 0;
+        padding: 0;
+        min-width: 0;
+        background-color: transparent;
+        color: var(--primary-color);
+      }
+
+      paper-button iron-icon {
+        --iron-icon-height: 40px;
+        --iron-icon-width: 40px;
+      }
+    </style>
+    <div class="poi-filter-wrapper">
+      <poi-filter id="poisFilter" label="Category" pois="{{pois}}" selected-filter="{{_selectedPoiFilter}}"></poi-filter>
+    </div>
+
+    <template id="poisList" is="dom-repeat" items="{{pois}}" as="poi" filter="_filterPois">
+      <paper-item on-click="_onPoiClick">
+        <iron-image src="{{poi.imageUrl}}" preload sizing="cover" item-icon placeholder="data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5b3V0cyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgOTYgNzIiPjxkZWZzPjxzdHlsZT4uY2xzLTF7b3BhY2l0eTowLjU0O30uY2xzLTJ7ZmlsbDojZGJkYmRkO30uY2xzLTN7ZmlsbDojZmZmO308L3N0eWxlPjwvZGVmcz48dGl0bGU+aW1hZ2VuX2RlZmF1bHRfc21hbGw8L3RpdGxlPjxyZWN0IGNsYXNzPSJjbHMtMiIgd2lkdGg9Ijk2IiBoZWlnaHQ9IjcyIi8+PHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjEwLjkzIDQ5LjUxIDg0LjM2IDQ5LjUxIDc4Ljc2IDI4LjM3IDcyLjk2IDMzLjczIDY2LjExIDIyLjAyIDMzLjUgNDEuNzYgMjAuNzkgMzcuMDQgMTAuOTMgNDkuNTEiLz48ZWxsaXBzZSBjbGFzcz0iY2xzLTMiIGN4PSIzMy41MSIgY3k9IjI3LjQxIiByeD0iNS4yIiByeT0iNS4xNCIvPjwvc3ZnPg=="></iron-image>
+        <paper-item-body two-line>
+          <div class="name">{{poi.name}}</div>
+          <template is="dom-if" if="{{poi.rating}}">
+            <icon-rate rate="{{poi.rating}}"></icon-rate>
+          </template>
+          <paper-button>
+            <iron-icon icon="icons:chevron-right"></iron-icon>
+          </paper-button>
+        </paper-item-body>
+      </paper-item>
+    </template>
+  </template>
+  <script>
+    Polymer({
+      is: 'poi-list',
+      properties : {
+        pois : {
+          type : Array,
+          observer: '_poisChange'
+        },
+        selected : {
+          type : Object,
+          notify: true,
+          value : null
+        },
+        _selectedPoiFilter: {
+          type: String,
+          value: '',
+          observer: '_selectedPoiFilterChange'
+        }
+      },
+
+      _poisChange: function(newPois) {
+        this._selectedPoiFilter = '';
+        this.$.poisFilter.clearFilter();
+      },
+
+      _computeRating : function(rating) {
+        return !rating? 0 : Math.floor(rating);
+      },
+
+      _onPoiClick : function(e) {
+        this.selected = this.$.poisList.itemForElement(e.target);
+      },
+
+      _selectedPoiFilterChange: function(newSelectedPoiFilter) {
+        this.$.poisList.render();
+      },
+
+      _filterPois: function(item) {
+        if (item.types && item.types.length > 0) {
+          for (var indexType = 0; indexType < item.types.length; indexType++) {
+            if (item.types[indexType].indexOf(this._selectedPoiFilter) != -1) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      }
+    });
+  </script>
+</dom-module>
