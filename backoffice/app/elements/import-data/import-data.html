@@ -1,0 +1,562 @@
+<dom-module id="import-data">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      .item-wrapper,
+      .header {
+        border-bottom: 1px solid #ccc;
+      }
+
+      .item-wrapper:hover {
+        background-color: var(--vta-light-gray);
+      }
+
+      .item-wrapper.active:hover {
+        background-color: var(--vta-white);
+      }
+
+      .item {
+        padding: 12px 5% 0;
+        @apply(--layout-horizontal);
+        font-size: 1.05em;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .item {
+        color: var(--primary-color);
+      }
+
+      .header {
+        padding: 20px 5% 18px;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+
+      .route-code,.stop-code {
+        min-width: 10%;
+        padding: 0 20px;
+        font-weight: bold;
+      }
+
+      .item-wrapper.active .route-name,.item-wrapper.active .stop-name {
+        margin-bottom: 20px;
+      }
+
+      .route-details,.stop-details {
+        @apply(--layout-flex);
+      }
+
+      .route-operations,.stop-operations {
+        padding: 0 20px;
+        margin-top: -12px;
+      }
+
+      paper-fab {
+        position: absolute;
+        right: 8%;
+        top: -28px;
+      }
+
+      paper-button {
+        top: 2px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+      }
+
+      paper-button iron-icon {
+        --iron-icon-height: 40px;
+        --iron-icon-width: 40px;
+      }
+
+      .route-departure-destination, .stop-departure-destination {
+        margin-bottom: 20px;
+        display: none;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .route-departure-destination, .item-wrapper.active .stop-departure-destination {
+        @apply(--layout-horizontal);
+      }
+
+      .route-departure,
+      .route-destination,.stop-lat,
+      .stop-lng {
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+      }
+
+      .route-detail-header,.stop-lat-header {
+        font-weight: bold;
+        margin-right: 30px;
+      }
+
+      .edit-route-operation,.stop-route-operation {
+        display: none;
+        padding: 21px 5%;
+        font-size: 1.4em;
+        text-transform: capitalize;
+        text-align: right;
+      }
+
+      .item-wrapper.active paper-button iron-icon.expand,
+      .item-wrapper paper-button iron-icon.collapse,
+      .route-map-template,
+      .stop-map-template,
+      .item-wrapper route-map {
+        display: none;
+      }
+
+      .item-wrapper paper-button iron-icon.expand,
+      .item-wrapper.active paper-button iron-icon.collapse,
+      .item-wrapper.active route-map,
+      .item-wrapper.active .edit-route-operation {
+        display: block;
+      }
+      #byte_content {
+        margin: 5px 0;
+        max-height: 100px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      #byte_range { margin-top: 5px; }
+      .loadButtons{
+            width: 12%;
+            background: gainsboro;
+      }
+      paper-toolbar {
+        --paper-toolbar-background: var(--paper-blue-900);
+      }
+    </style>
+
+    <div class="inner-content">
+      <h2 class="page-title">Import Data</h2>
+
+      <div>
+        &nbsp; Step 1: Slect Stop List File:  <input type="file" id="stop_list" name="stop_list" />
+        <br/>
+        <paper-button raised on-click="_loadStopeData" class="loadButtons"><iron-icon icon="file-download"></iron-icon>Load Stops</paper-button>
+      </div>
+      <br/>
+      <div>
+        &nbsp; Step 2: Slect Route List File:  <input type="file" id="route_list" name="route_list" />
+        <br/>
+        <paper-button raised on-click="_loadRoutesData" class="loadButtons"><iron-icon icon="file-download"></iron-icon>Load Routes</paper-button>
+      </div>
+
+      <div>
+        &nbsp; Step 3:
+        <paper-button raised on-click="_loadRoutesData" class="loadButtons"><iron-icon icon="rocket"></iron-icon>Batch Import</paper-button>
+      </div>
+
+
+      <paper-material elevation="1">
+        <paper-tabs scrollable selected="{{selectedTab}}" fit-container>
+          <paper-tab>Stops</paper-tab>
+          <paper-tab>Routes</paper-tab>
+        </paper-tabs>
+        <template is="dom-if" if="[[_stopTabIsSelected(selectedTab)]]">
+          <div class="item header">
+            <div class="route-code">Code</div>
+            <div class="route-details">Stop name</div>
+            <div class="route-operations">
+
+            </div>
+          </div>
+          <template is="dom-repeat" items="[[_imported_stops]]" as="stop" >
+            <div class="item-wrapper" data-stop-index$="[[index]]" data-stop-code$="[[stop.id]]">
+              <div class="item stop">
+                <div class="stop-code">[[stop.id]]</div>
+                <div class="stop-details">
+                  <div class="stop-name">[[stop.name]]</div>
+                  <div class="stop-departure-destination">
+                    <div class="stop-lat">
+                      <div class="stop-lat-header">Latitude</div>
+                      <div class="stop-lat-value">[[stop.lat]]</div>
+                    </div>
+                    <div class="stop-lng">
+                      <div class="stop-lng-header">Longitidue</div>
+                      <div class="stop-lng-value"> &nbsp;[[stop.lng]]</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="stop-operations">
+                  <paper-button on-click="_toggleStop" data-stop-index$="[[index]]">
+                    <iron-icon class="expand" icon="icons:expand-more"></iron-icon>
+                    <iron-icon class="collapse" icon="icons:expand-less"></iron-icon>
+                  </paper-button>
+                </div>
+              </div>
+              <div class="stop-map"></div>
+            </div>
+          </template>
+        </template>
+        <template is="dom-if" if="[[_routesTabIsSelected(selectedTab)]]">
+          <div class="item header">
+            <div class="route-code">Code</div>
+            <div class="route-details">Route name</div>
+            <div class="route-operations">
+
+            </div>
+          </div>
+          <template is="dom-repeat" items="[[_imported_routes]]" as="route">
+            <div class="item-wrapper" data-route-index$="[[index]]" data-route-code$="[[route.code]]">
+              <div class="item route">
+                <div class="route-code">[[route.code]]</div>
+                <div class="route-details">
+                  <div class="route-name">[[route.name]]</div>
+                  <div class="route-departure-destination">
+                    <div class="route-departure">
+                      <div class="route-detail-header">Departure</div>
+                      <div class="route-detail-value">[[route.departure]]</div>
+                    </div>
+                    <div class="route-destination">
+                      <div class="route-detail-header">Destination</div>
+                      <div class="route-detail-value">[[route.destination]]</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="route-operations">
+                  <paper-button on-click="_toggleRoute" data-route-index$="[[index]]">
+                    <iron-icon class="expand" icon="icons:expand-more"></iron-icon>
+                    <iron-icon class="collapse" icon="icons:expand-less"></iron-icon>
+                  </paper-button>
+                </div>
+              </div>
+              <div class="route-map"></div>
+            </div>
+          </template>
+
+          <div class="route-map-template">
+            <route-map id="routeMap" geo-points="{{_videoGeoPointsOrigin}}"></route-map>
+          </div>
+        </template>
+      </paper-material>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'import-data',
+
+      properties: {
+        _imported_routes: {
+          type: Array,
+          value: []
+        },
+        _imported_stops: {
+          type: Array,
+          value: []
+        },
+        _activeStopCode: {
+          type: String,
+          value: ''
+        },
+        _routes: {
+          type: Array
+        },
+        _activeRouteCode: {
+          type: String,
+          value: ''
+        },
+        selectedTab: {
+          type: Number,
+          value: 0
+        },
+        _videoGeoPointsOrigin:{
+          type: Object,
+          value: {}
+        }
+      },
+      _stopTabIsSelected: function(selectedTB) {
+         return selectedTB === 0;
+       },
+       _routesTabIsSelected: function(selectedTB) {
+          return selectedTB === 1;
+        },
+      _setStops : function(stopListArray){
+        this._imported_stops = stopListArray;
+        this.selectedTab = 0;
+      },
+      _setRoutes : function(routeListArray){
+        this._imported_routes = routeListArray;
+        this.selectedTab = 1;
+      },
+      _readStops:function(opt_startByte,opt_stopByte){
+        var files = document.getElementById('stop_list').files;
+         if (!files.length) {
+           alert('Please select a file!');
+           return;
+         }
+
+         var file = files[0];
+         var start = 0;
+         var stop = file.size - 1;
+         var reader = new FileReader();
+         var thisPolyMerObject = this;
+         // If we use onloadend, we need to check the readyState.
+         reader.onloadend = function(evt) {
+           if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+             //document.getElementById('byte_content').textContent = evt.target.result;
+             //this._imported_routes = JSON.parse(evt.target.result);
+             var rawStopsData = JSON.parse(evt.target.result);
+             console.log(this.rawStopsData);
+             let stopListArray = [];
+
+             for(var i=0;i<rawStopsData.length;i++){
+                 var rawStopObject = rawStopsData[i];
+                 var stopObject = {
+                   backofficeName:rawStopObject.stop_id+' - '+rawStopObject.stop_name,
+                   lat:rawStopObject.stop_lat,
+                   lng:rawStopObject.stop_lon,
+                   name:rawStopObject.stop_name,
+                   type:rawStopObject.stop_type,
+                   id:rawStopObject.stop_id,
+                   code:rawStopObject.stop_code,
+                 }
+                 if(stopObject.id){
+                    stopListArray.push(stopObject);
+                 }
+             }
+
+             thisPolyMerObject._setStops(stopListArray);
+             if(stopListArray.length==0){
+               alert('please select valid stop list json file');
+             }
+           }
+         };
+
+         var blob = file.slice(start, stop + 1);
+         reader.readAsBinaryString(blob);
+      },
+      _readRoutes:function(opt_startByte,opt_stopByte){
+        if(!this._imported_stops.length){
+          alert('Please load a stop list first!');
+          return;
+        }
+        var files = document.getElementById('route_list').files;
+         if (!files.length) {
+           alert('Please select a file!');
+           return;
+         }
+
+         var file = files[0];
+         var start = 0;
+         var stop = file.size - 1;
+         var reader = new FileReader();
+         var thisPolyMerObject = this;
+         // If we use onloadend, we need to check the readyState.
+         reader.onloadend = function(evt) {
+           if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+             //document.getElementById('byte_content').textContent = evt.target.result;
+             //this._imported_routes = JSON.parse(evt.target.result);
+             var rawRoutesData = JSON.parse(evt.target.result);
+             console.log(rawRoutesData);
+
+             let routeListArray = [];
+
+             var getStopObject = function(stopId){
+                var processedStopObject = null;
+                for(var stopCount = 0;stopCount<thisPolyMerObject._imported_stops.length;stopCount++){
+                    if(stopId==thisPolyMerObject._imported_stops[stopCount].id){
+                      processedStopObject = thisPolyMerObject._imported_stops[stopCount];
+                    }
+                }
+                if(processedStopObject){
+                  return processedStopObject;
+                }
+                return false;
+             }
+
+             var objectifyLatLon =  function(arr) {
+                  var rv = {};
+                  for (var i = 0; i < arr.length; ++i){
+                    arr[i].lat = parseFloat(arr[i].lat);
+                    arr[i].lon = parseFloat(arr[i].lon);
+                    rv[i] = arr[i];
+                  }
+
+                  return rv;
+                }
+
+             for(var i=0;i<rawRoutesData.length;i++){
+               var rawRouteObject = rawRoutesData[i];
+               var rawRouteObjectOtherDirection = null;
+               if(rawRoutesData[i+1] && rawRoutesData[i+1].route_id==rawRouteObject.route_id && rawRoutesData[i+1].direction_id==1){
+                 rawRouteObjectOtherDirection = rawRoutesData[i+1];
+               }
+               if(rawRouteObject.direction_id==0){
+                 var departure,destination;
+                 var sourcedestinationArray = rawRouteObject.route_long_name.split('-');
+                 if(sourcedestinationArray.length>1){
+                   departure = sourcedestinationArray[0];
+                   destination = sourcedestinationArray[1];
+                 }else{
+                   departure = rawRouteObject.route_long_name;
+                   destination = '';
+                 }
+
+                 var routeObject = {
+                   code:rawRouteObject.route_id,
+                   name:rawRouteObject.route_id+' - '+rawRouteObject.route_long_name,
+                   departure:departure,
+                   destination:destination,
+                   directionAName:'east',
+                   directionBName:'west',
+                   routeDetails: {
+                       a: {
+                         stops: [],
+                         videoGeoPoints: {},
+                         videoId: null,
+                         videoUrl: null
+                       },
+                       b: {
+                         stops: [],
+                         videoGeoPoints: {},
+                         videoId: null,
+                         videoUrl: null
+                       }
+                   }
+                 }
+
+                 var routesStopsArray = [];
+                 if(rawRouteObject.lst_stop_ids){
+                   var parsed1StStopIds = rawRouteObject.lst_stop_ids.split(',')
+                   if(parsed1StStopIds.length){
+                      for(var paredStopIdCount = 0;paredStopIdCount<parsed1StStopIds.length;paredStopIdCount++){
+                        var pasedProcesedStopObject = getStopObject(parsed1StStopIds[paredStopIdCount]);
+                        if(pasedProcesedStopObject){
+                          routesStopsArray.push({
+                            lat:parseFloat(pasedProcesedStopObject.lat),
+                            lng:parseFloat(pasedProcesedStopObject.lng),
+                            name:pasedProcesedStopObject.name,
+                            code:pasedProcesedStopObject.id,
+                          })
+                        }
+                      }
+                   }
+                 }
+                 var routesStopsOtherDirectionArray = [];
+                 if(rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.lst_stop_ids){
+                   var parsed1StStopIds = rawRouteObjectOtherDirection.lst_stop_ids.split(',')
+                   if(parsed1StStopIds.length){
+                      for(var paredStopIdCount = 0;paredStopIdCount<parsed1StStopIds.length;paredStopIdCount++){
+                        var pasedProcesedStopObject = getStopObject(parsed1StStopIds[paredStopIdCount]);
+                        if(pasedProcesedStopObject){
+                          routesStopsOtherDirectionArray.push({
+                            lat:parseFloat(pasedProcesedStopObject.lat),
+                            lng:parseFloat(pasedProcesedStopObject.lng),
+                            name:pasedProcesedStopObject.name,
+                            code:pasedProcesedStopObject.id,
+                          })
+                        }
+                      }
+                   }
+                 }
+
+                 routeObject.routeDetails.a.stops = routesStopsArray;
+                 routeObject.routeDetails.b.stops = routesStopsOtherDirectionArray;
+
+                 if(rawRouteObject.routeshape){
+                   var geoPointsArrayString = "["+rawRouteObject.routeshape+"]";
+                   var geoPointsArray = eval(geoPointsArrayString);
+                   routeObject.routeDetails.a.videoGeoPoints = objectifyLatLon(geoPointsArray);
+                 }
+                 if(rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.routeshape){
+                   var geoPointsArrayString = "["+rawRouteObjectOtherDirection.routeshape+"]";
+                   var geoPointsArray = eval(geoPointsArrayString);
+                   routeObject.routeDetails.b.videoGeoPoints = objectifyLatLon(geoPointsArray);
+                 }
+
+                 if(routeObject.code){
+                    routeListArray.push(routeObject);
+                 }
+               }
+             }
+             console.log('check final routes array');
+             console.log(routeListArray);
+
+             thisPolyMerObject._setRoutes(routeListArray);
+             if(routeListArray.length==0){
+               alert('please select valid stop list json file');
+             }
+           }
+         };
+
+         var blob = file.slice(start, stop + 1);
+         reader.readAsBinaryString(blob);
+      },
+
+      _loadStopeData: function(e) {
+              this._readStops();
+      },
+      _loadRoutesData: function(e) {
+              this._readRoutes();
+      },
+      _toggleRoute: function(e) {
+        var oldActiveRoute = Polymer.dom(this.root).querySelector('.item-wrapper.active');
+        var paperButton;
+        var routeIndex;
+        var activeRoute;
+
+        if (e.srcElement.localName === 'iron-icon') {
+          paperButton = e.srcElement.parentNode;
+        } else {
+          paperButton = e.srcElement;
+        }
+
+        // Get the info of the selected route
+        routeIndex = paperButton.getAttribute('data-route-index');
+        activeRoute = Polymer.dom(this.root).querySelector('.item-wrapper[data-route-index="' + routeIndex + '"]');
+
+        // Remove the active class
+        if (oldActiveRoute) {
+          oldActiveRoute.classList.remove('active');
+        }
+
+        // Check if the same route was collapsed
+        if (oldActiveRoute !== activeRoute) {
+          var routeMap = Polymer.dom(this.root).querySelector('#routeMap');
+
+          activeRoute.classList.add('active');
+
+          // Append the map element
+          Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
+          this._activeRouteCode = activeRoute.getAttribute('data-route-code');
+          this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.a.videoGeoPoints;
+        }
+      },
+      _toggleStop: function(e) {
+        var oldActiveStop = Polymer.dom(this.root).querySelector('.item-wrapper.active');
+        var paperButton;
+        var stopIndex;
+        var activeStop;
+
+        if (e.srcElement.localName === 'iron-icon') {
+          paperButton = e.srcElement.parentNode;
+        } else {
+          paperButton = e.srcElement;
+        }
+
+        // Get the info of the selected route
+        stopIndex = paperButton.getAttribute('data-stop-index');
+        activeStop = Polymer.dom(this.root).querySelector('.item-wrapper[data-stop-index="' + stopIndex + '"]');
+
+        // Remove the active class
+        if (oldActiveStop) {
+          oldActiveStop.classList.remove('active');
+        }
+
+        // Check if the same route was collapsed
+        if (oldActiveStop !== activeStop) {
+          activeStop.classList.add('active');
+          this._activeStopCode = activeStop.getAttribute('data-stop-code');
+        }
+      }
+    });
+  })();
+  </script>
+</dom-module>

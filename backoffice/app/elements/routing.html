@@ -28,13 +28,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     function selectRouteLink(selected) {
-      var selectedRouteAnchor = document.querySelector('a[data-route="' + selected + '"]');      
+      var selectedRouteAnchor = document.querySelector('a[data-route="' + selected + '"]');
       var routeItems = document.querySelector('a[data-route]');
 
       if (routeItems) {
         routeItems.removeAttribute('data-selected');
       }
-      
+
       if (selectedRouteAnchor) {
         selectedRouteAnchor.setAttribute('data-selected', 'true')
       }
@@ -94,6 +94,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     page('/stops-parser', function() {
       app.route = 'stops-parser';
+      setFocus(app.route);
+      selectRouteLink(app.route);
+    });
+    page('/import-data', function() {
+      app.route = 'import-data';
       setFocus(app.route);
       selectRouteLink(app.route);
     });
