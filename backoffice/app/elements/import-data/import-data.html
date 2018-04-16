@@ -462,12 +462,12 @@
 
                  if(rawRouteObject.routeshape){
                    var geoPointsArrayString = "["+rawRouteObject.routeshape+"]";
-                   var geoPointsArray = eval(geoPointsArrayString);
+                   var geoPointsArray = JSON.parse(JSON.stringify(eval(geoPointsArrayString)));
                    routeObject.routeDetails.a.videoGeoPoints = objectifyLatLon(geoPointsArray);
                  }
                  if(rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.routeshape){
                    var geoPointsArrayString = "["+rawRouteObjectOtherDirection.routeshape+"]";
-                   var geoPointsArray = eval(geoPointsArrayString);
+                   var geoPointsArray = JSON.parse(JSON.stringify(eval(eval(geoPointsArrayString))));
                    routeObject.routeDetails.b.videoGeoPoints = objectifyLatLon(geoPointsArray);
                  }
 
@@ -526,7 +526,7 @@
           // Append the map element
           Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
           this._activeRouteCode = activeRoute.getAttribute('data-route-code');
-          this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.a.videoGeoPoints;
+          //this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.a.videoGeoPoints;
         }
       },
       _toggleStop: function(e) {
