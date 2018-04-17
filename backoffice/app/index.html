@@ -111,7 +111,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </li> -->
             </ul>
 
-            <a data-route="logout" href="{{baseUrl}}logout">
+            <a data-route="logout" href="{{baseUrl}}logout/1">
               <span>Logout</span>
               <iron-icon icon="icons:exit-to-app"></iron-icon>
             </a>
@@ -150,6 +150,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </section>
             <section data-route="import-data" tabindex="-1">
               <import-data></import-data>
+            </section>
+            <section data-route="vta-logout" tabindex="-1">
+              <vta-logout action="{{params.action}}"></vta-logout>
             </section>
           </iron-pages>
         </div>

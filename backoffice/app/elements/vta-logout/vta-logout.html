@@ -1,0 +1,116 @@
+<dom-module id="vta-logout">
+  <template>
+    <style>
+      :host {
+        display: none;
+        position: relative;
+        top: 50%;
+        transform: translateY(-70%);
+      }
+
+      .content-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+      }
+
+      .vertical-container {
+        width: 442px;
+      }
+
+      .container {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+        @apply(--layout-end);
+        color: var(--primary-color);
+        font-weight: 500;
+      }
+
+      .fields-wrapper {
+        background-color: var(--vta-medium-light-gray);
+        border: 1px solid var(--vta-gray);
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+        margin-bottom: 30px;
+      }
+
+      iron-image {
+        width: 150px;
+        height: 150px;
+      }
+
+      .paper-input-wrapper {
+        padding: 7px 20px;
+      }
+
+      .paper-input-wrapper.first {
+        border-bottom: 1px solid var(--vta-gray);
+      }
+
+      paper-input {
+        --paper-input-container-color: none;
+        --paper-input-container-focus-color: none;
+
+        --paper-input-prefix: {
+          color: var(--vta-gray);
+        };
+
+        --paper-input-container-label: {
+          top: 2px;
+          margin-left: 15px;
+        };
+
+        --paper-input-container-input: {
+          top: 2px;
+          margin-left: 15px;
+        };
+      }
+
+      paper-button {
+        width: 100%;
+        height: 54px;
+        margin: 0 0 25px 0;
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .paper-checkbox-wrapper {
+        text-align: center;
+      }
+    </style>
+
+    <firebase-auth
+      app-name="vta"
+      id="auth"
+      user="{{user}}">
+    </firebase-auth>
+
+    <iron-localstorage id="storage" use-raw auto-save-disabled name="vta-user" value="{{userName}}"></iron-localstorage>
+    <h1>jhvj</h1>
+    ufuyfjyfyu
+  </template>
+  <script>
+    Polymer({
+      is: 'vta-logout',
+      properties : {
+        logoUrl : String,
+        user : {
+          type : Object,
+        },
+        action: {
+          type: String,
+          value: null,
+          observer: '_changeAction'
+        },
+      },
+
+      _changeAction: function(newAction) {
+        if (newAction=='1') { // A route will be edited
+          this.$.auth.signOut();
+          this.$.storage.value = null;
+          this.$.storage.save();
+          location.href='/';
+        }
+      },
+    });
+  </script>
+</dom-module>

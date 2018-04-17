@@ -139,6 +139,7 @@
         border: 1px solid var(--primary-color);
         color: var(--primary-color);
         padding: 0.2em .6em;
+        width: 167px;
 
       }
       .clear-break{
@@ -166,6 +167,9 @@
         padding-left: 0px;
         width: 100%;
       }
+      .download-icon{
+        height: 20px;
+      }
     </style>
 
     <firebase-document
@@ -182,33 +186,30 @@
       <h2 class="page-title">Import Data</h2>
 
       <div>
-        &nbsp; Step 1: Slect Stop List File:  <input type="file" id="stop_list" name="stop_list" />
+        &nbsp; Step 1: Select Stop List File:  <input type="file" id="stop_list" name="stop_list" />
         <br/>
 
         <div class="add-stop-wrapper">
         <paper-button on-click="_loadStopeData" >
-          <iron-icon icon="file-download"></iron-icon>Load Stops
+          <iron-icon icon="file-download" class="download-icon"></iron-icon>Load Stops
         </paper-button>
        </div>
       </div>
-      <br/><br/><br/><br/>
+      <br/><br/>
       <div class="clear-break">
-        &nbsp; Step 2: Slect Route List File:  <input type="file" id="route_list" name="route_list" />
+        &nbsp; Step 2: Select Route List File:  <input type="file" id="route_list" name="route_list" />
         <br/>
         <div class="add-stop-wrapper">
         <paper-button on-click="_loadRoutesData" >
-          <iron-icon icon="file-download"></iron-icon>Load Routes
+          <iron-icon icon="file-download" class="download-icon"></iron-icon>Load Routes
         </paper-button>
        </div>
       </div>
 
-      <br/><br/><br/><br/><br/>
-      <hr >
+      <br/><br/>
       <div class="clear-break">
         <paper-button  on-click="_batchImportRoutesListData" class="primary">Batch Import</paper-button>
       </div>
-
-
       <paper-material elevation="1">
         <paper-tabs scrollable selected="{{selectedTab}}" fit-container>
           <paper-tab>Stops</paper-tab>

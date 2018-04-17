@@ -43,7 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   // Listen for size changes to display menu options accordingly
   window.addEventListener('resize', function() {
-    
+
   });
 
   // Main area's paper-scroll-header-panel custom condensing transformation of
@@ -102,9 +102,4 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   // Logged user variable
   app.user = null;
-
-  app.signOut = function(){
-    app.firebaseApp.auth().signOut();
-  };
-
 })(document);
