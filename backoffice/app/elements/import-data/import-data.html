@@ -6,6 +6,10 @@
       .header {
         border-bottom: 1px solid #ccc;
       }
+      hr {
+
+        border-color: var(--primary-color);
+      }
 
       .item-wrapper:hover {
         background-color: var(--vta-light-gray);
@@ -125,8 +129,28 @@
             width: 12%;
             background: gainsboro;
       }
+      .add-stop-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+        float: left;
+      }
+
+      .add-stop-wrapper paper-button {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.2em .6em;
+
+      }
+      .clear-break{
+        clear:both;
+      }
+
       paper-toolbar {
         --paper-toolbar-background: var(--paper-blue-900);
+      }
+      paper-button.primary {
+        color: var(--primary-color);
+        font-size: 22px;
       }
     </style>
 
@@ -136,18 +160,28 @@
       <div>
         &nbsp; Step 1: Slect Stop List File:  <input type="file" id="stop_list" name="stop_list" />
         <br/>
-        <paper-button raised on-click="_loadStopeData" class="loadButtons"><iron-icon icon="file-download"></iron-icon>Load Stops</paper-button>
+
+        <div class="add-stop-wrapper">
+        <paper-button on-click="_loadStopeData" >
+          <iron-icon icon="file-download"></iron-icon>Load Stops
+        </paper-button>
+       </div>
       </div>
-      <br/>
-      <div>
+      <br/><br/><br/><br/>
+      <div class="clear-break">
         &nbsp; Step 2: Slect Route List File:  <input type="file" id="route_list" name="route_list" />
         <br/>
-        <paper-button raised on-click="_loadRoutesData" class="loadButtons"><iron-icon icon="file-download"></iron-icon>Load Routes</paper-button>
+        <div class="add-stop-wrapper">
+        <paper-button on-click="_loadRoutesData" >
+          <iron-icon icon="file-download"></iron-icon>Load Routes
+        </paper-button>
+       </div>
       </div>
 
-      <div>
-        &nbsp; Step 3:
-        <paper-button raised on-click="_loadRoutesData" class="loadButtons"><iron-icon icon="rocket"></iron-icon>Batch Import</paper-button>
+      <br/><br/><br/><br/><br/>
+      <hr >
+      <div class="clear-break">
+        <paper-button  on-click="_loadRoutesData" class="primary">Batch Import</paper-button>
       </div>
 
 

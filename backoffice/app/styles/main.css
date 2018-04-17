@@ -16,3 +16,9 @@ body {
 .page-title {
   outline: none;
 }
+
+
+.importButton{
+  height: 22px;
+  margin-right: 10px;
+}
