@@ -74,13 +74,13 @@
         --iron-icon-width: 40px;
       }
 
-      .route-departure-destination, .stop-departure-destination {
+      .route-departure-destination, .stop-departure-destination,.stop-list-listing {
         margin-bottom: 20px;
         display: none;
         color: var(--secondary-text-color);
       }
 
-      .item-wrapper.active .route-departure-destination, .item-wrapper.active .stop-departure-destination {
+      .item-wrapper.active .route-departure-destination, .item-wrapper.active .stop-departure-destination, .item-wrapper.active .stop-list-listing {
         @apply(--layout-horizontal);
       }
 
@@ -152,7 +152,22 @@
         color: var(--primary-color);
         font-size: 22px;
       }
+      .column1 {
+        width: 50%;
+        padding: 0 20px 0 0;
+        margin-right: 16%;
+      }
+
+      .column-container {
+        width: 35%;
+      }
+      .stop-list-listing{
+        margin-left: 0px;
+        padding-left: 0px;
+        width: 100%;
+      }
     </style>
+
 
     <div class="inner-content">
       <h2 class="page-title">Import Data</h2>
@@ -248,6 +263,36 @@
                     <div class="route-destination">
                       <div class="route-detail-header">Destination</div>
                       <div class="route-detail-value">[[route.destination]]</div>
+                    </div>
+                  </div>
+                  <div class="container item stop-list-listing">
+                    <div class="column1">
+                        <div class="stops-wrapper">
+                          <h3>Direction A - Stops</h3>
+                          <div class="stop-list">
+                            <div role="listbox">
+                              <template is="dom-repeat" items="{{route.routeDetails.a.stops}}" as="stop">
+                                <paper-item>
+                                  <paper-item-body>[[stop.name]]</paper-item-body>
+                                </paper-item>
+                              </template>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="column1">
+                        <div class="stops-wrapper">
+                          <h3>Direction B - Stops</h3>
+                          <div class="stop-list">
+                            <div role="listbox">
+                              <template is="dom-repeat" items="{{route.routeDetails.b.stops}}" as="stop">
+                                <paper-item>
+                                  <paper-item-body>[[stop.name]]</paper-item-body>
+                                </paper-item>
+                              </template>
+                            </div>
+                          </div>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -408,12 +453,16 @@
              var objectifyLatLon =  function(arr) {
                   var rv = {};
                   for (var i = 0; i < arr.length; ++i){
-                    arr[i].lat = parseFloat(arr[i].lat);
-                    arr[i].lon = parseFloat(arr[i].lon);
-                    rv[i] = arr[i];
-                  }
+                    var newLatLongObject = {
+                      lat:parseFloat(arr[i].lat),
+                      lng:parseFloat(arr[i].lon)
+                    }
+                    if (!isNaN(newLatLongObject.lat) && !isNaN(newLatLongObject.lng)) {
+                      rv[i+1] = newLatLongObject;
+                    }
 
-                  return rv;
+                  }
+                  return JSON.parse(JSON.stringify(rv));
                 }
 
              for(var i=0;i<rawRoutesData.length;i++){
@@ -426,10 +475,10 @@
                  var departure,destination;
                  var sourcedestinationArray = rawRouteObject.route_long_name.split('-');
                  if(sourcedestinationArray.length>1){
-                   departure = sourcedestinationArray[0];
-                   destination = sourcedestinationArray[1];
+                   departure = sourcedestinationArray[0].trim();
+                   destination = sourcedestinationArray[1].trim();
                  }else{
-                   departure = rawRouteObject.route_long_name;
+                   departure = rawRouteObject.route_long_name.trim();
                    destination = '';
                  }
 
@@ -496,12 +545,12 @@
 
                  if(rawRouteObject.routeshape){
                    var geoPointsArrayString = "["+rawRouteObject.routeshape+"]";
-                   var geoPointsArray = JSON.parse(JSON.stringify(eval(geoPointsArrayString)));
+                   var geoPointsArray = eval(geoPointsArrayString);
                    routeObject.routeDetails.a.videoGeoPoints = objectifyLatLon(geoPointsArray);
                  }
                  if(rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.routeshape){
                    var geoPointsArrayString = "["+rawRouteObjectOtherDirection.routeshape+"]";
-                   var geoPointsArray = JSON.parse(JSON.stringify(eval(eval(geoPointsArrayString))));
+                   var geoPointsArray = eval(geoPointsArrayString);
                    routeObject.routeDetails.b.videoGeoPoints = objectifyLatLon(geoPointsArray);
                  }
 
@@ -560,7 +609,8 @@
           // Append the map element
           Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
           this._activeRouteCode = activeRoute.getAttribute('data-route-code');
-          //this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.a.videoGeoPoints;
+          this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.a.videoGeoPoints;
+
         }
       },
       _toggleStop: function(e) {
