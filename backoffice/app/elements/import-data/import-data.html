@@ -168,7 +168,16 @@
       }
     </style>
 
-
+    <firebase-document
+      app-name="vta"
+      id="routeInfo"
+      data="{{_routeInfoOrigin}}">
+    </firebase-document>
+    <firebase-document
+      app-name="vta"
+      id="routeDetails"
+      data="{{_routeDetailsOrigin}}">
+    </firebase-document>
     <div class="inner-content">
       <h2 class="page-title">Import Data</h2>
 
@@ -196,7 +205,7 @@
       <br/><br/><br/><br/><br/>
       <hr >
       <div class="clear-break">
-        <paper-button  on-click="_loadRoutesData" class="primary">Batch Import</paper-button>
+        <paper-button  on-click="_batchImportRoutesListData" class="primary">Batch Import</paper-button>
       </div>
 
 
@@ -348,7 +357,36 @@
         _videoGeoPointsOrigin:{
           type: Object,
           value: {}
-        }
+        },
+        _routeInfoOrigin: {
+          type: Object,
+          //observer: '_routeInfoOriginChange'
+        },
+        _routeInfo: {
+          type: Object,
+          value: {}
+        },
+        _routeDetailsOrigin: {
+          type: Object,
+          //observer: '_routeDetailsOriginChange'
+        },
+        _routeDetails: {
+          type: Object,
+          value: {
+            a: {
+              stops: [],
+              videoGeoPoints: {},
+              videoId: null,
+              videoUrl: null
+            },
+            b: {
+              stops: [],
+              videoGeoPoints: {},
+              videoId: null,
+              videoUrl: null
+            }
+          }
+        },
       },
       _stopTabIsSelected: function(selectedTB) {
          return selectedTB === 0;
@@ -465,6 +503,10 @@
                   return JSON.parse(JSON.stringify(rv));
                 }
 
+                var toTitleCase =  function(str){
+                    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+                }
+
              for(var i=0;i<rawRoutesData.length;i++){
                var rawRouteObject = rawRoutesData[i];
                var rawRouteObjectOtherDirection = null;
@@ -484,11 +526,11 @@
 
                  var routeObject = {
                    code:rawRouteObject.route_id,
-                   name:rawRouteObject.route_id+' - '+rawRouteObject.route_long_name,
-                   departure:departure,
-                   destination:destination,
-                   directionAName:'east',
-                   directionBName:'west',
+                   name:rawRouteObject.route_id+' - '+toTitleCase(rawRouteObject.route_long_name).replace('-',' to '),
+                   departure:toTitleCase(departure),
+                   destination:toTitleCase(destination),
+                   directionAName:'west',
+                   directionBName:'east',
                    routeDetails: {
                        a: {
                          stops: [],
@@ -639,7 +681,90 @@
           activeStop.classList.add('active');
           this._activeStopCode = activeStop.getAttribute('data-stop-code');
         }
-      }
+      },
+      _saveRoute: function(fullRouteData,callback) {
+        var self = this;
+        this._routeInfo = fullRouteData;
+        this._routeDetails = this._routeInfo.routeDetails;
+        delete this._routeInfo.routeDetails;
+        this._routeInfoOrigin = this._routeInfo;
+        this._routeDetailsOrigin = this._routeDetails;
+        console.log('final route info');
+        console.log(this._routeInfoOrigin);
+        console.log('final route details');
+        console.log(this._routeDetailsOrigin);
+        this.$.routeInfo.save('/routes', self._routeInfo.code)
+          .then(function() {
+            return self.$.routeDetails.save('/route-details', self._routeInfo.code);
+          }).then(function() {
+            return callback(null,true)
+          }).catch(function(error) {
+            console.log(error);
+            return callback(error,null)
+          });
+      },
+      _batchImportRoutesListData:function(e) {
+
+        if(!confirm('Are you Sure? this will update new routes data in database but will not overwrite eixtsing routes ')){
+          return false;
+        }
+
+        var self = this;
+
+        if(!this._imported_stops.length){
+          alert('Please load a stop list first!');
+          return;
+        }
+        if(!this._imported_routes.length){
+          alert('Please load a route list!');
+          return;
+        }
+
+        var updateAble = 0;
+        var self = this;
+        var startUpdate =  function(index){
+          var fullRouteDetails = self._imported_routes[index];
+          var alreadyHadRouteInfoData = false;
+          var alreadyHadRouteDetailsData = false;
+          if(index<self._imported_routes.length){
+            self.$.routeInfo.getStoredValue('/routes/' + fullRouteDetails.code)
+              .then(function(data) {
+                console.log('check route root data');
+                console.log(data);
+                if(data && data.code){
+                  alreadyHadRouteInfoData = true;
+                }
+                return self.$.routeDetails.getStoredValue('/route-details/' + fullRouteDetails.code);
+              }).then(function(data) {
+                console.log('check route detailed data');
+                console.log(data);
+                if(data && data.a && data.a.stops.length){
+                  alreadyHadRouteDetailsData = true;
+                }
+                if(alreadyHadRouteInfoData && alreadyHadRouteDetailsData){
+                  startUpdate(index+1);
+                }else{
+                  //alert('safe to proceed to final store');
+                  self._saveRoute(fullRouteDetails,function(err,success){
+                      if(err){
+                        console.log('There is a error to check')
+                        console.log(err);
+                      }
+                      console.log('Success: '+success);
+                      startUpdate(index+1);
+                  })
+                }
+
+              }).catch(function(error) {
+                console.log(error);
+              });
+          }else{
+            alert('All Routes Data Imported Successfully')
+            return;
+          }
+        }
+        startUpdate(0);
+      },
     });
   })();
   </script>
