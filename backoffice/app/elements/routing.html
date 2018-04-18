@@ -41,7 +41,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       if(!selectedRouteAnchor){
         setTimeout(function(){
           var selectedRouteAnchorRecheck = document.querySelector('a[data-route="' + selected + '"]');
-          console.log(selectedRouteAnchorRecheck)
           if (selectedRouteAnchorRecheck) {
             selectedRouteAnchorRecheck.setAttribute('data-selected', 'true')
           }

@@ -170,6 +170,43 @@
       .download-icon{
         height: 20px;
       }
+
+      #saveOperationResultModal {
+        width: auto;
+        background-color: transparent;
+        color: var(--vta-white);
+        box-shadow: none;
+      }
+
+      #saveOperationResultModal .icon {
+        text-align: center;
+      }
+
+      #saveOperationResultModal iron-icon {
+        width: 140px;
+        height: 140px;
+        padding: 20px;
+        text-align: center;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+      }
+
+      #saveOperationResultModal .message-wrapper.success iron-icon {
+        background-color: var(--primary-color);
+      }
+
+      #saveOperationResultModal .message-wrapper.error iron-icon {
+        background-color: var(--secondary-color);
+      }
+
+      #saveOperationResultModal .message {
+        text-align: center;
+        font-size: 2.5em;
+        line-height: 1;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-top: 10px;
+      }
     </style>
 
     <firebase-document
@@ -323,6 +360,26 @@
         </template>
       </paper-material>
     </div>
+    <paper-dialog id="saveOperationResultModal" modal>
+      <template is="dom-if" if="{{_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:check"></iron-icon>
+          </div>
+          <div class="message">Done</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+      <template is="dom-if" if="{{!_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:cached"></iron-icon>
+          </div>
+          <div class="message">Processing...</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+    </paper-dialog>
   </template>
   <script>
   (function() {
@@ -389,6 +446,15 @@
           }
         },
       },
+      _showOperationResultModal: function(isSuccess, operationDetailMessage) {
+        this.$.saveOperationResultModal.open();
+        var self = this;
+        this._operationSuccess = isSuccess;
+        this._operationMessageDetail = operationDetailMessage;
+      },
+      _closeOperationResultModal: function() {
+        this.$.saveOperationResultModal.close();
+      },
       _stopTabIsSelected: function(selectedTB) {
          return selectedTB === 0;
        },
@@ -398,14 +464,27 @@
       _setStops : function(stopListArray){
         this._imported_stops = stopListArray;
         this.selectedTab = 0;
+        this.$.saveOperationResultModal.close();
+        this._showOperationResultModal(true,"Stop list data loaded, after all stops data loaded you can load route list data");
+        var self = this;
+        setTimeout(function(){
+           self.$.saveOperationResultModal.close();
+        }, 1000);
       },
       _setRoutes : function(routeListArray){
         this._imported_routes = routeListArray;
         this.selectedTab = 1;
+        this.$.saveOperationResultModal.close();
+        this._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
+        var self = this;
+        setTimeout(function(){
+           self.$.saveOperationResultModal.close();
+        }, 2000);
       },
       _readStops:function(opt_startByte,opt_stopByte){
         var files = document.getElementById('stop_list').files;
          if (!files.length) {
+           this.$.saveOperationResultModal.close();
            alert('Please select a file!');
            return;
          }
@@ -452,11 +531,13 @@
       },
       _readRoutes:function(opt_startByte,opt_stopByte){
         if(!this._imported_stops.length){
+          this.$.saveOperationResultModal.close();
           alert('Please load a stop list first!');
           return;
         }
         var files = document.getElementById('route_list').files;
          if (!files.length) {
+           this.$.saveOperationResultModal.close();
            alert('Please select a file!');
            return;
          }
@@ -617,9 +698,13 @@
       },
 
       _loadStopeData: function(e) {
-              this._readStops();
+        this.$.saveOperationResultModal.close();
+        this._showOperationResultModal(false,"Stop list data getting loaded please wait ");
+        this._readStops();
       },
       _loadRoutesData: function(e) {
+        this.$.saveOperationResultModal.close();
+        this._showOperationResultModal(false,"Route list data getting loaded please wait ");
               this._readRoutes();
       },
       _toggleRoute: function(e) {
@@ -706,20 +791,24 @@
       },
       _batchImportRoutesListData:function(e) {
 
-        if(!confirm('Are you Sure? this will update new routes data in database but will not overwrite eixtsing routes ')){
+        if(!confirm('Are you sure? This action will update new routes in database, but will not overwrite existing routes.')){
           return false;
         }
+
 
         var self = this;
 
         if(!this._imported_stops.length){
+          this.$.saveOperationResultModal.close();
           alert('Please load a stop list first!');
           return;
         }
         if(!this._imported_routes.length){
+          this.$.saveOperationResultModal.close();
           alert('Please load a route list!');
           return;
         }
+        this._showOperationResultModal(false,"Route list data getting updated in firebase db, it will take a while, please wait...");
 
         var updateAble = 0;
         var self = this;
@@ -760,7 +849,10 @@
                 console.log(error);
               });
           }else{
-            alert('All Routes Data Imported Successfully')
+            self._showOperationResultModal(true,"All new routes updated in firebase db");
+            setTimeout(function(){
+               self.$.saveOperationResultModal.close();
+            }, 2000);
             return;
           }
         }
