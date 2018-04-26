@@ -4,17 +4,25 @@
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/> 
 	<title>Video Generation</title> 
 
-	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCknqD2M0wRbsXnPUIezfAVBdzhJLQexiw&libraries=places" type="text/javascript"></script> 
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCknqD2M0wRbsXnPUIezfAVBdzhJLQexiw&libraries=places,geometry" type="text/javascript"></script> 
 	<script src="js/dat.gui.min.js"></script>
 	<script src="js/three.min.js"></script>
 	<script src="js/GSVPano.js"></script>
 	<script src="js/geoaddress.js"></script>
- 
+	 <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+ 
+ 
 	<script src="js/Hyperlapse.js"></script>
 	<script> 
 
-
+        $('#spinner').hide();
 		var jsonarray = new Array();
 		var coords = [];
 		var start_point;
@@ -31,14 +39,30 @@
 
 		function init() {
 			
-			//var stationpairname = document.getElementById("stationname").value;
-			
+			var stationpairname = document.getElementById("stationname").value;
+            var stationJson = JSON.stringify(stationpairname);
+            var pythonUrl = "http://localhost:5000/json"; //python url to post data
+            var sendCordinates = $.ajax({
+                  type: 'POST',
+                  url: pythonUrl,
+                  dataType: "json",
+                  data: stationJson,
+                  contentType: 'application/json',
+                  success: function(resultData) {  
+                  console.log("done"); }
+            });
+            $('#spinner').hide();
 		 	var st = document.getElementById("start_cordinates").value;
 			var stcordinates = st.split(",");
 			
 			var en = document.getElementById("end_cordinates").value;
 			var encordinates = en.split(",");
 			
+            var a = new google.maps.LatLng(stcordinates[0], stcordinates[1]);
+            var b = new google.maps.LatLng(encordinates[0], encordinates[1]);
+            var dist = (google.maps.geometry.spherical.computeDistanceBetween(a,b))/7;
+      
+
 			start_point = new google.maps.LatLng(stcordinates[0], stcordinates[1]);
 			end_point = new google.maps.LatLng(encordinates[0], encordinates[1]);
 			if( window.location.hash ) {
@@ -90,7 +114,7 @@
 
 			start_pin = new google.maps.Marker({
 				position: start_point,
-				draggable: true,
+				draggable: false,
 				map: map
 			});
 
@@ -104,7 +128,7 @@
 
 			end_pin = new google.maps.Marker({
 				position: end_point,
-				draggable: true,
+				draggable: false,
 				map: map
 			});
 
@@ -118,7 +142,7 @@
 
 			pivot_pin = new google.maps.Marker({
 				position: lookat_point,
-				draggable: true,
+				draggable: false,
 				map: map
 			});
 
@@ -160,8 +184,8 @@
 				height: window.innerHeight,
 				zoom: 1,
 				use_lookat: false,
-				distance_between_points: 10,
-				max_points: 1000,
+				distance_between_points: 5,
+				max_points: dist,
 				elevation: _elevation
 			});
 			
@@ -188,6 +212,7 @@
 			
 			// data: {cordinatesJson:JSON.stringify(cordinatesJson),stationpairname:stationpairname},
 			var cordinatesJson = JSON.stringify(coords);
+            $('#spinner').show();
 			var pythonUrl = "http://localhost:5000/json"; //python url to post data
 			var sendCordinates = $.ajax({
 			      type: 'POST',
@@ -195,8 +220,15 @@
 			      dataType: "json",
 			      data: cordinatesJson,
 			      contentType: 'application/json',
-			      success: function(resultData) { alert("Video Created");
+			      success: function(resultData) { 
+                     
+                        $('#spinner').text("Video Created");
+                
 			      }
+                  ,
+                  complete: function(){
+                       // $('#spinner').hide();
+                  }
 			});
 				
 			};
@@ -265,8 +297,8 @@
 			var gui = new dat.GUI();
 
 			var o = {
-				distance_between_points:10, 
-				max_points:1000, 
+				distance_between_points:5, 
+				max_points:dist, 
 				fov: 80, 
 				elevation:Math.floor(_elevation), 
 				tilt:0, 
@@ -333,7 +365,7 @@
 			};
 
 
-			var scn = gui.addFolder('screen');
+			/*var scn = gui.addFolder('screen');
 			scn.add(o, 'screen_width', window.innerHeight).listen();
 			scn.add(o, 'screen_height', window.innerHeight).listen();
 
@@ -402,7 +434,7 @@
 			});
 
 			parameters.open();
-			
+			*/
 
 			var play_controls = gui.addFolder('play controls');
 			play_controls.add(hyperlapse, 'play');
@@ -446,11 +478,11 @@
 
 			o.generate();
 		}
+		
 		$(document).ready(function() {
-		 
+		    $('#spinner').hide();
 		    document.getElementById("searchButton").onclick = init;
 		});
-
  		 
 		
 	</script> 
@@ -458,29 +490,36 @@
 <body> 
 	<div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
 	<div id="controls">
-		<div id="map" style="width: 400px; height: 300px; float: left; padding: 0;"></div>
-		<div id="controls" style="">
-			<form id="map_form">
-				<label>Start Point</label> 
-				<input type="text" name="startpoint" id="startpoint" />
-				<input type="hidden" name="start_cordinates" id="start_cordinates" />
-				<label>End Point</label>
-				<input type="text" name="endpoint" id="endpoint" />
-				<input type="hidden" name="end_cordinates" id="end_cordinates" />
-			<!-- 	<label>Station pair name</label>
-				<input type="text" value="stationpair" name="stationname" id="stationname" /> -->
-				<button type="button" id="searchButton" >Generate</button>
-			</form>
+	<div id="controls" >
+	<div class="container">
+        <div class="row">
+            	<div class="col-md-6 ">
+            	   <div id="map" style="width: 400px; height: 300px; float: left; padding: 0;"></div>
+                </div>
+                <div class="col-md-6 ">
+        			<form id="map_form">
+        			    <div class="form-group">
+                    	<label>Start Point</label> 
+                		      <input type="text" class="form-control" name="startpoint" id="startpoint" />
+                		      <input type="hidden" name="start_cordinates" id="start_cordinates" /> 
+                        </div>
+                        <div class="form-group">
+                         <label>End Point</label>
+                			 <input type="text" class="form-control" name="endpoint" id="endpoint" />
+                			 <input type="hidden" name="end_cordinates" id="end_cordinates" />
+                        </div>
+                         <div class="form-group">
+                    	   <label>Station pair name</label>
+                			 <input type="text" class="form-control" value="stationpairname" name="stationname" id="stationname" />
+                        </div>
+                        <button type="button" id="searchButton" class="btn btn-success" >Generate</button>
+        			</form>
+                </div>
+            </div>
+            </div>
 		</div>
 		<div id="text" style="width: 555px; height: 50px; float: left; padding-top: 10px; z-index:0; border-style:solid; border-width:medium;"></div>
+        <div id="spinner" style="width: 555px; height: 50px; float: left; padding-top: 10px; z-index:0; border-style:solid; border-width:medium;">Generating video, please wait...</div>
 	</div>
-	 
-
- 
-
-<script >
-
-</script>
 </body>
-
 </html>
