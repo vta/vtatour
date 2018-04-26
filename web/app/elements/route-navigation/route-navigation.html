@@ -1,8 +1,6 @@
 <dom-module id="route-navigation">
   <template>
     <style is="custom-style" include="shared-styles"></style>
-    <link rel="stylesheet" href="../../scripts/video-js/video-js.css">
-    <script src="../../scripts/video-js/video.js"></script>
     <style>
       :host {
         display: block;
@@ -502,7 +500,7 @@
         if (!this._routeDetails || !this.player) {
           return;
         }
-        
+
 
         if(parseFloat(this.player.duration())<0){
             return;
