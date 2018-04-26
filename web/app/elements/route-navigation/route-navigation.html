@@ -107,7 +107,7 @@
           min-height: 500px;
         }
       }
-      
+
     </style>
       <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
       <firebase-document
@@ -566,7 +566,7 @@
         // Check if the video hasn't been started to search for the first position
         if (oldVideoState === -1 && (newVideoState === 1 || newVideoState === 3)) {
           var second = Math.round(this._videoStartTime);
-          this.$.routeVideo.seekTo(second, false);
+          this.player.currentTime(second, false);
         }
         // Check each state of the video to see which buttons to enable/disable
         if (newVideoState !== -1) { // unstarted
@@ -601,7 +601,7 @@
       _restartVideo: function() {
         this.player.currentTime(0);
         this.player.play();
-        // this.$.routeVideo.seekTo(this._videoStartTime);
+        // this.player.currentTime(this._videoStartTime);
         // this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
 
         // Send the event to Google Analytics
@@ -654,7 +654,7 @@
         var clickPercentage = progressBar.layerX * 100 / progressBar.srcElement.clientWidth;
         var progressSeconds = this._calculateVideoSeconds(this._videoStartTime, this._videoEndTime, clickPercentage);
         this._nextStop = this._calculateNextStop(this._stopsSlot, progressSeconds);
-        this.$.routeVideo.seekTo(progressSeconds);
+        this.player.currentTime(progressSeconds);
       },
 
       /**
@@ -731,7 +731,7 @@
         var point = this.$.mapsUtils.getClosestPoint(latLng.lat(), latLng.lng(), this._routeDetails.videoGeoPoints);
         this._currentLat = point.latLng.lat;
         this._currentLng = point.latLng.lng;
-        this.$.routeVideo.seekTo(point.key);
+        this.player.currentTime(point.key);
         this._nextStop = this._calculateNextStop(this._stopsSlot, point.key);
       },
 
@@ -897,7 +897,7 @@
               if(src){
                 self.player.src({type: "video/mp4", src: src});
               }
-              self.player.pause();
+              //self.player.pause();
               self._shouldHidePlay = false;
               videojs.log('Paused now');
 
@@ -921,14 +921,6 @@
         }else{
           this._bingVideo(src);
         }
-        var self = this;
-        if(self._mapsApiLoaded){
-        self._playVideo();
-        }
-        // setTimeout(function(){
-        //     self._playVideo();
-        // },5000);
-
       },
       ready: function() {
         var self = this;
