@@ -107,10 +107,7 @@
           min-height: 500px;
         }
       }
-      .video-js{
-        width: 640px;
-        height: 300px;
-      }
+      
     </style>
       <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
       <firebase-document
@@ -404,6 +401,7 @@
         this._assignSource(newRouteDetails.videoUrl);
 
         // Get the departure and destination points based on the closest points to the stops
+
         var departurePoint = this.$.mapsUtils.getClosestPoint(newRouteDetails.stops[this.departureStopId].lat,
           newRouteDetails.stops[this.departureStopId].lng, newRouteDetails.videoGeoPoints);
         var destinationPoint = this.$.mapsUtils.getClosestPoint(newRouteDetails.stops[this.destinationStopId].lat,
@@ -416,7 +414,11 @@
         var tourSlot = this.getRouteSlot(newRouteDetails.videoGeoPoints, departurePointInt, destinationPointInt);
 
         // Set the names of the departure and destination stops
+        console.log('checking below departure');
+        console.log(newRouteDetails.stops[this.departureStopId]);
+
         this._departureStop = newRouteDetails.stops[this.departureStopId];
+
         this._destinationStop = newRouteDetails.stops[this.destinationStopId];
         this.$.departureMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._departureStop.name + '</h3>');
         this.$.destinationMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._destinationStop.name + '</h3>');
@@ -523,9 +525,9 @@
           this._currentLat = point.lat;
           this._currentLng = point.lng;
           this._map.panTo(point)
-          if(this._map.getZoom() < 16){
-            this._map.setZoom(16);
-          }
+          // if(this._map.getZoom() < 16){
+          //   this._map.setZoom(16);
+          // }
         }
         console.log('point');
         console.log(point);
