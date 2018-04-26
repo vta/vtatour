@@ -20,10 +20,11 @@
 * Flask-Cors
 * pprint
 
-* Replace file in /usr/local/lib/python2.7/dist-packages/google_streetview/api.py with google_api/api.py
+ 
 
 ## How to setup? ##
 
 1. Run the install.sh file
-2. Open terminal run FLASK_APP=google.pyflaskrun
-3. Open index.html in browser,enter start and end points,click on Generate button.
+2. Replace file in /usr/local/lib/python2.7/dist-packages/google_streetview/api.py with google_api/api.py
+3. Open terminal run FLASK_APP=google.pyflaskrun
+4. Open index.html in browser,enter start and end points,click on Generate button.
