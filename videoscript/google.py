@@ -12,7 +12,7 @@ from pprint import pprint
 from flask import jsonify
 from flask import request
 from flask_cors import CORS, cross_origin
-from url_decode import urldecode
+#from url_decode import urldecode
  
 
 app = Flask(__name__)
@@ -52,7 +52,7 @@ def json():
 
         data = request.data.split('"')
         tme=00;
-        pairname = "Route_"+datetime.datetime.now().strftime("%I:%M%p-%B-%d-%Y")
+        pairname = "Route_"+datetime.datetime.now().strftime("%I-%M%p-%B-%d-%Y")
         try:
             os.makedirs(base_dir+"/"+pairname)
         except OSError as e:
@@ -64,7 +64,7 @@ def json():
         m=0;
         f.write("""<?xml version="1.0" encoding="UTF-8"?> <kml xmlns="http://www.opengis.net/kml/2.2">\n""")
         f.write("<Document>")
-        for i in range(0,len(data)-1):
+        for i in range(0, len(data)-1):
           if i%2 == 1 :
             try:
                 a = data[i].split(',')
@@ -99,11 +99,12 @@ def json():
         f.close()
         gif_name = 'pic'
         fps = 2.01666667
-        file_list = glob.glob('*.jpg')  # Get all the pngs in the current directory
+        file_list = glob.glob(base_dir+"/"+pairname+"/"+'*.jpg')  # Get all the pngs in the current directory
         file_list_sorted = natsorted(file_list,reverse=False)  # Sort the images
         clips = [ImageClip(m).set_duration(.495867768)
                  for m in file_list_sorted]
         concat_clip = concatenate_videoclips(clips, method="compose")
-        concat_clip.write_videofile(video, fps=fps)
-        os.system('ffmpeg -y -i '+base_dir+"/"+pairname+"/"+video+' -filter:v "crop=640:500:640:0" '+base_dir+'/cropped'+video)
+        concat_clip.write_videofile(base_dir+"/"+pairname+"/"+video, fps=fps)
+        print(base_dir+'/'+pairname+'/'+video)
+        os.system('/usr/bin/ffmpeg -y -i '+base_dir+'/'+pairname+'/'+video+' -filter:v "crop=1024:800:1025:0" '+base_dir+'/'+pairname+'/cropped'+video)
         return jsonify(request.data)
