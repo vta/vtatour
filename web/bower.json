@@ -18,7 +18,7 @@
     "Swipe": "thebird/Swipe#^2.0.0",
     "fullscreen-api": "^1.1.1",
     "google-analytics": "^0.2.0",
-    "icon-rate": "^1.0.0"
+    "icon-rate": "^1.0.0",
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
