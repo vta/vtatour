@@ -79,7 +79,7 @@ def json():
                         b2 = float(b[-1])
                         ang=calculate_initial_compass_bearing((a1,a2),(b1,b2))
                         params = [{
-                          'size': '1024x1024', # max 2048x2048 pixels
+                          'size': '1550x1024', # max 2048x2048 pixels
                           'location': data[i],
                           'heading': ang,
                           'pitch': '-0.76',
@@ -101,5 +101,6 @@ def json():
                          for m in file_list_sorted]
                 concat_clip = concatenate_videoclips(clips, method="compose")
                 concat_clip.write_videofile(base_dir+"/"+pairname+"/"+video, fps=fps)
-                os.system('/usr/bin/ffmpeg -y -i '+base_dir+'/'+pairname+'/'+video+' -filter:v "crop=1024:800:1024:0" '+base_dir+'/'+pairname+'/cropped'+video)
+               # os.system('/usr/bin/ffmpeg -y -i '+base_dir+'/'+pairname+'/'+video+' -filter:v "crop=1024:800:1024:0" '+base_dir+'/'+pairname+'/cropped'+video)
+                os.system('/usr/bin/ffmpeg -y -i '+base_dir+'/'+pairname+'/'+video+' -filter:v "crop=in_w:in_h-400" '+base_dir+'/'+pairname+'/cropped'+video)
             return jsonify(request.data)
