@@ -380,6 +380,7 @@
         </div>
       </template>
     </paper-dialog>
+    <maps-utils id="mapsUtils"></maps-utils>
   </template>
   <script>
   (function() {
@@ -770,24 +771,60 @@
       },
       _saveRoute: function(fullRouteData,callback) {
         var self = this;
-        this._routeInfo = fullRouteData;
-        this._routeDetails = this._routeInfo.routeDetails;
-        delete this._routeInfo.routeDetails;
-        this._routeInfoOrigin = this._routeInfo;
-        this._routeDetailsOrigin = this._routeDetails;
-        console.log('final route info');
-        console.log(this._routeInfoOrigin);
-        console.log('final route details');
-        console.log(this._routeDetailsOrigin);
-        this.$.routeInfo.save('/routes', self._routeInfo.code)
-          .then(function() {
-            return self.$.routeDetails.save('/route-details', self._routeInfo.code);
-          }).then(function() {
-            return callback(null,true)
-          }).catch(function(error) {
-            console.log(error);
-            return callback(error,null)
-          });
+        if(!fullRouteData){
+            return callback({message:'data missing'},false);
+        }
+        if(!fullRouteData.code){
+            return callback({message:'data missing - before trim'},false);
+        }
+        var code = fullRouteData.code.trim();
+        if(!code){
+            return callback({message:'Code missing - after trim'},false)
+        }
+        var routeInfo = fullRouteData;
+        var routeDetails = routeInfo.routeDetails;
+        delete routeInfo.routeDetails;
+        var update = {};
+
+        update['routes/'+code] = routeInfo;
+        update['route-details/'+code] = routeDetails;
+        console.log('check below update deep path');
+        console.log(update)
+        //return callback(null,true);
+        //firebase.database().ref().update(update);
+        var firebaseDb = this.$.routeInfo.db;
+        var firebaseDbRef = firebaseDb.ref();
+        firebaseDbRef.update(update, function(error) {
+          if (error) {
+            console.log("Error updating data:", error);
+          }else{
+            console.log('Write Success');
+          }
+          return callback(null,true);
+        });
+        // self._routeInfoOrigin = routeInfo;
+        // self._routeDetailsOrigin = routeDetails;
+        // console.log(self.$.routeInfo);
+        // console.log(self.$.routeDetails);
+        // setTimeout(function(){
+        //   console.log('code: '+code);
+        //   console.log('final route info');
+        //   console.log(self._routeInfoOrigin);
+        //   console.log('final route details');
+        //   console.log(self._routeDetailsOrigin);
+        //   self.$.routeInfo.save('/routes', code)
+        //     .then(function() {
+        //       return self.$.routeDetails.save('/route-details', code);
+        //     }).then(function() {
+        //       console.log('Route data + route details saving success');
+        //       console.log('Next item will start after 500ms');
+        //          return callback(null,true);
+        //     }).catch(function(error) {
+        //       console.log('must check below error if any');
+        //       console.log(error);
+        //       //return callback(error,null)
+        //     });
+        // }, 1000);
       },
       _batchImportRoutesListData:function(e) {
 
@@ -813,22 +850,24 @@
         var updateAble = 0;
         var self = this;
         var startUpdate =  function(index){
-          var fullRouteDetails = self._imported_routes[index];
-          var alreadyHadRouteInfoData = false;
-          var alreadyHadRouteDetailsData = false;
           if(index<self._imported_routes.length){
-            self.$.routeInfo.getStoredValue('/routes/' + fullRouteDetails.code)
+            var fullRouteDetails = {};
+            fullRouteDetails = self._imported_routes[index];
+            var alreadyHadRouteInfoData = false;
+            var alreadyHadRouteDetailsData = false;
+            var code = fullRouteDetails.code.trim();
+            self.$.routeInfo.getStoredValue('/routes/' + code)
               .then(function(data) {
-                console.log('check route root data');
-                console.log(data);
+                // console.log('check route root data');
+                // console.log(data);
                 if(data && data.code){
                   alreadyHadRouteInfoData = true;
                 }
-                return self.$.routeDetails.getStoredValue('/route-details/' + fullRouteDetails.code);
+                return self.$.routeDetails.getStoredValue('/route-details/' + code);
               }).then(function(data) {
-                console.log('check route detailed data');
-                console.log(data);
-                if(data && data.a && data.a.stops.length){
+                // console.log('check route detailed data');
+                // console.log(data);
+                if(data && data.a && data.a.stops.length && data.a.stops[0] && data.a.stops[0].sec && data.a.stops[0].sec !=null  ){
                   alreadyHadRouteDetailsData = true;
                 }
                 if(alreadyHadRouteInfoData && alreadyHadRouteDetailsData){

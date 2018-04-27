@@ -107,6 +107,7 @@
           min-height: 500px;
         }
       }
+
     </style>
       <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
       <firebase-document
@@ -121,26 +122,35 @@
       <div class="inner-content">
       	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
       </div>
-
       <div class="navigation-wrapper">
         <div class="video-player-wrapper">
-          <google-youtube
-            id="routeVideo"
-            video-id="{{_routeDetails.videoId}}"
-            playsinline="1"
-            webkit-playsinline
-            fluid
-            state="{{_videoState}}"
-            chromeless
-            currenttime="{{_videoCurrentTime}}"
-            currenttimeformatted="{{_currentTimeFormatted}}"
-            duration="{{_duration}}"
-            durationformatted="{{_durationFormatted}}"
-            on-google-youtube-ready="_onYoutubeReady"
-            playsupported="{{_playsupported}}"
-            autoplay="1"
-            >
-          </google-youtube>
+          <video id="mainRouteVideo" class="video-js vjs-default-skin" controls preload="auto" width="640" height="300px">
+                <!-- <source src="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/ALUMROCKTRANSITCENTER-SANTACLARA%2628TH/1024x1024-SANTA_CLARA_28TH-ALUM_ROCK_TRANSIT_CENTER.mp4" type='video/mp4'> -->
+                <p class="vjs-no-js">
+                  To view this video please enable JavaScript, and consider upgrading to a web browser that
+                  <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                </p>
+          </video>
+          <div style="display:none">
+            <google-youtube
+              id="routeVideo"
+              video-id="{{_routeDetails.videoId}}"
+              playsinline="1"
+              webkit-playsinline
+              fluid
+              state="{{_videoState}}"
+              chromeless
+              currenttime="{{_videoCurrentTime}}"
+              currenttimeformatted="{{_currentTimeFormatted}}"
+              duration="{{_duration}}"
+              durationformatted="{{_durationFormatted}}"
+              on-google-youtube-ready="_onYoutubeReady"
+              playsupported="{{_playsupported}}"
+              autoplay="1"
+              >
+            </google-youtube>
+          </div>
+
           <paper-progress value="{{_progressBarValue}}" on-click="_videoProgressClick"></paper-progress>
         </div>
 
@@ -162,7 +172,7 @@
             mapType="satellite"
             disable-zoom>
             <google-map-marker id="marker" icon="/images/fa-bus.png"
-              latitude="{{_currentLat}}" longitude="{{_currentLng}}">    
+              latitude="{{_currentLat}}" longitude="{{_currentLng}}">
             </google-map-marker>
 
             <google-map-marker
@@ -212,7 +222,7 @@
       </div>
 
       <div class="video-controls" hidden$="{{!_playsupported}}">
-        <paper-button id="restartVideo" on-click="_restartVideo" disabled>
+        <paper-button id="restartVideo" on-click="_restartVideo" disabled$="{{!_isVideoPlaying}}">
           <iron-icon icon="vta-icons:restart"></iron-icon>
           <span class="button-copy">Restart</span>
         </paper-button>
@@ -236,10 +246,12 @@
 <script>
 	(function() {
     'use strict';
-
     Polymer({
       is: 'route-navigation',
       properties: {
+        player: {
+          type: Object
+        },
       	code: {
       		type: String,
       		observer: '_initialPropertyChange'
@@ -384,7 +396,12 @@
           return;
         }
 
+        console.log('check new route details')
+        console.log(newRouteDetails)
+        this._assignSource(newRouteDetails.videoUrl);
+
         // Get the departure and destination points based on the closest points to the stops
+
         var departurePoint = this.$.mapsUtils.getClosestPoint(newRouteDetails.stops[this.departureStopId].lat,
           newRouteDetails.stops[this.departureStopId].lng, newRouteDetails.videoGeoPoints);
         var destinationPoint = this.$.mapsUtils.getClosestPoint(newRouteDetails.stops[this.destinationStopId].lat,
@@ -397,7 +414,11 @@
         var tourSlot = this.getRouteSlot(newRouteDetails.videoGeoPoints, departurePointInt, destinationPointInt);
 
         // Set the names of the departure and destination stops
+        console.log('checking below departure');
+        console.log(newRouteDetails.stops[this.departureStopId]);
+
         this._departureStop = newRouteDetails.stops[this.departureStopId];
+
         this._destinationStop = newRouteDetails.stops[this.destinationStopId];
         this.$.departureMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._departureStop.name + '</h3>');
         this.$.destinationMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._destinationStop.name + '</h3>');
@@ -416,12 +437,16 @@
         this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
 
         // Load the route path with the tour slot select by the user
-        this._loadRoutePath(tourSlot);
+        var self = this;
+        setTimeout(function(){
+            self._loadRoutePath(tourSlot);
+        },1000);
+
 
       },
 
       _routeDetailsOriginChange: function(newRouteDetailsOrigin) {
-        if (newRouteDetailsOrigin && newRouteDetailsOrigin.videoId) {
+        if (newRouteDetailsOrigin && newRouteDetailsOrigin.videoUrl) {
           this._routeDetails = newRouteDetailsOrigin;
         }
       },
@@ -474,13 +499,20 @@
       },
 
       _videoCurrentTimeChange: function(newVideoCurrentTime) {
-        if (!this._routeDetails) {
+        if (!this._routeDetails || !this.player) {
           return;
         }
 
+
+        if(parseFloat(this.player.duration())<0){
+            return;
+        }
+
+        console.log('current Time: '+newVideoCurrentTime)
+        console.log('duration: '+this.player.duration());
         // Check if the video reaches the end of the tour
-        if (newVideoCurrentTime >= this._videoEndTime) {
-          this.$.routeVideo.pause();
+        if (newVideoCurrentTime >= this.player.duration()) {
+          this.player.pause();
           return;
         }
 
@@ -493,10 +525,13 @@
           this._currentLat = point.lat;
           this._currentLng = point.lng;
           this._map.panTo(point)
-          if(this._map.getZoom() < 16){
-            this._map.setZoom(16);
-          }
+          // if(this._map.getZoom() < 16){
+          //   this._map.setZoom(16);
+          // }
         }
+        console.log('point');
+        console.log(point);
+        console.log('Current lat-lng: '+this._currentLat +'-'+this._currentLng);
 
         // Check if the video current time is in the range of the next stop
         if (newVideoCurrentTime >= this._nextStop.sec &&
@@ -531,7 +566,7 @@
         // Check if the video hasn't been started to search for the first position
         if (oldVideoState === -1 && (newVideoState === 1 || newVideoState === 3)) {
           var second = Math.round(this._videoStartTime);
-          this.$.routeVideo.seekTo(second, false);
+          this.player.currentTime(second, false);
         }
         // Check each state of the video to see which buttons to enable/disable
         if (newVideoState !== -1) { // unstarted
@@ -564,8 +599,10 @@
       },
 
       _restartVideo: function() {
-        this.$.routeVideo.seekTo(this._videoStartTime);
-        this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
+        this.player.currentTime(0);
+        this.player.play();
+        // this.player.currentTime(this._videoStartTime);
+        // this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
 
         // Send the event to Google Analytics
         ga('send', 'event', 'Tour', 'restart', this._routeInfo.name);
@@ -575,7 +612,11 @@
       _playVideo: function() {
         // If its on poi list or detail go back to navigation page.
         this._back();
+        //_playVideo
+        this.player.play();
         this.$.routeVideo.play();
+        this._shouldHidePlay = true;
+        this._isVideoPlaying = true;
 
         if (this._pois) {
           this._pois = null;
@@ -584,10 +625,13 @@
         // Send the event to Google Analytics
         ga('send', 'event', 'Tour', 'play', this._routeInfo.name);
       },
-      
+
       _pauseVideo: function() {
-        this.$.routeVideo.pause();
-        this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+        this.player.pause();
+        this._shouldHidePlay = false;
+        this._isVideoPlaying = false;
+        // this.$.routeVideo.pause();
+        // this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
 
         // Send the event to Google Analytics
         ga('send', 'event', 'Tour', 'pause', this._routeInfo.name);
@@ -596,6 +640,7 @@
       _stopVideo: function() {
         var self = this;
 
+        this.player.pause();
         this.$.routeVideo.pause();
         this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
 
@@ -609,7 +654,7 @@
         var clickPercentage = progressBar.layerX * 100 / progressBar.srcElement.clientWidth;
         var progressSeconds = this._calculateVideoSeconds(this._videoStartTime, this._videoEndTime, clickPercentage);
         this._nextStop = this._calculateNextStop(this._stopsSlot, progressSeconds);
-        this.$.routeVideo.seekTo(progressSeconds);
+        this.player.currentTime(progressSeconds);
       },
 
       /**
@@ -640,6 +685,11 @@
        * @param points array with the geo points
        */
       _loadRoutePath : function(points){
+
+        if(!points){
+          return;
+        }
+
         var length = points.length;
         var cords = [];
         var bounds = new google.maps.LatLngBounds();
@@ -681,7 +731,7 @@
         var point = this.$.mapsUtils.getClosestPoint(latLng.lat(), latLng.lng(), this._routeDetails.videoGeoPoints);
         this._currentLat = point.latLng.lat;
         this._currentLng = point.latLng.lng;
-        this.$.routeVideo.seekTo(point.key);
+        this.player.currentTime(point.key);
         this._nextStop = this._calculateNextStop(this._stopsSlot, point.key);
       },
 
@@ -827,6 +877,56 @@
           }
           page.back(navPage);
         }
+      },
+      _bingVideo:function(src){
+
+          if(!videojs){
+            return;
+          }
+
+            var options = {
+                //aspectRatio:'20:20'
+                controls:false
+            };
+            var self = this;
+             this.player = videojs(self.$.mainRouteVideo, options, function onPlayerReady() {
+              videojs.log('Your player is ready!');
+              //self.player.src({type: "video/mp4", src: "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/ALUMROCKTRANSITCENTER-SANTACLARA%2628TH/1024x1024-SANTA_CLARA_28TH-ALUM_ROCK_TRANSIT_CENTER.mp4"});
+
+              // In this context, `this` is the player that was created by Video.js.
+              if(src){
+                self.player.src({type: "video/mp4", src: src});
+              }
+              //self.player.pause();
+              self._shouldHidePlay = false;
+              videojs.log('Paused now');
+
+              // How about an event listener?
+              self.player.on('ended', function() {
+                videojs.log('Awww...over so soon?!');
+              });
+              self.player.on('timeupdate', function () {
+                  //console.log(this.currentTime());
+                self._videoCurrentTimeChange(parseInt(this.currentTime()))
+              });
+            });
+
+        console.log('done')
+
+      },
+      _assignSource : function(src){
+
+        if(this.player){
+          this.player.src({type: "video/mp4", src: src});
+        }else{
+          this._bingVideo(src);
+        }
+      },
+      ready: function() {
+        var self = this;
+        setTimeout(function(){
+          self._bingVideo()
+        }, 1000);
       }
     });
   })();

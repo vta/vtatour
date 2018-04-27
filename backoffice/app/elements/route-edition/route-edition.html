@@ -596,8 +596,33 @@
       _saveRoute: function() {
         var self = this;
 
+        console.log(this._routeDetails);
+        console.log('above data is old one');
+
+        if(this._routeDetails.a && this._routeDetails.a.stops && this._routeDetails.a.stops.length ){
+          for(var a=0;a<this._routeDetails.a.stops.length;a++){
+            var tempStopObject = this._routeDetails.a.stops[a];
+              var point = this.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, this._routeDetails.a.videoGeoPoints);
+              this._routeDetails.a.stops[a].sec =  parseInt(point.key);
+          }
+        }
+
+        if(this._routeDetails.b && this._routeDetails.b.stops && this._routeDetails.b.stops.length ){
+          for(var b=0;b<this._routeDetails.b.stops.length;b++){
+            var tempStopObject = this._routeDetails.b.stops[b];
+            var point = this.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, this._routeDetails.b.videoGeoPoints);
+            this._routeDetails.b.stops[b].sec =  parseInt(point.key);
+          }
+        }
+
+        console.log(this._routeDetails);
+        //return false;
+
+
         this._routeInfoOrigin = this._routeInfo;
         this._routeDetailsOrigin = this._routeDetails;
+
+
 
         this.$.routeInfo.save('/routes', this._code)
           .then(function() {
