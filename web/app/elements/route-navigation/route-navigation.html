@@ -182,6 +182,13 @@
               on-google-map-marker-click="_onPoiClick"
               hidden>
             </google-map-marker>
+            <template is="dom-repeat" items="[[_routeDetails.stops]]" as="stopObj">
+              <google-map-marker latitude="[[stopObj.lat]]" longitude="[[stopObj.lng]]" data-sec="[[stopObj.sec]]"
+                click-events on-google-map-marker-click="_onStopIconClick" icon="/images/fa-map-marker-stop.png">
+                <span style="display:none">[[stopObj.sec]]</span>
+                <h2>[[stopObj.name]]</h2>
+              </google-map-marker>
+            </template>
 
             <template is="dom-repeat" items="{{_pois}}" as="poi">
               <google-map-marker latitude="{{poi.latitude}}" longitude="{{poi.longitude}}"
@@ -659,19 +666,23 @@
        */
       _onMapsApiLoad : function(){
         var self = this;
-        google.maps.event.addListener(this._map, 'mouseup', function(event){
-          if(!self._isDragging && event.latLng){
-            self._moveMarker(event.latLng);
-          }
-        });
+        console.log('Maps Api Loaded');
+        setTimeout(function(){
+          google.maps.event.addListener(self._map, 'mouseup', function(event){
+            if(!self._isDragging && event.latLng){
+              self._moveMarker(event.latLng);
+            }
+          });
 
-        google.maps.event.addListener(this._map, 'dragstart', function(event){
-          self._isDragging = true;
-        });
+          google.maps.event.addListener(self._map, 'dragstart', function(event){
+            self._isDragging = true;
+          });
 
-        google.maps.event.addListener(this._map, 'dragend', function(event){
-          self._isDragging = false;
-        });
+          google.maps.event.addListener(self._map, 'dragend', function(event){
+            self._isDragging = false;
+          });
+        },1000);
+
       },
 
       /**
@@ -695,25 +706,32 @@
           cords.push(point);
           bounds.extend(new google.maps.LatLng(point.lat, point.lng));
         }
-
-        this._mapPolyline = new google.maps.Polyline({
-          path: cords,
-          geodesic: true,
-          strokeColor: '#009FDD',
-          strokeOpacity: 1.0,
-          strokeWeight: 2
-        });
-
-        // Draw the route line
-        this._mapPolyline.setMap(this._map);
-        this._map.fitBounds(bounds);
-
         var self = this;
-        google.maps.event.addListener(this._mapPolyline, 'mouseup', function(event){
-          if(!self._isDragging){
-            self._moveMarker(event.latLng);
-          }
+        var map = document.querySelector('google-map');
+        map.addEventListener('google-map-ready', function(e) {
+          console.log('Map loaded!');
         });
+
+         setTimeout(function(){
+           self._mapPolyline = new google.maps.Polyline({
+             path: cords,
+             geodesic: true,
+             strokeColor: '#009FDD',
+             strokeOpacity: 1.0,
+             strokeWeight: 2
+           });
+
+           // Draw the route line
+           self._mapPolyline.setMap(self._map);
+           self._map.fitBounds(bounds);
+
+
+           google.maps.event.addListener(self._mapPolyline, 'mouseup', function(event){
+             if(!self._isDragging){
+               self._moveMarker(event.latLng);
+             }
+           });
+         },1000)
       },
 
       /**
@@ -825,6 +843,19 @@
 
         this._selectedPoiMarker = e.srcElement;
       },
+      _onStopIconClick : function(e){
+        console.log('check stop click even');
+        console.log(e);;
+        var sourceElement = e.srcElement;
+        var sec = sourceElement.childNodes[1].innerText;
+        console.log('clicked station sec: '+sec);
+        if(sec){
+            this.player.currentTime(sec);
+        }
+        this._onPoiClick(e);
+
+        //this._selectedPoiMarker = e.srcElement;
+      },
 
       _selectedPoiChange: function(newSelectedPoi) {
         if (newSelectedPoi) {
@@ -911,12 +942,16 @@
               timeRemaing.style.display='none';
               var controllBar = document.querySelector('.video-js .vjs-control-bar');
               controllBar.style.backgroundColor = 'transparent';
+              self._adjustMapSize();
               window.addEventListener("resize", function(){
                 self._adjustMapSize();
               });
               setTimeout(function(){
                    self._adjustMapSize();
-              }, 1000);
+              }, 2000);
+              setTimeout(function(){
+                   self._adjustMapSize();
+              }, 4000);
               var screenEvent = document.querySelector('.vjs-tech');
               if(screenEvent){
                 screenEvent.style.pointerEvents = 'none';
