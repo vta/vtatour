@@ -202,7 +202,7 @@
       </div>
 
       <div class="video-controls" >
-        <paper-button id="restartVideo" on-click="_restartVideo" disabled$="{{!_isVideoPlaying}}">
+        <paper-button id="restartVideo" on-click="_restartVideo" disabled$="{{!_startedOnce}}">
           <iron-icon icon="vta-icons:restart"></iron-icon>
           <span class="button-copy">Restart</span>
         </paper-button>
@@ -260,6 +260,10 @@
             lat: null,
             lng: null
           }
+        },
+        _startedOnce: {
+          type: Boolean,
+          value: false
         },
         _playsupported: {
           type: Boolean,
@@ -501,9 +505,12 @@
         // Calculate the progress bar value
         this._progressBarValue = this._calculateVideoProgress(this._videoStartTime, this._videoEndTime, newVideoCurrentTime);
 
-        if (point) {
-          this._currentLat = point.lat;
-          this._currentLng = point.lng;
+        if (point && !isNaN(parseFloat(point.lat)) && !isNaN(parseFloat(point.lng))) {
+          console.log('check lat and lng');
+          console.log(point.lat);
+          console.log(point.lng);
+          this._currentLat = parseFloat(point.lat);
+          this._currentLng = parseFloat(point.lng);
           this._map.panTo(point)
           // if(this._map.getZoom() < 16){
           //   this._map.setZoom(16);
@@ -514,7 +521,7 @@
         console.log('Current lat-lng: '+this._currentLat +'-'+this._currentLng);
 
         // Check if the video current time is in the range of the next stop
-        if (newVideoCurrentTime >= this._nextStop.sec &&
+        if (this._nextStop && newVideoCurrentTime >= this._nextStop.sec &&
             newVideoCurrentTime < this._nextStop.endSec &&
             this.$.nextStopMarker.hidden === true) {
           this._nextStopGeoPoint.lat = parseFloat(this._nextStop.lat);
@@ -522,7 +529,7 @@
           this.notifyPath('_nextStopGeoPoint.lat', this._nextStop.lat);
           this.notifyPath('_nextStopGeoPoint.lng', this._nextStop.lng);
           this._enableNextStop();
-        } else if (newVideoCurrentTime > this._nextStop.endSec) {
+        } else if (this._nextStop && newVideoCurrentTime > this._nextStop.endSec) {
           this._nextStop = this._calculateNextStop(this._stopsSlot, newVideoCurrentTime);
           this._disableNextStop();
         }
@@ -582,7 +589,7 @@
         this.player.currentTime(0);
         this.player.play();
         // this.player.currentTime(this._videoStartTime);
-        // this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
+        this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
 
         // Send the event to Google Analytics
         ga('send', 'event', 'Tour', 'restart', this._routeInfo.name);
@@ -593,12 +600,10 @@
         // If its on poi list or detail go back to navigation page.
         this._back();
         //_playVideo
-        if(this.player.paused()){
-                this.player.play();
-        }
-        //this.$.routeVideo.play();
+        this.player.play();
         this._shouldHidePlay = true;
         this._isVideoPlaying = true;
+        this._startedOnce = true;
 
         if (this._pois) {
           this._pois = null;
@@ -609,9 +614,7 @@
       },
 
       _pauseVideo: function() {
-        if(!this.player.paused()){
-              this.player.pause();
-        }
+        this.player.pause();
         this._shouldHidePlay = false;
         this._isVideoPlaying = false;
         // this.$.routeVideo.pause();
@@ -620,7 +623,15 @@
         // Send the event to Google Analytics
         ga('send', 'event', 'Tour', 'pause', this._routeInfo.name);
       },
+      _endVideo: function() {
+        this._shouldHidePlay = true;
+        this._isVideoPlaying = false;
+        // this.$.routeVideo.pause();
+        // this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
 
+        // Send the event to Google Analytics
+        ga('send', 'event', 'Tour', 'end', this._routeInfo.name);
+      },
       _stopVideo: function() {
         var self = this;
 
@@ -670,7 +681,7 @@
        */
       _loadRoutePath : function(points){
 
-        if(!points){
+        if(!points || !this._mapsApiLoaded){
           return;
         }
 
@@ -769,6 +780,12 @@
       _calculateNextStop: function(stopsSlot, videoCurrentTime) {
         // Get the next stop according to the actual time
         var nextStopOrigin = this._getNextStop(stopsSlot, videoCurrentTime);
+        if(!nextStopOrigin){
+          return ;
+        }
+        if(!nextStopOrigin.sec){
+          return ;
+        }
         var nextStopSec = parseInt(nextStopOrigin.sec);
         var nextStop = {
           lat: nextStopOrigin.lat,
@@ -900,6 +917,11 @@
               setTimeout(function(){
                    self._adjustMapSize();
               }, 1000);
+              var screenEvent = document.querySelector('.vjs-tech');
+              if(screenEvent){
+                screenEvent.style.pointerEvents = 'none';
+              }
+
 
 
               //self.player.src({type: "video/mp4", src: "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/ALUMROCKTRANSITCENTER-SANTACLARA%2628TH/1024x1024-SANTA_CLARA_28TH-ALUM_ROCK_TRANSIT_CENTER.mp4"});
@@ -915,12 +937,16 @@
               // How about an event listener?
               self.player.on('ended', function() {
                 videojs.log('Awww...over so soon?!');
+                self._endVideo();
+                self._adjustMapSize();
               });
               self.player.on('play', function() {
+                console.log('Video Played');
                 self._playVideo();
                 self._adjustMapSize();
               });
               self.player.on('pause', function() {
+                console.log('Video Paused');
                 self._pauseVideo();
                 self._adjustMapSize();
               });
