@@ -121,6 +121,21 @@
 
       <div class="inner-content">
       	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
+        <select id="videoViewSelection" on-change="_videoViewChange">
+          <option value="">Select View</option>
+          <template is="dom-if" if="[[_routeDetails.videoLeftUrl]]" >
+           <option value="[[_routeDetails.videoLeftUrl]]">Left View</option>
+          </template>
+          <template is="dom-if" if="[[_routeDetails.videoRightUrl]]">
+                <option value="[[_routeDetails.videoRightUrl]]">Right View</option>
+          </template>
+          <template is="dom-if" if="[[_routeDetails.videoUpUrl]]">
+              <option value="[[_routeDetails.videoUpUrl]]">Up View</option>
+          </template>
+          <template is="dom-if" if="[[_routeDetails.videoDownUrl]]">
+          <option value="[[_routeDetails.videoDownUrl]]">Down View</option>
+          </template>
+        </select>
       </div>
       <div class="navigation-wrapper">
         <div class="video-player-wrapper">
@@ -1002,6 +1017,22 @@
         }else{
           this._bingVideo(src);
         }
+      },
+      _videoViewChange:function(e){
+
+        this._oldVideoSource = this
+        console.log('video direction change');
+        console.log(this.$.videoViewSelection.value);
+        // if(this._oldVideoSource!=this.$.videoViewSelection.value){
+        //
+        // }
+
+        this._assignSource(this.$.videoViewSelection.value);
+        this._videoCurrentTimeChange(0);
+        this._pauseVideo();
+
+
+
       },
       ready: function() {
         var self = this;
