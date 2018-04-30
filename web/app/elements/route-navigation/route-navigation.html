@@ -1019,20 +1019,14 @@
         }
       },
       _videoViewChange:function(e){
-
-        this._oldVideoSource = this
         console.log('video direction change');
         console.log(this.$.videoViewSelection.value);
         // if(this._oldVideoSource!=this.$.videoViewSelection.value){
         //
         // }
-
         this._assignSource(this.$.videoViewSelection.value);
         this._videoCurrentTimeChange(0);
         this._pauseVideo();
-
-
-
       },
       ready: function() {
         var self = this;
