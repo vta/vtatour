@@ -216,11 +216,11 @@
           <div class="column1">
             <h3>Direction A - Info</h3>
             <paper-input id="directionAName" value="{{_routeInfo.directionAName}}" placeholder="Direction A Name" required></paper-input>
-            <paper-input id="videoA" value="{{_routeDetails.a.videoUrl}}" label="Video Direction A" placeholder="Video URL" required></paper-input>
+            <paper-input id="videoA" value="{{_routeDetails.a.videoUrl}}" label="Video Direction A - Front" placeholder="Front Video URL" required></paper-input>
             <paper-input id="videoALeft" value="{{_routeDetails.a.videoLeftUrl}}" label="Video Direction A - Left" placeholder="Left Side Video URL" required></paper-input>
             <paper-input id="videoARight" value="{{_routeDetails.a.videoRightUrl}}" label="Video Direction A - Right" placeholder="Right Side Video URL" required></paper-input>
-            <paper-input id="videoAUp" value="{{_routeDetails.a.videoUpUrl}}" label="Video Direction A - Right" placeholder="Up Side Video URL" required></paper-input>
-            <paper-input id="videoADown" value="{{_routeDetails.a.videoDownUrl}}" label="Video Direction A - Down" placeholder="Down Side Video URL" required></paper-input>
+            <paper-input id="videoABack" value="{{_routeDetails.a.videoBackUrl}}" label="Video Direction A - Back" placeholder="Back Side Video URL" required></paper-input>
+            <paper-input id="videoANight" value="{{_routeDetails.a.videoNightUrl}}" label="Video Direction A - Night" placeholder="Night Video URL" required></paper-input>
             <paper-input id="kmlFileA" label="KML File Direction A" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChange"></paper-input>
 
             <template is="dom-if" if="{{_displayStops}}">
@@ -238,11 +238,11 @@
           <div class="column1">
             <h3>Direction B - Info</h3>
             <paper-input id="directionBName" value="{{_routeInfo.directionBName}}" placeholder="Direction B Name" required></paper-input>
-            <paper-input id="videoB" value="{{_routeDetails.b.videoUrl}}" label="Video Direction B" placeholder="Video URL" required></paper-input>
+            <paper-input id="videoB" value="{{_routeDetails.b.videoUrl}}" label="Video Direction B - Front" placeholder="Front Video URL" required></paper-input>
             <paper-input id="videoBLeft" value="{{_routeDetails.b.videoLeftUrl}}" label="Video Direction B - Left" placeholder="Left Side Video URL" required></paper-input>
             <paper-input id="videoBRight" value="{{_routeDetails.b.videoRightUrl}}" label="Video Direction B - Right" placeholder="Right Side Video URL" required></paper-input>
-            <paper-input id="videoBUp" value="{{_routeDetails.b.videoUpUrl}}" label="Video Direction B - Right" placeholder="Up Side Video URL" required></paper-input>
-            <paper-input id="videoBDown" value="{{_routeDetails.b.videoDownUrl}}" label="Video Direction B - Down" placeholder="Down Side Video URL" required></paper-input>
+            <paper-input id="videoBBack" value="{{_routeDetails.b.videoBackUrl}}" label="Video Direction B - Back" placeholder="Back Side Video URL" required></paper-input>
+            <paper-input id="videoBNight" value="{{_routeDetails.b.videoNightUrl}}" label="Video Direction B - Night" placeholder="Night Video URL" required></paper-input>
             <paper-input id="kmlFileB" label="KML File Direction B" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChange"></paper-input>
 
             <template is="dom-if" if="{{_displayStops}}">
@@ -359,8 +359,8 @@
               videoUrl: null,
               videoLeftUrl: null,
               videoRightUrl: null,
-              videoUpUrl: null,
-              videoDownUrl: null,
+              videoBackUrl: null,
+              videoNightUrl: null,
             },
             b: {
               stops: [],
@@ -369,8 +369,8 @@
               videoUrl: null,
               videoLeftUrl: null,
               videoRightUrl: null,
-              videoUpUrl: null,
-              videoDownUrl: null,
+              videoBackUrl: null,
+              videoNightUrl: null,
             }
           }
         },
@@ -578,13 +578,13 @@
           this.$.videoA,
           this.$.videoALeft,
           this.$.videoARight,
-          this.$.videoAUp,
-          this.$.videoADown,
+          this.$.videoABack,
+          this.$.videoANight,
           this.$.videoB,
           this.$.videoBLeft,
           this.$.videoBRight,
-          this.$.videoBUp,
-          this.$.videoBDown,
+          this.$.videoBBack,
+          this.$.videoBNight,
           this.$.directionAName,
           this.$.directionBName,
           this.$.departure,

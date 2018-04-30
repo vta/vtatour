@@ -123,17 +123,20 @@
       	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
         <select id="videoViewSelection" on-change="_videoViewChange">
           <option value="">Select View</option>
+          <template is="dom-if" if="[[_routeDetails.videoUrl]]" >
+           <option value="[[_routeDetails.videoUrl]]">Front View</option>
+          </template>
           <template is="dom-if" if="[[_routeDetails.videoLeftUrl]]" >
            <option value="[[_routeDetails.videoLeftUrl]]">Left View</option>
           </template>
           <template is="dom-if" if="[[_routeDetails.videoRightUrl]]">
                 <option value="[[_routeDetails.videoRightUrl]]">Right View</option>
           </template>
-          <template is="dom-if" if="[[_routeDetails.videoUpUrl]]">
-              <option value="[[_routeDetails.videoUpUrl]]">Up View</option>
+          <template is="dom-if" if="[[_routeDetails.videoBackUrl]]">
+              <option value="[[_routeDetails.videoBackUrl]]">Back View</option>
           </template>
-          <template is="dom-if" if="[[_routeDetails.videoDownUrl]]">
-          <option value="[[_routeDetails.videoDownUrl]]">Down View</option>
+          <template is="dom-if" if="[[_routeDetails.videoNightUrl]]">
+          <option value="[[_routeDetails.videoNightUrl]]">Night View</option>
           </template>
         </select>
       </div>
