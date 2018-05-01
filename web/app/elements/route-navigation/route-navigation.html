@@ -442,7 +442,15 @@ var map;
           console.log(newRouteDetails.stops[this.departureStopId]);
 
           this._departureStop = newRouteDetails.stops[this.departureStopId];
-
+          // if(this._departureStop){
+          //   this._currentLat = parseFloat(this._departureStop.lat);
+          //   this._currentLng = parseFloat(this._departureStop.lng);
+          //   this._map.panTo({
+          //     lat:this._currentLat,
+          //     lng:this._currentLng,
+          //   })
+          //   this._map.setZoom(16);
+          // }
           this._destinationStop = newRouteDetails.stops[this.destinationStopId];
           if(this.$.departureMarker){
             this.$.departureMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._departureStop.name + '</h3>');
@@ -558,9 +566,10 @@ var map;
             this._currentLat = parseFloat(point.lat);
             this._currentLng = parseFloat(point.lng);
             this._map.panTo(point)
-            // if(this._map.getZoom() < 16){
-            //   this._map.setZoom(16);
-            // }
+            if(this._map.getZoom() < 16 && !this.reFocused){
+              this._map.setZoom(16);
+              this.reFocused = true;
+            }
           }
           console.log('point');
           console.log(point);
@@ -734,6 +743,9 @@ var map;
           if(!points || !this._mapsApiLoaded){
             return;
           }
+          console.log('check points');
+          console.log(points)
+          //alert('loading route: '+ points.length);
 
           var length = points.length;
           var cords = [];
@@ -1057,6 +1069,12 @@ var map;
 
           if(this.player){
             this.player.src({type: "video/mp4", src: src});
+            var self = this;
+            this._adjustMapSize();
+            setTimeout(function(){
+               self._adjustMapSize();
+            }, 2000);
+
           }else{
             this._bingVideo(src);
           }
