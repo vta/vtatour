@@ -208,7 +208,9 @@
 
           </div>
           <div class="column2">
+            <template is="dom-if" if="[[_routeDetails.a.videoGeoPoints]]">
             <route-map id="routeMap" geo-points="{{_routeDetails.a.videoGeoPoints}}"></route-map>
+            </template>
           </div>
         </div>
 
