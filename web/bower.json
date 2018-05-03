@@ -20,7 +20,8 @@
     "google-analytics": "^0.2.0",
     "icon-rate": "^1.0.0",
     "bootstrap": "3",
-    "font-awesome": "3.2.1"
+    "font-awesome": "3.2.1",
+    "jquery": "^3.3.1"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
