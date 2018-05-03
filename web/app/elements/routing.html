@@ -40,6 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     page('*', scrollToTop, function(ctx, next) {
       var routeNavigation = document.querySelector('route-navigation');
       app.hideBackBtn();
+      app.hideViewsBtn();
       app.resetAppName();
       next();
     });
@@ -66,6 +67,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var routeNavigation = document.querySelector('route-navigation');
 
       app.showBackBtn();
+      app.showViewsBtn();
       app.route = 'route-navigation';
       app.params = data.params;
       routeNavigation.code = data.params.code;
@@ -86,6 +88,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var routeNavigation = document.querySelector('route-navigation');
       if(routeNavigation.code){
         app.showBackBtn();
+        app.hideViewsBtn();
         routeNavigation.showPois();
       }else{
         page.redirect(page.current.replace('/pois', ''));
@@ -96,6 +99,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var routeNavigation = document.querySelector('route-navigation');
       if(routeNavigation.code){
         app.showBackBtn();
+        app.hideViewsBtn();
         routeNavigation.showPoiDetails();
       }else{
         page.redirect(page.current.replace('/pois/detail', ''));

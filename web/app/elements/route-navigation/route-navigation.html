@@ -65,7 +65,7 @@
       @media all and (min-width: 361px) and (orientation: landscape) {
         .navigation-wrapper {
           @apply(--layout-horizontal);
-          margin: 48px 62px;
+          margin: 0px 0px;
         }
 
         .video-player-wrapper,
@@ -73,9 +73,9 @@
           @apply(--layout-flex);
         }
 
-        .video-player-wrapper {
+        /* .video-player-wrapper {
           margin-right: 10px;
-        }
+        } */
       }
 
       /* Styles of the POI list and details for desktop version */
@@ -87,6 +87,7 @@
           width: 100%;
           @apply(--layout-horizontal);
           background-color: var(--vta-light-gray);
+          z-index: 100;
         }
 
         poi-list,
@@ -108,37 +109,56 @@
         }
       }
 
+      .icon{
+        cursor: pointer;
+      }
+
     </style>
       <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
       <firebase-document
         app-name="vta"
     	  id="routeDetails"
-        data="{{_routeDetailsOrigin}}"></firebase-document>
+        data="{{_routeDetailsOrigin}}">
+      </firebase-document>
       <firebase-document
         app-name="vta"
         id="routeInfo"
-        data="{{_routeInfoOrigin}}"></firebase-document>
+        data="{{_routeInfoOrigin}}">
+      </firebase-document>
+      <template is="dom-if" if="[[_routeInfo]]" >
+      <div class="top-header hidden-sm">
+              <div class="container-fluid header-area">
+                  <div class="pull-left">
+                      <div class="header-item"><img class="arrow-icons" src="../../images/back.svg" alt="">[[_routeDirection]] / V Tour /  [[_routeInfo.name]]</div>
+                  </div>
+                  <div class="pull-right  ">
+                  </div>
+                  <!-- #top-social end -->
+              </div>
+        </div>
+      </template>
+      <!-- <select id="videoViewSelection" on-change="_videoViewChange">
+        <option value="">Select View</option>
+        <template is="dom-if" if="[[_routeDetails.videoUrl]]" >
+         <option value="[[_routeDetails.videoUrl]]">Front View</option>
+        </template>
+        <template is="dom-if" if="[[_routeDetails.videoLeftUrl]]" >
+         <option value="[[_routeDetails.videoLeftUrl]]">Left View</option>
+        </template>
+        <template is="dom-if" if="[[_routeDetails.videoRightUrl]]">
+              <option value="[[_routeDetails.videoRightUrl]]">Right View</option>
+        </template>
+        <template is="dom-if" if="[[_routeDetails.videoBackUrl]]">
+            <option value="[[_routeDetails.videoBackUrl]]">Back View</option>
+        </template>
+        <template is="dom-if" if="[[_routeDetails.videoNightUrl]]">
+        <option value="[[_routeDetails.videoNightUrl]]">Night View</option>
+        </template>
+      </select> -->
 
-      <div class="inner-content">
+      <div class="inner-content" style="display:none;">
       	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
-        <select id="videoViewSelection" on-change="_videoViewChange">
-          <option value="">Select View</option>
-          <template is="dom-if" if="[[_routeDetails.videoUrl]]" >
-           <option value="[[_routeDetails.videoUrl]]">Front View</option>
-          </template>
-          <template is="dom-if" if="[[_routeDetails.videoLeftUrl]]" >
-           <option value="[[_routeDetails.videoLeftUrl]]">Left View</option>
-          </template>
-          <template is="dom-if" if="[[_routeDetails.videoRightUrl]]">
-                <option value="[[_routeDetails.videoRightUrl]]">Right View</option>
-          </template>
-          <template is="dom-if" if="[[_routeDetails.videoBackUrl]]">
-              <option value="[[_routeDetails.videoBackUrl]]">Back View</option>
-          </template>
-          <template is="dom-if" if="[[_routeDetails.videoNightUrl]]">
-          <option value="[[_routeDetails.videoNightUrl]]">Night View</option>
-          </template>
-        </select>
+
       </div>
       <div class="navigation-wrapper">
         <div class="video-player-wrapper">
@@ -239,7 +259,55 @@
           lat-origin="{{_nextStopGeoPoint.lat}}" lng-origin="{{_nextStopGeoPoint.lng}}"></poi-detail>
       </div>
 
-      <div class="video-controls" >
+      <div class="background-color">
+      <div class="container">
+          <div class="row">
+              <!--feature start-->
+              <div class="button-area">
+              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="restartVideo" on-click="_restartVideo">
+                  <section>
+                      <div class="f-box">
+                          <i><img style=" width:30px;" src="../../images/restart.svg" alt=""></i>
+                          <a href="javascript:void(0);"><h2>RESTART</h2></a>
+                      </div>
+
+                  </section>
+              </div>
+              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="playVideo" on-click="_playVideo" hidden$="{{_shouldHidePlay}}" disabled$="{{!_startedOnce}}">
+                  <section>
+                      <div class="f-box ">
+                          <i><img style=" width:30px;" src="../../images/play.svg" alt=""></i>
+                           <a href="javascript:void(0);"><h2>PLAY</h2></a>
+                      </div>
+
+                  </section>
+              </div>
+              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="pauseVideo" on-click="_pauseVideo" hidden$="{{!_isVideoPlaying}}" >
+                  <section>
+                      <div class="f-box ">
+                          <i><img style=" width:30px;" src="../../images/pause.svg" alt=""></i>
+                           <a href="javascript:void(0);"><h2>PAUSE</h2></a>
+                      </div>
+
+                  </section>
+              </div>
+              <div style=" border-right:1px solid #fff" class="col-lg-4 col-sm-4 col-xs-4 icon" id="stopVideo" on-click="_stopVideo" disabled>
+                  <section>
+                      <div class="f-box">
+                           <i><img style=" width:30px;" src="../../images/view.svg" alt=""></i>
+                           <a href="javascript:void(0);"><h2>VIEW PIOs</h2></a>
+                      </div>
+
+                  </section>
+              </div>
+              </div>
+              <!--feature end-->
+          </div>
+
+      </div>
+    </div>
+
+      <!-- <div class="video-controls" >
         <paper-button id="restartVideo" on-click="_restartVideo" disabled$="{{!_startedOnce}}">
           <iron-icon icon="vta-icons:restart"></iron-icon>
           <span class="button-copy">Restart</span>
@@ -256,7 +324,7 @@
           <iron-icon icon="vta-icons:stop"></iron-icon>
           <span class="button-copy">View POIs</span>
         </paper-button>
-      </div>
+      </div> -->
       <maps-utils id="mapsUtils" on-pois-loaded="_poisLoaded"></maps-utils>
     </template>
 </dom-module>
@@ -397,10 +465,14 @@ var map;
           this.$.routeDetails.path = null;
           this.$.routeInfo.path = null;
           this._pois = [];
+          this.reFocused = false;
 
           if (this._mapPolyline) {
             this._mapPolyline.setMap(null);
           }
+          this._videoViewChange("");
+          $('.SelectViewItems').hide();
+          $('#viewSelectionText').text("VIEWS");
         },
 
         _initialPropertyChange: function() {
@@ -423,6 +495,32 @@ var map;
           console.log('check new route details')
           console.log(newRouteDetails)
           this._assignSource(newRouteDetails.videoUrl);
+
+          if(newRouteDetails.videoUrl){
+            $('#frontView').show().attr('data-video',newRouteDetails.videoUrl);
+          }else{
+            $('#frontView').hide();
+          }
+          if(newRouteDetails.videoLeftUrl){
+            $('#leftView').show().attr('data-video',newRouteDetails.videoLeftUrl);
+          }else{
+            $('#leftView').hide();
+          }
+          if(newRouteDetails.videoRightUrl){
+            $('#rightView').show().attr('data-video',newRouteDetails.videoRightUrl);
+          }else{
+            $('#rightView').hide();
+          }
+          if(newRouteDetails.videoBackUrl){
+            $('#backView').show().attr('data-video',newRouteDetails.videoBackUrl);
+          }else{
+            $('#backView').hide();
+          }
+          if(newRouteDetails.videoNightUrl){
+            $('#nightView').show().attr('data-video',newRouteDetails.videoNightUrl);
+          }else{
+            $('#nightView').hide();
+          }
 
           // Get the departure and destination points based on the closest points to the stops
 
@@ -676,7 +774,9 @@ var map;
           // this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
 
           // Send the event to Google Analytics
-          ga('send', 'event', 'Tour', 'pause', this._routeInfo.name);
+          if(this._routeInfo){
+            ga('send', 'event', 'Tour', 'pause', this._routeInfo.name);
+          }
         },
         _endVideo: function() {
           this._shouldHidePlay = true;
@@ -744,8 +844,7 @@ var map;
             return;
           }
           console.log('check points');
-          console.log(points)
-          //alert('loading route: '+ points.length);
+          console.log(points);
 
           var length = points.length;
           var cords = [];
@@ -768,6 +867,8 @@ var map;
           // map.addEventListener('google-map-ready', function(e) {
           //   console.log('Map loaded!');
           // });
+          console.log('final cords');
+          console.log(cords);
              try{
                self._mapPolyline = new google.maps.Polyline({
                  path: cords,
@@ -1079,13 +1180,13 @@ var map;
             this._bingVideo(src);
           }
         },
-        _videoViewChange:function(e){
-          console.log('video direction change');
-          console.log(this.$.videoViewSelection.value);
-          // if(this._oldVideoSource!=this.$.videoViewSelection.value){
-          //
-          // }
-          this._assignSource(this.$.videoViewSelection.value);
+        _videoViewChange:function(src){
+          // console.log('video direction change');
+          // console.log(this.$.videoViewSelection.value);
+          // this._assignSource(this.$.videoViewSelection.value);
+          // this._videoCurrentTimeChange(0);
+          // this._pauseVideo();
+          this._assignSource(src);
           this._videoCurrentTimeChange(0);
           this._pauseVideo();
         },
@@ -1094,6 +1195,15 @@ var map;
           setTimeout(function(){
             self._bingVideo()
           }, 1000);
+
+          $(document).ready(function(e){
+            $('.SelectViewItems').hide();
+            $('.SelectViewItems').on('click',function(e){
+              var videoSource = $(this).attr('data-video');
+              $('#viewSelectionText').text($(this).find('a').text());
+              self._videoViewChange(videoSource);
+            });
+          })
         },
         _isValidCords:function(lat,lng){
           if(isNaN(parseFloat(lat))){
