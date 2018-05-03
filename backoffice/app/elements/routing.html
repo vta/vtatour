@@ -28,15 +28,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     function selectRouteLink(selected) {
-      var selectedRouteAnchor = document.querySelector('a[data-route="' + selected + '"]');      
-      var routeItems = document.querySelector('a[data-route]');
-
-      if (routeItems) {
-        routeItems.removeAttribute('data-selected');
+      var routeItems = document.querySelectorAll('a[data-route]');
+      if(routeItems){
+        routeItems.forEach(function(item, index){
+            item.removeAttribute('data-selected');
+        })
       }
-      
+      var selectedRouteAnchor = document.querySelector('a[data-route="' + selected + '"]');
       if (selectedRouteAnchor) {
         selectedRouteAnchor.setAttribute('data-selected', 'true')
+      }
+      if(!selectedRouteAnchor){
+        setTimeout(function(){
+          var selectedRouteAnchorRecheck = document.querySelector('a[data-route="' + selected + '"]');
+          if (selectedRouteAnchorRecheck) {
+            selectedRouteAnchorRecheck.setAttribute('data-selected', 'true')
+          }
+        }, 2000);
       }
     }
 
@@ -97,9 +105,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       setFocus(app.route);
       selectRouteLink(app.route);
     });
+    page('/import-data', function() {
+      app.route = 'import-data';
+      setFocus(app.route);
+      selectRouteLink(app.route);
+    });
 
-    page('/logout', function() {
-      app.signOut();
+    page('/logout/:action', function(data) {
+      app.route = 'vta-logout';
+      app.params = data.params;
+      console.log(app.params);
+      setFocus(app.route);
+      selectRouteLink(app.route);
     });
 
     // 404

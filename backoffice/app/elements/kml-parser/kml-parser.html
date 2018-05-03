@@ -22,13 +22,13 @@
         reader.onload = function() {
          self._parseRouteShootKML(this.result, self);
         }
-        
+
         reader.readAsText(this.file);
       },
 
       /**
        * Method to parse a KML from the RouteShoot application
-       * 
+       *
        * @param file the KML to be parsed
        * @param Polymer actual element
        */

@@ -44,13 +44,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- Tile icon for Win8 (144x144) -->
   <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
 
+  <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <!-- endbuild -->
+
+  <link rel="stylesheet" href="https://vjs.zencdn.net/6.6.3/video-js.css">
+  <script src="https://vjs.zencdn.net/6.6.3/video.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <!-- <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" > -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
+
+
+  <!--end of external css-->
+
   <!-- build:css styles/main.css -->
   <link rel="stylesheet" href="styles/main.css">
   <!-- endbuild-->
 
-  <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-  <!-- endbuild -->
+    <!-- importing fontawesome-->
+  <!-- <link href="bower_components/font-awesome/css/font-awesome.css" rel="stylesheet" /> -->
+
+
 
   <!-- Because this project uses vulcanize this should be your only html import
        in this file. All other imports should go in elements.html -->
@@ -72,7 +89,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       database-url="https://project-6110787873650778530.firebaseio.com"
       api-key="AIzaSyCDtI3bfIhVlYdG9zrYzKtqCOqQWldRI7c">
     </firebase-app-->
-	
+
 	<firebase-app name="vta" auth-domain="vtavirtualtransit-7c904.firebaseapp.com" database-url="https://vtavirtualtransit-7c904.firebaseio.com" api-key="AIzaSyALqCogus7yIJJ0OE48RwBtmteqybWvZ6g"></firebase-app>
 
     <google-analytics code="UA-80621906-1"></google-analytics>
@@ -82,10 +99,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- Main Area -->
     <paper-scroll-header-panel main id="headerPanelMain" keep-condensed-header fixed>
       <!-- Main Toolbar -->
-      <paper-toolbar id="mainToolbar" class="title">
-        <div class="icons left-icons">
+      <paper-toolbar id="mainToolbar" class="title" style="display:none;">
+        <!-- <div class="icons left-icons">
           <paper-icon-button id="backBtn" icon="arrow-back" aria-label="Go back"></paper-icon-button>
-        </div>
+        </div> -->
 
         <div class="icons right-icons">
           <paper-icon-button id="poisBtn" icon="maps:hotel" aria-label="POIs"></paper-icon-button>
@@ -106,6 +123,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <div class="bottom-title"></div>
         </div>
       </paper-toolbar>
+      <header class="header-frontend">
+          <div class="navbar navbar-default navbar-static-top">
+              <div class="container-fluid">
+                  <div class="navbar-header">
+
+                      <a class="navbar-brand" href="#"><img style="margin-top:4px; height:48px"  src="images/vtavirtualtransit-logo.jpg" alt=""></a>
+                  </div>
+                  <div class="navbar-collapse collapse ">
+                      <ul class="nav navbar-nav">
+
+                          <li class="dropdown" id="viewsBtn">
+                              <a href="#" class="dropdown-toggle " data-toggle="dropdown" data-hover="dropdown" data-delay="0" >
+                              <span id="viewSelectionText">VIEWS</span>
+                              <iron-icon icon="icons:expand-more"></iron-icon></b></a>
+                              <ul class="dropdown-menu">
+                                  <li id="frontView" class="SelectViewItems"><a href="javascript:void(0);">Front View</a></li>
+                                  <li id="leftView" class="SelectViewItems"><a href="javascript:void(0);">Left View</a></li>
+                                  <li id="rightView" class="SelectViewItems"><a href="javascript:void(0);">Right View</a></li>
+                                  <li id="backView" class="SelectViewItems"><a href="javascript:void(0);">Back View</a></li>
+                                  <li id="nightView" class="SelectViewItems"><a href="javascript:void(0);">Night View</a></li>
+                              </ul>
+                          </li>
+
+                           <!-- <li class="dropdown ">
+                              <a href="#" class="dropdown-toggle " data-toggle="dropdown" data-hover="dropdown" data-delay="0" >STATION PAIR <b class=" icon-angle-down"></b></a>
+                              <ul class="dropdown-menu">
+                                  <li><a href="#">Station Pair-1</a></li>
+                                  <li><a href="#">Station Pair-2</a></li>
+                                    <li><a href="#">Station Pair-3</a></li>
+                                      <li><a href="#">Station Pair-4</a></li>
+                                        <li><a href="#">Station Pair-5</a></li>
+                                          <li><a href="#">Station Pair-6</a></li>
+                                            <li><a href="#">Station Pair-7</a></li>
+                              </ul>
+
+
+
+
+
+
+
+
+                          </li> -->
+
+                          <li id="backBtn"><a href="javascript:void(0);">GO BACK</a></li>
+
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </header>
+
 
       <!-- Main Content -->
       <div class="content">
@@ -144,10 +213,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     -->
 
   </template>
-
   <!-- build:js scripts/app.js -->
   <script src="scripts/app.js"></script>
   <!-- endbuild-->
+
 </body>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<!-- <script src="bower_components/jquery/dist/jquery.min.js" ></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script> -->
 
 </html>

@@ -12,7 +12,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <html lang="en">
 
 <head>
-  <base href="/backoffice/"
+  <base href="/backoffice/">
+  <!-- <base href="/"> -->
   <meta charset="utf-8">
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -74,7 +75,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       database-url="https://project-6110787873650778530.firebaseio.com"
       api-key="AIzaSyCDtI3bfIhVlYdG9zrYzKtqCOqQWldRI7c">
     </firebase-app-->
-	
+
 	<firebase-app name="vta" auth-domain="vtavirtualtransit-7c904.firebaseapp.com" database-url="https://vtavirtualtransit-7c904.firebaseio.com" api-key="AIzaSyALqCogus7yIJJ0OE48RwBtmteqybWvZ6g"></firebase-app>
 
     <vta-login hidden$="{{signedIn}}" user="{{user}}" signed-in={{signedIn}} logo-url="images/vta-logo.png"></vta-login>
@@ -91,6 +92,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </a> -->
             <ul>
               <li>
+                <a data-route="import-data" href="{{baseUrl}}import-data">
+                  <img class="importButton"src="images/import.svg">
+                  <span>Import</span>
+                </a>
+              </li>
+              <li>
                 <a data-route="routes" href="{{baseUrl}}routes">
                   <iron-icon icon="vta-icons:routes"></iron-icon>
                   <span>Routes</span>
@@ -104,7 +111,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </li> -->
             </ul>
 
-            <a data-route="logout" href="{{baseUrl}}logout">
+            <a data-route="logout" href="{{baseUrl}}logout/1">
               <span>Logout</span>
               <iron-icon icon="icons:exit-to-app"></iron-icon>
             </a>
@@ -140,6 +147,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </section>
             <section data-route="stops-parser" tabindex="-1">
               <stops-parser></stops-parser>
+            </section>
+            <section data-route="import-data" tabindex="-1">
+              <import-data></import-data>
+            </section>
+            <section data-route="vta-logout" tabindex="-1">
+              <vta-logout action="{{params.action}}"></vta-logout>
             </section>
           </iron-pages>
         </div>

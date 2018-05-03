@@ -208,7 +208,9 @@
 
           </div>
           <div class="column2">
+            <template is="dom-if" if="[[_routeDetails.a.videoGeoPoints]]">
             <route-map id="routeMap" geo-points="{{_routeDetails.a.videoGeoPoints}}"></route-map>
+            </template>
           </div>
         </div>
 
@@ -216,7 +218,11 @@
           <div class="column1">
             <h3>Direction A - Info</h3>
             <paper-input id="directionAName" value="{{_routeInfo.directionAName}}" placeholder="Direction A Name" required></paper-input>
-            <paper-input id="videoA" value="{{_routeDetails.a.videoUrl}}" label="Video Direction A" placeholder="YouTube Video URL" required></paper-input>
+            <paper-input id="videoA" value="{{_routeDetails.a.videoUrl}}" label="Video Direction A - Front" placeholder="Front Video URL" required></paper-input>
+            <paper-input id="videoALeft" value="{{_routeDetails.a.videoLeftUrl}}" label="Video Direction A - Left" placeholder="Left Side Video URL" required></paper-input>
+            <paper-input id="videoARight" value="{{_routeDetails.a.videoRightUrl}}" label="Video Direction A - Right" placeholder="Right Side Video URL" required></paper-input>
+            <paper-input id="videoABack" value="{{_routeDetails.a.videoBackUrl}}" label="Video Direction A - Back" placeholder="Back Side Video URL" required></paper-input>
+            <paper-input id="videoANight" value="{{_routeDetails.a.videoNightUrl}}" label="Video Direction A - Night" placeholder="Night Video URL" required></paper-input>
             <paper-input id="kmlFileA" label="KML File Direction A" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChange"></paper-input>
 
             <template is="dom-if" if="{{_displayStops}}">
@@ -234,7 +240,11 @@
           <div class="column1">
             <h3>Direction B - Info</h3>
             <paper-input id="directionBName" value="{{_routeInfo.directionBName}}" placeholder="Direction B Name" required></paper-input>
-            <paper-input id="videoB" value="{{_routeDetails.b.videoUrl}}" label="Video Direction B" placeholder="YouTube Video URL" required></paper-input>
+            <paper-input id="videoB" value="{{_routeDetails.b.videoUrl}}" label="Video Direction B - Front" placeholder="Front Video URL" required></paper-input>
+            <paper-input id="videoBLeft" value="{{_routeDetails.b.videoLeftUrl}}" label="Video Direction B - Left" placeholder="Left Side Video URL" required></paper-input>
+            <paper-input id="videoBRight" value="{{_routeDetails.b.videoRightUrl}}" label="Video Direction B - Right" placeholder="Right Side Video URL" required></paper-input>
+            <paper-input id="videoBBack" value="{{_routeDetails.b.videoBackUrl}}" label="Video Direction B - Back" placeholder="Back Side Video URL" required></paper-input>
+            <paper-input id="videoBNight" value="{{_routeDetails.b.videoNightUrl}}" label="Video Direction B - Night" placeholder="Night Video URL" required></paper-input>
             <paper-input id="kmlFileB" label="KML File Direction B" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChange"></paper-input>
 
             <template is="dom-if" if="{{_displayStops}}">
@@ -348,13 +358,21 @@
               stops: [],
               videoGeoPoints: {},
               videoId: null,
-              videoUrl: null
+              videoUrl: null,
+              videoLeftUrl: null,
+              videoRightUrl: null,
+              videoBackUrl: null,
+              videoNightUrl: null,
             },
             b: {
               stops: [],
               videoGeoPoints: {},
               videoId: null,
-              videoUrl: null
+              videoUrl: null,
+              videoLeftUrl: null,
+              videoRightUrl: null,
+              videoBackUrl: null,
+              videoNightUrl: null,
             }
           }
         },
@@ -560,7 +578,15 @@
           this.$.code,
           this.$.name,
           this.$.videoA,
+          this.$.videoALeft,
+          this.$.videoARight,
+          this.$.videoABack,
+          this.$.videoANight,
           this.$.videoB,
+          this.$.videoBLeft,
+          this.$.videoBRight,
+          this.$.videoBBack,
+          this.$.videoBNight,
           this.$.directionAName,
           this.$.directionBName,
           this.$.departure,
@@ -596,8 +622,33 @@
       _saveRoute: function() {
         var self = this;
 
+        console.log(this._routeDetails);
+        console.log('above data is old one');
+
+        if(this._routeDetails.a && this._routeDetails.a.stops && this._routeDetails.a.stops.length ){
+          for(var a=0;a<this._routeDetails.a.stops.length;a++){
+            var tempStopObject = this._routeDetails.a.stops[a];
+              var point = this.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, this._routeDetails.a.videoGeoPoints);
+              this._routeDetails.a.stops[a].sec =  parseInt(point.key);
+          }
+        }
+
+        if(this._routeDetails.b && this._routeDetails.b.stops && this._routeDetails.b.stops.length ){
+          for(var b=0;b<this._routeDetails.b.stops.length;b++){
+            var tempStopObject = this._routeDetails.b.stops[b];
+            var point = this.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, this._routeDetails.b.videoGeoPoints);
+            this._routeDetails.b.stops[b].sec =  parseInt(point.key);
+          }
+        }
+
+        console.log(this._routeDetails);
+        //return false;
+
+
         this._routeInfoOrigin = this._routeInfo;
         this._routeDetailsOrigin = this._routeDetails;
+
+
 
         this.$.routeInfo.save('/routes', this._code)
           .then(function() {

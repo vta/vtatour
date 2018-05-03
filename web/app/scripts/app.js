@@ -10,12 +10,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 (function(document) {
   'use strict';
 
-  // Grab a reference to our auto-binding template
-  // and give it some initial binding values
+  window.onerror = function (msg, url, lineNo, columnNo, error) {
+    // ... handle error ...
+    console.log('Error Debugging');
+    console.log('Line No:'+lineNo);
+    console.log('Message:'+msg);
+    console.log('error details');
+    console.log(error);
+
+
+    return false;
+  }
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
   var poisBtn;
   var backBtn;
+  var viewsBtn;
 
   // Sets app default base URL
   app.baseUrl = '/';
@@ -39,6 +49,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     poisBtn = Polymer.dom(document).querySelector('#poisBtn');
     backBtn = Polymer.dom(document).querySelector('#backBtn');
+    viewsBtn = Polymer.dom(document).querySelector('#viewsBtn');
 
     backBtn.addEventListener('click', app.back);
   });
@@ -110,6 +121,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       backBtn.style.display = 'none';
     }
   };
+
+  app.showViewsBtn = function() {
+    if (viewsBtn) {
+      viewsBtn.style.display = 'block';
+    }
+  };
+
+  app.hideViewsBtn = function() {
+    if (viewsBtn) {
+      viewsBtn.style.display = 'none';
+    }
+  };
+
+
 
   app.showPOIsBtn = function() {
     if (poisBtn) {

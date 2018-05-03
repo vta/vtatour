@@ -13,6 +13,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // Grab a reference to our auto-binding template
   // and give it some initial binding values
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
+
+
   var app = document.querySelector('#app');
 
   // Sets app default base URL
@@ -43,7 +45,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   // Listen for size changes to display menu options accordingly
   window.addEventListener('resize', function() {
-    
+
   });
 
   // Main area's paper-scroll-header-panel custom condensing transformation of
@@ -102,9 +104,4 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   // Logged user variable
   app.user = null;
-
-  app.signOut = function(){
-    app.firebaseApp.auth().signOut();
-  };
-
 })(document);
