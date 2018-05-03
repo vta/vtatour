@@ -8,10 +8,13 @@
       }
 
       paper-progress {
-        --paper-progress-active-color: var(--vta-red);
+        --paper-progress-active-color: #44B5E3;
         width: 100%;
         cursor: pointer;
+        height: 10px;
+        --paper-progress-height: 10px;
       }
+
 
       .video-controls {
         @apply(--layout-horizontal);
@@ -109,8 +112,14 @@
         }
       }
 
-      .icon{
+      .icon,#secondery-back-link{
         cursor: pointer;
+      }
+
+      .background-color{
+        /* margin-top: 7%; */
+        position: fixed;
+        bottom: 0;
       }
 
     </style>
@@ -129,7 +138,7 @@
       <div class="top-header hidden-sm">
               <div class="container-fluid header-area">
                   <div class="pull-left">
-                      <div class="header-item"><img class="arrow-icons" src="../../images/back.svg" alt="">[[_routeDirection]] / V Tour /  [[_routeInfo.name]]</div>
+                      <div class="header-item"><img class="arrow-icons" src="../../images/back.svg" alt="" on-click="_goBack" id="secondery-back-link">[[_routeDirection]] / V Tour /  [[_routeInfo.name]]</div>
                   </div>
                   <div class="pull-right  ">
                   </div>
@@ -137,24 +146,6 @@
               </div>
         </div>
       </template>
-      <!-- <select id="videoViewSelection" on-change="_videoViewChange">
-        <option value="">Select View</option>
-        <template is="dom-if" if="[[_routeDetails.videoUrl]]" >
-         <option value="[[_routeDetails.videoUrl]]">Front View</option>
-        </template>
-        <template is="dom-if" if="[[_routeDetails.videoLeftUrl]]" >
-         <option value="[[_routeDetails.videoLeftUrl]]">Left View</option>
-        </template>
-        <template is="dom-if" if="[[_routeDetails.videoRightUrl]]">
-              <option value="[[_routeDetails.videoRightUrl]]">Right View</option>
-        </template>
-        <template is="dom-if" if="[[_routeDetails.videoBackUrl]]">
-            <option value="[[_routeDetails.videoBackUrl]]">Back View</option>
-        </template>
-        <template is="dom-if" if="[[_routeDetails.videoNightUrl]]">
-        <option value="[[_routeDetails.videoNightUrl]]">Night View</option>
-        </template>
-      </select> -->
 
       <div class="inner-content" style="display:none;">
       	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
@@ -169,7 +160,7 @@
                   <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
                 </p>
           </video>
-          <paper-progress value="{{_progressBarValue}}" on-click="_videoProgressClick"></paper-progress>
+          <paper-progress value="{{_progressBarValue}}" on-click="_videoProgressClick" class="blue"></paper-progress>
         </div>
 
         <div class="map-wrapper">
@@ -1104,8 +1095,9 @@ var map;
                 }
                 var fullSkinButton = document.querySelector('.video-js .vjs-fullscreen-control');
                 fullSkinButton.style.display = 'block';
-                fullSkinButton.style.marginTop = '-55%';
+                fullSkinButton.style.marginTop = '-57.5%';
                 fullSkinButton.style.position = 'relative';
+                fullSkinButton.style.fontSize = '17px';
                 var progressBar = document.querySelector('.video-js .vjs-progress-control');
                 progressBar.style.visibility='hidden';
                 var timeRemaing = document.querySelector('.vjs-remaining-time-display');
@@ -1190,6 +1182,9 @@ var map;
           this._videoCurrentTimeChange(0);
           this._pauseVideo();
         },
+        _goBack:function(){
+          $('#backBtn').click();
+        },
         ready: function() {
           var self = this;
           setTimeout(function(){
@@ -1203,6 +1198,10 @@ var map;
               $('#viewSelectionText').text($(this).find('a').text());
               self._videoViewChange(videoSource);
             });
+            // $('.paper-progress-0 #primaryProgress.paper-progress').css({
+            //   'background':'#44B5E3',
+            //   'height':'20px'
+            // })
           })
         },
         _isValidCords:function(lat,lng){
