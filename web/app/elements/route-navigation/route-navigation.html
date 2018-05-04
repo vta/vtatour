@@ -225,11 +225,13 @@
 
             <template is="dom-repeat" items="[[_routeDetails.stops]]" as="stopObj">
                 <template is="dom-if" if="[[_isValidCords(stopObj.lat,stopObj.lng)]]">
+                  <template is="dom-if" if="[[_isInValidRange(stopObj.sec)]]">
                   <google-map-marker latitude="[[stopObj.lat]]" longitude="[[stopObj.lng]]" data-sec="[[stopObj.sec]]"
                     click-events on-google-map-marker-click="_onStopIconClick" icon="/images/fa-map-marker-stop.png">
                     <span style="display:none">[[stopObj.sec]]</span>
                     <h2>[[stopObj.name]]</h2>
                   </google-map-marker>
+                  </template>
                 </template>
             </template>
 
@@ -552,8 +554,14 @@ var map;
 
 
           // Set the start and end times of the video based on the departure and destination stops
-          this._videoStartTime = departurePoint.key;
-          this._videoEndTime = destinationPoint.key;
+          this._videoStartTime = parseInt(departurePoint.key);
+          this._videoEndTime = parseInt(destinationPoint.key);
+          if(this.player.duration()<this._videoStartTime){
+            this.player.pause();
+          }else{
+            this.player.currentTime(this._videoStartTime);
+          }
+
 
           // Set the next stop
           if(this.departureStopId < this.destinationStopId){
@@ -639,10 +647,22 @@ var map;
           console.log('current Time: '+newVideoCurrentTime)
           console.log('duration: '+this.player.duration());
           // Check if the video reaches the end of the tour
-          if (newVideoCurrentTime >= this.player.duration()) {
+          if(newVideoCurrentTime<this._videoStartTime){
+            this.player.currentTime(this._videoStartTime);
+          }
+          if(newVideoCurrentTime == (this._videoEndTime+1)){
+            this.player.pause();
+            return;
+          }else if(newVideoCurrentTime > (this._videoEndTime+1)){
+            this.player.pause();
+            this.player.currentTime(this._videoEndTime);
+            return;
+          }else if (newVideoCurrentTime >= this.player.duration()) {
             this.player.pause();
             return;
           }
+
+
 
           var point = this._routeDetails.videoGeoPoints[newVideoCurrentTime - 1];
 
@@ -1218,7 +1238,13 @@ var map;
             return false;
           }
           return true;
-        }
+        },
+        _isInValidRange:function(sec){
+          if(sec>=this._videoStartTime && sec<=this._videoEndTime){
+            return true;
+          }
+          return false;
+        },
       });
     }catch(err){
       console.log('route navigation error');
