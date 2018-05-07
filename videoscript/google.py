@@ -13,6 +13,7 @@ from flask import request
 global base_dir,pairname,routename,dirname,video 
 pairname='undefined'
 app = Flask(__name__)
+app.run(host='0.0.0.0')
 cors = CORS(app, resources={r'/*': {"origins": '*'}})
 base_dir = os.path.realpath("")
 
