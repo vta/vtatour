@@ -9,6 +9,100 @@
         .route-selection-message {
           color: var(--secondary-color);
         }
+
+        paper-fab{
+          float: left;
+          position: relative;
+          margin-left: 44%;
+          margin-top: 45px;
+          width:135px;
+          background-color: #02528a;
+          border-radius: 29px;
+          touch-action: manipulation;
+          -ms-touch-action: manipulation;
+          cursor: pointer;
+          font-weight: 600;
+          text-align: center;
+          height: 45px;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          background-image: none;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(2, 82, 138, 0.19);
+        }
+        .panel-body {
+          padding: 10px!important;
+          border-radius: 60px!important;
+          background-color: #FFF!important;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(2, 82, 138, 0.19);
+          margin-top: 16px;
+          width: 55%;
+          margin-left: 22%;
+        }
+        paper-input-autocomplete,paper-dropdown-menu{
+          border: 1px solid #02528a!important;
+          box-shadow: none;
+          /* color: #c2c2c2; */
+          padding: 1px 32px;
+          font-size: 11px;
+          border-radius: 60px!important;
+        }
+        /* paper-dropdown-menu{
+          padding: 5px!important;
+          border-radius: 21px!important;
+          background-color: #FFF!important;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(2, 82, 138, 0.19) !important;
+          margin-top: 16px;
+          border: 1px solid #02528a!important;
+          height: 60px;
+        } */
+        @media all and (min-width: 768px) and (max-width: 980px) {
+          .panel-body {
+            width: 85%;
+            margin-left: 10%;
+          }
+        }
+        @media all and (max-width: 768px) {
+          .panel-body {
+            width: 85%;
+            margin-left: 10%;
+          }
+          .top-header{
+            height: 39px!important;
+          }
+
+          paper-fab{
+            margin-left: 40%;
+          }
+
+        }
+
+        @media (max-width: 480px) {
+          .panel-body {
+            width: 100%;
+            margin-left: 0%;
+          }
+          .top-header{
+            height: 39px!important;
+          }
+            paper-fab{
+              margin-left: 38%;
+            }
+
+        }
+        @media (max-width:320px) {
+
+              .panel-body {
+                width: 100%;
+                margin-left: 0%;
+              }
+
+        }
+        .header-frontend .navbar{
+              min-height: 52px !important;
+        }
+
       </style>
       <firebase-query
           app-name="vta"
@@ -20,14 +114,35 @@
         app-name="vta"
         id="routeDetailsDoc">
       </firebase-document>
+      <div class="top-header">
+              <div class="container-fluid header-area">
+                  <div class="pull-left">
+
+                      <div style="height:30px;" class="header-item">Choose your route</div>
+
+                  </div>
+                  <div class="pull-right  ">
+
+
+                  </div>
+                  <!-- #top-social end -->
+
+              </div>
+
+      </div>
 
       <div class="inner-content">
-        <h2 class="page-title" tabindex="-1">Choose your Route</h2>
+        <!-- <h2 class="page-title" tabindex="-1">Choose your Route</h2> -->
 
+
+        <div class="panel-body">
         <paper-input-autocomplete id="routesAutocomplete" label="Routes" placeholder="Type your route"
           search-property="name" value="{{_selectedRoute}}" source={{_routes}} suggestions-in-overlay="true"
-          display-options-on-focus="true"></paper-input-autocomplete>
+          display-options-on-focus="true">
+        </paper-input-autocomplete>
+        </div>
 
+        <div class="panel-body">
         <paper-dropdown-menu id="directionDropdown" label="Direction" placeholder="Choose direction of the route"
           disabled on-iron-select="_directionDropdownSelect">
           <paper-listbox id="directionDropdownListBox" class="dropdown-content">
@@ -35,7 +150,9 @@
             <paper-item value="[[_directions.b]]">[[_selectedRoute.directionBName]]</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
+        </div>
 
+        <div class="panel-body">
         <paper-dropdown-menu id="departureDropdown" label="Departure" placeholder="Choose departure point"
           disabled on-iron-select="_departureDropdownSelect">
           <paper-listbox id="departureDropdownListBox" class="dropdown-content">
@@ -44,7 +161,9 @@
             </template>
           </paper-listbox>
         </paper-dropdown-menu>
+        </div>
 
+        <div class="panel-body">
         <paper-dropdown-menu id="destinationDropdown" label="Destination" placeholder="Choose destination point"
           disabled on-iron-select="_destinationDropdownSelect">
           <paper-listbox id="destinationDropdownListBox" class="dropdown-content">
@@ -53,6 +172,7 @@
             </template>
           </paper-listbox>
         </paper-dropdown-menu>
+        </div>
 
         <template is="dom-if" if="{{_sameStops}}">
           <div class="route-selection-message">
@@ -61,7 +181,7 @@
         </template>
       </div>
 
-      <paper-fab id="viewRide" label="Go" raised disabled on-click="_onGoClick"></paper-fab>
+      <paper-fab id="viewRide" label="View Route" raised disabled on-click="_onGoClick"></paper-fab>
     </template>
 </dom-module>
 
@@ -194,7 +314,7 @@
         }
 
         goPage += originDestinationPath;
-        
+
         page(goPage);
       }
     });
