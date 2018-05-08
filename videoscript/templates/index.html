@@ -91,7 +91,7 @@
 
 
             var stationJson = JSON.stringify(routedirid);
-            var pythonUrl = "http://localhost:5000/json"; //python url to post data
+            var pythonUrl = "http://local_vta.com/json"; //python url to post data
             var sendCordinates = $.ajax({
                   type: 'POST',
                   url: pythonUrl,
@@ -104,7 +104,7 @@
 
 			var cordinatesJson = JSON.stringify(coords);
             $('#spinner').show();
-			var pythonUrl = "http://localhost:5000/json"; //python url to post data
+			var pythonUrl = "http://local_vta.com/json"; //python url to post data
 			var sendCordinates = $.ajax({
 			      type: 'POST',
 			      url: pythonUrl,
