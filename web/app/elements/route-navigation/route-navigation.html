@@ -212,25 +212,29 @@
               </template>
 
 
+                <template is="dom-if" if="[[_isValidCords(_nextStopGeoPoint.lat,_nextStopGeoPoint.lng)]]">
                   <google-map-marker
                     id="nextStopMarker"
                     latitude="[[_nextStopGeoPoint.lat]]"
                     longitude="[[_nextStopGeoPoint.lng]]"
-                    icon="/images/fa-map-marker-stop.png"
+                    icon="{{_getStopIcon()}}"
                     click-events
                     on-google-map-marker-click="_onPoiClick"
                     hidden>
                   </google-map-marker>
+                </template>
 
 
             <template is="dom-repeat" items="[[_routeDetails.stops]]" as="stopObj">
                 <template is="dom-if" if="[[_isValidCords(stopObj.lat,stopObj.lng)]]">
                   <template is="dom-if" if="[[_isInValidRange(stopObj.sec)]]">
-                  <google-map-marker latitude="[[stopObj.lat]]" longitude="[[stopObj.lng]]" data-sec="[[stopObj.sec]]"
-                    click-events on-google-map-marker-click="_onStopIconClick" icon="/images/fa-map-marker-stop.png">
-                    <span style="display:none">[[stopObj.sec]]</span>
-                    <h2>[[stopObj.name]]</h2>
-                  </google-map-marker>
+                      <google-map-marker latitude="[[stopObj.lat]]" longitude="[[stopObj.lng]]" data-sec="[[stopObj.sec]]"
+                        click-events on-google-map-marker-click="_onStopIconClick" icon="{{_getStopIcon()}}"
+                        hidden$="{{!_isValidZoom}}"
+                        >
+                        <span style="display:none">[[stopObj.sec]]</span>
+                        <h2>[[stopObj.name]]</h2>
+                      </google-map-marker>
                   </template>
                 </template>
             </template>
@@ -417,6 +421,10 @@ var map;
         	  type: Number,
         	  observer: '_videoCurrentTimeChange'
         	},
+          _isValidZoom: {
+            type: Boolean,
+            value: false,
+          },
         	_videoState: {
         	  type: Number,
         	  observer: '_videoStateChange'
@@ -460,6 +468,7 @@ var map;
           this.$.routeInfo.path = null;
           this._pois = [];
           this.reFocused = false;
+          this._isValidZoom = false;
 
           if (this._mapPolyline) {
             this._mapPolyline.setMap(null);
@@ -638,6 +647,11 @@ var map;
           if (!this._routeDetails || !this.player) {
             return;
           }
+          if(this._map.getZoom() >= 14){
+            this._isValidZoom = true;
+          }else{
+            this._isValidZoom = false;
+          }
 
 
           if(parseFloat(this.player.duration())<0){
@@ -662,7 +676,7 @@ var map;
             return;
           }
 
-
+          console.log('zoom level: '+this._map.getZoom());
 
           var point = this._routeDetails.videoGeoPoints[newVideoCurrentTime - 1];
 
@@ -832,6 +846,10 @@ var map;
               if(!self._isDragging && event.latLng){
                 self._moveMarker(event.latLng);
               }
+            });
+            google.maps.event.addListener(self._map, 'zoom_changed', function(event){
+              console.log('zoom event changed')
+              self._calculateValidZooomStatus();
             });
 
             google.maps.event.addListener(self._map, 'dragstart', function(event){
@@ -1245,6 +1263,22 @@ var map;
           }
           return false;
         },
+        _getStopIcon:function(){
+          return new google.maps.MarkerImage(
+           '/images/fa-map-marker-stop.png', //url
+           null, //size
+           null, //origin
+           null, //anchor
+           new google.maps.Size(15, 15)
+          );
+        },
+        _calculateValidZooomStatus:function(){
+          if(this._map.getZoom() >= 14){
+            this._isValidZoom = true;
+          }else{
+            this._isValidZoom = false;
+          }
+        }
       });
     }catch(err){
       console.log('route navigation error');
