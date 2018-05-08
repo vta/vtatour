@@ -2335,6 +2335,41 @@ ul#filters > .active > span {
 }
 
 #dropdown{
-  left:15% !important;
+  left:27% !important;
   top:none !important;
+}
+#suggestionsWrapper{
+  width:85.5% !important;
+}
+@media all and (min-width: 768px) and (max-width: 980px) {
+  #dropdown{
+    left:20% !important;
+    top:none !important;
+  }
+  #suggestionsWrapper{
+    width:84% !important;
+  }
+}
+@media all and (max-width: 768px) {
+  paper-fab{
+    margin-left: 40%;
+  }
+  #dropdown{
+    left:22% !important;
+    top:none !important;
+  }
+  #suggestionsWrapper{
+    width:76% !important;
+  }
+
+}
+@media (max-width: 480px) {
+  #suggestionsWrapper{
+    width:66% !important;
+  }
+  #dropdown{
+    left:15% !important;
+    top:none !important;
+  }
+
 }
