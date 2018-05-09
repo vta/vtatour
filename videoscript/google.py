@@ -13,7 +13,7 @@ from flask import request
 global base_dir,pairname,routename,dirname,video 
 pairname='undefined'
 app = Flask(__name__)
-app.run(host='0.0.0.0')
+#app.run(host='0.0.0.0')
 cors = CORS(app, resources={r'/*': {"origins": '*'}})
 base_dir = os.path.realpath("")
 
@@ -90,10 +90,14 @@ def createkml(timeinmsec,data,base_dir,dirname,video):
 def hello():
     # web = base_dir+'/'+'index.html'
     return render_template('index.html')
+@app.route("/hello")
+def hello1():
+    # web = base_dir+'/'+'index.html'
+    return render_template('index.html')
 @app.route('/json', methods=['GET','POST'])
 def json():
-      clicked=None
-      if request.method == "POST":
+    clicked=None
+    if request.method == "POST":
         if request.data != '':
             data = request.data.split('"')
             print "No of cordinates : ",len(data)/2
@@ -178,6 +182,10 @@ def json():
                 #sudo apt-get install mediainfo
                 createkml(a,data,base_dir,dirname,video)            
             return "done"
+        else:
+            return "fff"
+    else:
+        return "jjjj"
 
 
 

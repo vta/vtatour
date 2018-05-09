@@ -4,11 +4,11 @@
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/> 
 	<title>Video 70 </title> 
 
-	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCknqD2M0wRbsXnPUIezfAVBdzhJLQexiw&libraries=places,geometry" type="text/javascript"></script> 
-	<script src="{{ url_for('static', filename = 'geoaddress.js') }}"></script>
-	<script src="{{ url_for('static', filename = 'three.min.js') }}"></script>
-	<script src="{{ url_for('static', filename = 'GSVPano.js') }}"></script>
-	<script src="{{ url_for('static', filename = 'geoaddress.js') }}"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0&libraries=places,geometry" type="text/javascript"></script> 
+	<script src="http://local_vta.com/static/geoaddress.js"></script>
+	<script src="http://local_vta.com/static/three.min.js"></script>
+	<script src="http://local_vta.com/static/GSVPano.js"></script>
+
 	
 	 <!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -18,7 +18,7 @@
 
 	<!-- Latest compiled JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
-    <script src="{{ url_for('static', filename = 'Hyperlapse.js') }}"></script>
+    <script src="http://local_vta.com/static/Hyperlapse.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
 
 
@@ -138,7 +138,7 @@
 	        var a = new google.maps.LatLng(stcordinates[0], stcordinates[1]);
             var b = new google.maps.LatLng(encordinates[0], encordinates[1]);
             console.log(encordinates[0]);
-            var dist = (google.maps.geometry.spherical.computeDistanceBetween(a,b))/10;
+            var dist = (google.maps.geometry.spherical.computeDistanceBetween(a,b))/14;
       
 
 			start_point = new google.maps.LatLng(stcordinates[0], stcordinates[1]); 
@@ -277,7 +277,7 @@
 				_route_markers.push( new google.maps.Marker({
 					position: e.point.location,
 					draggable: false,
-					icon: "{{ url_for('static', filename = 'dot_marker.png') }}",
+					icon: "http://local_vta.com/static/dot_marker.png",
 					map: map
 					})
 				);

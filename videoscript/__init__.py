@@ -10,7 +10,7 @@ from flask import Flask,request, render_template
 from flask_cors import CORS, cross_origin
 from flask import request
 
-global base_dir,pairname,routename,dirname,video 
+global base_dir,pdir,pairname,routename,dirname,video 
 pairname='undefined'
 app = Flask(__name__)
 cors = CORS(app, resources={r'/*': {"origins": '*'}})
@@ -18,9 +18,11 @@ base_dir = os.path.realpath("")
 
 fps='2.01'
 
+pdir='/html/vtatour/videoscript/' # Project directory
 
 
-def grabimage(data,angle,resln,base_dir,dirname,path,fno):
+
+def grabimage(data,angle,resln,base_dir,pdir,dirname,path,fno):
     params = [{
       'size': resln, # max 2048x2048 pixels
       'location': data,
@@ -29,10 +31,8 @@ def grabimage(data,angle,resln,base_dir,dirname,path,fno):
       'key': 'AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0'
     }]
     results = google_streetview.api.results(params)# Download images to directory 'downloads'
-    results.download_links(base_dir+"/"+dirname+"/original/"+path+"/",str(fno))    
-    os.system('/usr/bin/ffmpeg -y -i '+base_dir+'/'+dirname+'/original/'+path+'/'+str(fno)+'.jpg'+' -vf "crop=in_w:in_h-800" -loglevel quiet '+base_dir+'/'+dirname+'/cropped/'+path+'/'+str(fno)+'_cropped.jpg')
-    #os.system('/usr/bin/ffmpeg -y -i '+base_dir+'/'+pairname+'/original/'+path+'/'+str(fno)+'.jpg'+' -vf "crop=in_w:in_h-800" '+base_dir+'/'+pairname+'/cropped/'+path+'/'+str(fno)+'_cropped.jpg')
-
+    results.download_links(base_dir+pdir+dirname+"/original/"+path+"/",str(fno))    
+    os.system('ffmpeg -y -i '+base_dir+pdir+dirname+'/original/'+path+'/'+str(fno)+'.jpg'+' -vf "crop=in_w:in_h-800" -loglevel quiet '+base_dir+pdir+dirname+'/cropped/'+path+'/'+str(fno)+'_cropped.jpg')
 
 def calculate_initial_compass_bearing(pointA, pointB):
     if (type(pointA) != tuple) or (type(pointB) != tuple):
@@ -55,12 +55,12 @@ def createlog(logdata,value):
 	f.write("\n")
 	f.write('   "'+logdata+'": "'+value+'",')
 	
-def createkml(timeinmsec,data,base_dir,dirname,video):
+def createkml(timeinmsec,data,base_dir,pdir,dirname,video):
     print "Creating KML"
     time=0;
     time=((float(timeinmsec)/1000)/(len(data)/2))
     print time
-    f = open(base_dir+"/"+dirname+"/"+video+".kml", "w")
+    f = open(base_dir+pdir+dirname+"/"+video+".kml", "w")
     f.write("""<?xml version="1.0" encoding="UTF-8"?> <kml xmlns="http://www.opengis.net/kml/2.2">\n""")
     f.write("<Document>")
     tme=00;
@@ -86,10 +86,8 @@ def createkml(timeinmsec,data,base_dir,dirname,video):
     return "Kml file created!"
 @app.route("/")
 def hello():
-     return render_template('index.html')
-if __name__ == "__main__":
-    app.run()
-    
+    # web = base_dir+'/'+'index.html'
+    return render_template('index.html')
 @app.route('/json', methods=['GET','POST'])
 def json():
       clicked=None
@@ -102,27 +100,26 @@ def json():
             		global routename,dirid,video,dirname
             		routename = data[3]
             		dirid = data[5]
-            		dirname = routename
             		dirname = routename +'/'+ dirid
             		video = routename+"_"+dirid
             else :
             	global f
              	try:
-            		os.makedirs(base_dir+"/"+dirname)
-            		os.makedirs(base_dir+"/"+dirname+'/original')
-            		os.makedirs(base_dir+"/"+dirname+'/original/left')
-            		os.makedirs(base_dir+"/"+dirname+'/original/right')
-            		os.makedirs(base_dir+"/"+dirname+'/original/forward')
-            		os.makedirs(base_dir+"/"+dirname+'/original/backward')
-            		os.makedirs(base_dir+"/"+dirname+'/cropped')
-            		os.makedirs(base_dir+"/"+dirname+'/cropped/left')
-            		os.makedirs(base_dir+"/"+dirname+'/cropped/right')
-            		os.makedirs(base_dir+"/"+dirname+'/cropped/forward')
-            		os.makedirs(base_dir+"/"+dirname+'/cropped/backward')
+            		os.makedirs(base_dir+pdir+dirname)
+            		os.makedirs(base_dir+pdir+dirname+'/original')
+            		os.makedirs(base_dir+pdir+dirname+'/original/left')
+            		os.makedirs(base_dir+pdir+dirname+'/original/right')
+            		os.makedirs(base_dir+pdir+dirname+'/original/forward')
+            		os.makedirs(base_dir+pdir+dirname+'/original/backward')
+            		os.makedirs(base_dir+pdir+dirname+'/cropped')
+            		os.makedirs(base_dir+pdir+dirname+'/cropped/left')
+            		os.makedirs(base_dir+pdir+dirname+'/cropped/right')
+            		os.makedirs(base_dir+pdir+dirname+'/cropped/forward')
+            		os.makedirs(base_dir+pdir+dirname+'/cropped/backward')
             		
             	except :
             	    pass
-            	f = open(base_dir+"/"+dirname+"/"+video+"log.txt", "w")
+            	f = open(base_dir+pdir+dirname+"/"+video+"log.txt", "w")
             	f.write("{")
             	f.write('\n   "log": "Start",')
             	createlog("cordinates",str(len(data)/2))
@@ -141,10 +138,10 @@ def json():
                 		    except:
                 		        pass
                 		    ang=int(calculate_initial_compass_bearing((a1,a2),(b1,b2)))
-                		    grabimage(data[i],ang+0,'2048x2048',base_dir,dirname,'forward',m)
-                		    grabimage(data[i],ang+90,'2048x2048',base_dir,dirname,'right',m)
-                		    grabimage(data[i],ang+180,'2048x2048',base_dir,dirname,'backward',m)
-                		    grabimage(data[i],ang+270,'2048x2048',base_dir,dirname,'left',m)
+                		    grabimage(data[i],ang+0,'2048x2048',base_dir,pdir,dirname,'forward',m)
+                		    grabimage(data[i],ang+90,'2048x2048',base_dir,pdir,dirname,'right',m)
+                		    grabimage(data[i],ang+180,'2048x2048',base_dir,pdir,dirname,'backward',m)
+                		    grabimage(data[i],ang+270,'2048x2048',base_dir,pdir,dirname,'left',m)
                 		    createlog("Image_"+str(m),"ok")
                 		    prog=(float(i)/(len(data)-2))*100
                 		    print "Progress : ",int(prog),"% Downloading Image ",m," Status : OK"
@@ -156,27 +153,26 @@ def json():
                 		    pass
                 print "Creating video : ",video,"_forward.mp4"
                 
-                os.system('/usr/bin/ffmpeg -framerate '+fps+' -y -i '+base_dir+'/'+dirname+'/cropped/forward/'+'%d_cropped.jpg -vf mpdecimate,setpts=N/4/TB -crf 0 -loglevel quiet '+base_dir+'/'+dirname+'/'+video+'_forward.mp4')
+                os.system('/usr/bin/ffmpeg -framerate '+fps+' -y -i '+base_dir+pdir+dirname+'/cropped/forward/'+'%d_cropped.jpg -vf mpdecimate,setpts=N/4/TB -crf 0 -loglevel quiet '+base_dir+pdir+dirname+'/'+video+'_forward.mp4')
                 createlog("forward","ok")
                 print "Done!","\nCreating video : ",video,"_right.mp4"
                 
-                os.system('/usr/bin/ffmpeg -framerate '+fps+' -y -i '+base_dir+'/'+dirname+'/cropped/right/'+'%d_cropped.jpg -vf mpdecimate,setpts=N/4/TB -crf 0 -loglevel quiet '+base_dir+'/'+dirname+'/'+video+'_right.mp4')
+                os.system('/usr/bin/ffmpeg -framerate '+fps+' -y -i '+base_dir+pdir+dirname+'/cropped/right/'+'%d_cropped.jpg -vf mpdecimate,setpts=N/4/TB -crf 0 -loglevel quiet '+base_dir+pdir+dirname+'/'+video+'_right.mp4')
                 createlog("right","ok")
                 print "Done! \nCreating video : ",video,"_backward.mp4"
                 
-                os.system('/usr/bin/ffmpeg -framerate '+fps+' -y -i '+base_dir+'/'+dirname+'/cropped/backward/'+'%d_cropped.jpg -vf mpdecimate,setpts=N/4/TB -crf 0 -loglevel quiet '+base_dir+'/'+dirname+'/'+video+'_backward.mp4')
+                os.system('/usr/bin/ffmpeg -framerate '+fps+' -y -i '+base_dir+pdir+dirname+'/cropped/backward/'+'%d_cropped.jpg -vf mpdecimate,setpts=N/4/TB -crf 0 -loglevel quiet '+base_dir+pdir+dirname+'/'+video+'_backward.mp4')
                 createlog("backward","ok")
                 print "Done! \nCreating video : ",video,"_left.mp4"
                 
-                os.system('/usr/bin/ffmpeg -framerate '+fps+' -y -i '+base_dir+'/'+dirname+'/cropped/left/'+'%d_cropped.jpg -vf mpdecimate,setpts=N/4/TB -crf 0 -loglevel quiet '+base_dir+'/'+dirname+'/'+video+'_left.mp4')
+                os.system('/usr/bin/ffmpeg -framerate '+fps+' -y -i '+base_dir+pdir+dirname+'/cropped/left/'+'%d_cropped.jpg -vf mpdecimate,setpts=N/4/TB -crf 0 -loglevel quiet '+base_dir+pdir+dirname+'/'+video+'_left.mp4')
                 createlog("left'","ok")
                 print "Done!"
                 f.write('\n   "log": "End"')
                 f.write("\n}")
                 f.close()
-                a = os.popen('mediainfo --Inform="Video;%Duration%" '+base_dir+'/'+dirname+'/'+video+'_forward.mp4').read()
-                #sudo apt-get install mediainfo
-                createkml(a,data,base_dir,dirname,video)            
+                a = os.popen('mediainfo --Inform="Video;%Duration%" '+base_dir+pdir+dirname+'/'+video+'_forward.mp4').read()
+                createkml(a,data,base_dir,pdir,dirname,video)            
             return "done"
 
 
