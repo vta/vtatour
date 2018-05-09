@@ -1,0 +1,351 @@
+<dom-module id="training-quiz">
+    <template>
+      <style is="custom-style" include="shared-styles"></style>
+      <style>
+        paper-dropdown-menu {
+          width: 100%;
+        }
+
+        .route-selection-message {
+          color: var(--secondary-color);
+          margin-left: 26%;
+          margin-top: 1%;
+        }
+
+        paper-fab{
+          float: left;
+          position: relative;
+          margin-left: 44%;
+          margin-top: 10px;
+          width:135px;
+          background-color: #02528a;
+          border-radius: 29px;
+          touch-action: manipulation;
+          -ms-touch-action: manipulation;
+          cursor: pointer;
+          font-weight: 600;
+          text-align: center;
+          height: 45px;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          background-image: none;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(2, 82, 138, 0.19);
+        }
+        .panel-body {
+          padding: 10px!important;
+          border-radius: 10px!important;
+          background-color: #FFF!important;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(2, 82, 138, 0.19);
+          margin-top: 16px;
+          width: 86%;
+          margin-left: 5%;
+        }
+        paper-input-autocomplete,paper-dropdown-menu{
+          border: 1px solid #02528a!important;
+          box-shadow: none;
+          /* color: #c2c2c2; */
+          padding: 1px 32px;
+          font-size: 11px;
+          border-radius: 60px!important;
+        }
+        paper-material{
+          width:88%;
+        }
+        /* paper-dropdown-menu{
+          padding: 5px!important;
+          border-radius: 21px!important;
+          background-color: #FFF!important;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(2, 82, 138, 0.19) !important;
+          margin-top: 16px;
+          border: 1px solid #02528a!important;
+          height: 60px;
+        } */
+        @media all and (min-width: 768px) and (max-width: 980px) {
+          .panel-body {
+            width: 85%;
+            margin-left: 10%;
+          }
+          .route-selection-message {
+            margin-left: 20%;
+          }
+        }
+        @media all and (max-width: 768px) {
+          .panel-body {
+            width: 85%;
+            margin-left: 10%;
+          }
+          .top-header{
+            height: 39px!important;
+          }
+
+          paper-fab{
+            margin-left: 40%;
+            margin-top: 30px;
+          }
+          .route-selection-message {
+            margin-left: 15%;
+          }
+
+        }
+
+        @media (max-width: 480px) {
+          .panel-body {
+            width: 100%;
+            margin-left: 0%;
+          }
+          .top-header{
+            height: 39px!important;
+          }
+            paper-fab{
+              margin-left: 38%;
+              margin-top: 30px;
+            }
+            .route-selection-message {
+              margin-left: 10%;
+            }
+
+        }
+        @media (max-width:320px) {
+
+              .panel-body {
+                width: 100%;
+                margin-left: 0%;
+              }
+
+        }
+        .header-frontend .navbar{
+              min-height: 52px !important;
+        }
+
+      </style>
+      <firebase-document
+        app-name="vta"
+        id="routeDataProcessing">
+      </firebase-document>
+      <div class="top-header">
+              <div class="container-fluid header-area">
+                  <div class="pull-left">
+
+                      <div style="height:30px;" class="header-item">Training</div>
+
+                  </div>
+                  <div class="pull-right  ">
+
+
+                  </div>
+                  <!-- #top-social end -->
+
+              </div>
+
+      </div>
+
+      <div class="inner-content">
+        <!-- <h2 class="page-title" tabindex="-1">Choose your Route</h2> -->
+
+    <template is="dom-if" if="[[_qa.length]]">
+      <template is="dom-repeat" items="[[_qa]]" as="qaItem" >
+        <div class="panel-body">
+            <div>
+              <h3>Q[[_getQuestionNumber(index)]]: [[qaItem.questionText]]</h3>
+              <div>
+              <template is="dom-repeat" items="[[qaItem.options]]" as="optionItem" >
+                  <span>[[_getQuestionNumber(index)]]) [[optionItem.name]]
+                  <template is="dom-if" if="[[optionItem.isCorrect]]">
+                       <span> -- Right Answer</span>
+                  </template>
+                  </span>
+                    <br/>
+              </template>
+
+              </div>
+            </div>
+
+        </div>
+      </template>
+    </template>
+    <template is="dom-if" if="[[!_qa.length]]">
+      <div class="panel-body">
+        <h3>Generating Train Q&A Please wait.....</h3>
+      </div>
+    </template>
+
+        <!-- <template is="dom-if" if="{{_sameStops}}">
+          <div class="route-selection-message">
+            Please select different departure and destination stops to start the tour.
+          </div>
+        </template> -->
+      </div>
+
+      <!-- <paper-fab id="viewRide" label="View Route" raised disabled on-click="_onGoClick"></paper-fab> -->
+    </template>
+</dom-module>
+
+<script>
+	(function() {
+    'use strict';
+    Polymer({
+      is: 'training-quiz',
+
+      properties: {
+        _qa: {
+          type: Array,
+          value: []
+        },
+      },
+
+      _generateQASet:function(processedRoutes){
+        var qa = [];
+        console.log('Received routes to create qa');
+        console.log(processedRoutes);
+        for(var index in  processedRoutes){
+          var tempQuizItem = {};
+          var tempRoute = processedRoutes[index];
+          var direction = Math.random() < 0.5 ? 'a' : 'b';
+          var questionType =  Math.floor(Math.random() * 2) + 1;
+          console.log('Direction: '+ direction);
+          console.log('question type:'+ questionType);
+          var directionName = "";
+          console.log(tempRoute);
+          if(direction=='a'){
+            directionName = tempRoute.directionAName;
+          }else{
+            directionName = tempRoute.directionBName;
+          }
+          var question = ""
+          var answer = null;
+          var options = [];
+          var shuffleArray = function (array) {
+                for (var i = array.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                }
+                return array;
+            }
+          if(questionType<=1){
+            var randomStopSelection = Math.floor(Math.random() * (tempRoute.routeDetails[direction].stops.length - 2)) + 1;
+            if(randomStopSelection>=tempRoute.routeDetails[direction].stops.length){
+              randomStopSelection = randomStopSelection -1;
+            }
+            question = "What is the next stop after "+tempRoute.routeDetails[direction].stops[randomStopSelection].name+" on "+ tempRoute.name + " "+directionName + " bound";
+
+            answer = randomStopSelection +1;
+            var answerStop = tempRoute.routeDetails[direction].stops[answer];
+            console.log(answer);
+            console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+            answerStop.isCorrect = true;
+            options.push(answerStop);
+            var arr = [answer];
+            var length = tempRoute.routeDetails[direction].stops.length >4?4:tempRoute.routeDetails[direction].stops.length;
+            while(arr.length < length){
+                var randomnumber = Math.floor(Math.random()*tempRoute.routeDetails[direction].stops.length) + 1;
+                if(arr.indexOf(randomnumber) > -1 && randomnumber !=randomStopSelection) continue;
+                console.log('random number: '+randomnumber);
+                if(tempRoute.routeDetails[direction].stops[randomnumber] && tempRoute.routeDetails[direction].stops[randomnumber].name !=answerStop.name){
+                  arr[arr.length] = randomnumber;
+                  options.push(tempRoute.routeDetails[direction].stops[randomnumber]);
+                }
+            }
+
+          }else{
+            var randomStopSelection = Math.floor(Math.random() * (tempRoute.routeDetails[direction].stops.length - 1)) + 1;
+            question = "What is the stop before "+tempRoute.routeDetails[direction].stops[randomStopSelection].name+" on "+ tempRoute.name + " "+directionName + " bound";
+            answer = randomStopSelection -1;
+            console.log(answer);
+            console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+            var answerStop = tempRoute.routeDetails[direction].stops[answer];
+            answerStop.isCorrect = true;
+            console.log(answer);
+            console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+            options.push(answerStop);
+            var arr = [answer];
+            var length = tempRoute.routeDetails[direction].stops.length >4?4:tempRoute.routeDetails[direction].stops.length;
+            while(arr.length < length){
+                var randomnumber = Math.floor(Math.random()*tempRoute.routeDetails[direction].stops.length) + 1;
+                if(arr.indexOf(randomnumber) > -1 && randomnumber !=randomStopSelection) continue;
+                console.log('random number: '+randomnumber);
+                if(tempRoute.routeDetails[direction].stops[randomnumber] && tempRoute.routeDetails[direction].stops[randomnumber].name !=answerStop.name){
+                  arr[arr.length] = randomnumber;
+                  options.push(tempRoute.routeDetails[direction].stops[randomnumber]);
+                }
+            }
+          }
+          var questionAnswerObject = {
+            questionText:question,
+            answerIndex : answer,
+            options:shuffleArray(options)
+          }
+          qa.push(questionAnswerObject);
+        }
+
+        this._qa = qa;
+        console.log('Final QA');
+        console.log(this._qa);
+
+      },
+      _combineRouteAndRouteDetails: function(routes,routeDetailses){
+        var finalRoutes = [];
+        // console.log('routes parameter');
+        // console.log(routes);
+        // console.log('Route Detailses parameter');
+        // console.log(routeDetailses);
+        for (var routeKey in routes) {
+          var tempRoute = routes[routeKey]
+              if(tempRoute){
+                console.log(tempRoute.code);
+                if(routeDetailses && routeDetailses[routeKey] && routeDetailses[routeKey].a && routeDetailses[routeKey].a.stops && routeDetailses[routeKey].b && routeDetailses[routeKey].b.stops){
+                  tempRoute.routeDetails = routeDetailses[routeKey];
+                  finalRoutes.push(tempRoute);
+                }
+              }
+        }
+        console.log('Final Routes Data');
+        console.log(finalRoutes);
+        //randomly selecting 10 routes
+        var arr = [];
+        var ranDomRoutes = [];
+        while(arr.length < 10){
+            var randomnumber = Math.floor(Math.random()*finalRoutes.length) + 1;
+            if(arr.indexOf(randomnumber) > -1) continue;
+            console.log('random number: '+randomnumber);
+            if(finalRoutes[randomnumber]){
+              arr[arr.length] = randomnumber;
+              ranDomRoutes.push(finalRoutes[randomnumber]);
+            }
+        }
+        this._generateQASet(ranDomRoutes);
+        // console.log('uniqure routes selected for question');
+        // console.log(ranDomRoutes);
+      },
+      _getQuestionNumber : function(index){
+         return parseInt(index)+1;
+      },
+      ready: function() {
+        var self = this;
+        var routes = [];
+        var routesDetailses = [];
+         this.$.routeDataProcessing.getStoredValue('/routes')
+           .then(function(data) {
+             // console.log('Rotues Data');
+             // console.log(data);
+             // console.log(data.length);
+             routes = data;
+             self.$.routeDataProcessing.getStoredValue('/route-details')
+               .then(function(data) {
+                 // console.log('Rotue Details Data');
+                 // console.log(data);
+                 routesDetailses = data;
+                 self._combineRouteAndRouteDetails(routes,routesDetailses);
+               }).catch(function(error) {
+                 console.log(error);
+               });
+           }).catch(function(error) {
+             console.log(error);
+           });
+      },
+    });
+  })();
+</script>

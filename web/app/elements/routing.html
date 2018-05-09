@@ -54,6 +54,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       routeNavigation.clearRouteSelection();
       openRoutesScreen();
     });
+    page('/training-quiz', function() {
+      app.route = 'training-quiz';
+      setFocus(app.route);
+    });
 
     page(app.baseUrl, function() {
       var routeNavigation = document.querySelector('route-navigation');
