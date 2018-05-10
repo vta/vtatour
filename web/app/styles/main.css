@@ -2265,7 +2265,11 @@ ul#filters > .active > span {
         float: none;
         text-align: center;
         width: 100%;
-        margin: 10px 0;
+        /* margin: 1%; */
+        margin-top: -5%;
+        margin-bottom: 1%;
+        margin-left: 0%;
+        margin-right: 0%;
     }
 
     .navbar-brand {
@@ -2282,7 +2286,9 @@ ul#filters > .active > span {
         margin-bottom: 10px;
     }
 
-
+.navbar-collapse{
+  margin-left: -2% !important;
+}
 
 }
 
@@ -2322,6 +2328,15 @@ ul#filters > .active > span {
         font-size: 23px;
         line-height: 38px;
     }
+    .navbar-collapse{
+      margin-left: -6% !important;
+    }
+}
+
+@media all and (min-width: 768px) and (max-width: 980px) {
+.navbar-header{
+  margin-bottom: -4%;
+}
 }
 
 @media (max-width:320px) {

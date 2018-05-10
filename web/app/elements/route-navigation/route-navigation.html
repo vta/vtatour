@@ -14,6 +14,7 @@
         height: 10px;
         --paper-progress-height: 10px;
         margin-top: -1.4%;
+        --paper-progress-container-color: rgba(224, 224, 224, 0.4);
       }
 
 
@@ -122,6 +123,82 @@
         position: fixed;
         bottom: 0;
       }
+      #spacer_div{
+        display: none;
+      }
+      /*  Extra Media queries */
+
+      @media all and (min-width: 768px) and (max-width: 980px) {
+
+      }
+      @media all and (max-width: 768px) {
+        #spacer_div{
+          display: block;
+        }
+          .top-header{
+              height:50px !important;
+              /* margin-left: 10px!important */
+          }
+          .arrow-icons{
+            margin-top: -1px !important;
+            height: 25px;
+            position: absolute;
+            margin-left: -32px!important
+          }
+          .top-header .header-item{
+            margin-left: 3px !important;
+          }
+          .f-box{
+            padding:0px;
+            padding-top:5%;
+          }
+          .f-box h2{
+            font-size: 0.9em;
+          }
+          .f-box img{
+            width: 27px;
+          }
+
+      }
+      @media (max-width: 480px) {
+        .navbar-header{
+          margin: 2px 0 !important;
+        }
+
+        .f-box{
+          padding:0px!important;
+          padding-top:5%!important;
+        }
+        .f-box h2{
+          font-size: 0.0em!important;
+        }
+        .f-box img{
+          width: 16px !important;
+        }
+        .background-color{
+          height:5%;
+        }
+        .f-box i{
+          font-size: 15%;
+        }
+        .top-header .header-item{
+          font-size: 12px;
+        }
+
+        /* .arrow-icons{
+          margin-top: 3%!important;
+          height: 25px;
+          position: absolute;
+          margin-left: -32px!important
+        }
+        .top-header .header-item{
+          margin-left: 3px !important;
+          margin-top: -3%;
+        } */
+
+      }
+
+
 
     </style>
       <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
@@ -136,7 +213,7 @@
         data="{{_routeInfoOrigin}}">
       </firebase-document>
       <template is="dom-if" if="[[_routeInfo]]" >
-      <div class="top-header hidden-sm">
+      <div class="top-header">
               <div class="container-fluid header-area">
                   <div class="pull-left">
                       <div class="header-item"><img class="arrow-icons" src="../../images/back.svg" alt="" on-click="_goBack" id="secondery-back-link">[[_routeDirection]] / V Tour /  [[_routeInfo.name]]</div>
@@ -257,12 +334,14 @@
           lat-origin="{{_nextStopGeoPoint.lat}}" lng-origin="{{_nextStopGeoPoint.lng}}"></poi-detail>
       </div>
 
+    <div id="spacer_div"><br/></div>
+
       <div class="background-color">
       <div class="container">
           <div class="row">
               <!--feature start-->
               <div class="button-area">
-              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="restartVideo" on-click="_restartVideo">
+              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="restartVideo" on-click="_restartVideo" title="Restart">
                   <section>
                       <div class="f-box">
                           <i><img style=" width:30px;" src="../../images/restart.svg" alt=""></i>
@@ -271,7 +350,7 @@
 
                   </section>
               </div>
-              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="playVideo" on-click="_playVideo" hidden$="{{_shouldHidePlay}}" disabled$="{{!_startedOnce}}">
+              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="playVideo" on-click="_playVideo" hidden$="{{_shouldHidePlay}}" disabled$="{{!_startedOnce}}" title="Play">
                   <section>
                       <div class="f-box ">
                           <i><img style=" width:30px;" src="../../images/play.svg" alt=""></i>
@@ -280,7 +359,7 @@
 
                   </section>
               </div>
-              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="pauseVideo" on-click="_pauseVideo" hidden$="{{!_isVideoPlaying}}" >
+              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="pauseVideo" on-click="_pauseVideo" hidden$="{{!_isVideoPlaying}}" title="Pause">
                   <section>
                       <div class="f-box ">
                           <i><img style=" width:30px;" src="../../images/pause.svg" alt=""></i>
@@ -289,7 +368,7 @@
 
                   </section>
               </div>
-              <div style=" border-right:1px solid #fff" class="col-lg-4 col-sm-4 col-xs-4 icon" id="stopVideo" on-click="_stopVideo" disabled>
+              <div style=" border-right:1px solid #fff" class="col-lg-4 col-sm-4 col-xs-4 icon" id="stopVideo" on-click="_stopVideo" disabled title="View PIO's">
                   <section>
                       <div class="f-box">
                            <i><img style=" width:30px;" src="../../images/view.svg" alt=""></i>
