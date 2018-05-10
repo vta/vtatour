@@ -138,7 +138,7 @@
 	        var a = new google.maps.LatLng(stcordinates[0], stcordinates[1]);
             var b = new google.maps.LatLng(encordinates[0], encordinates[1]);
             console.log(encordinates[0]);
-            var dist = (google.maps.geometry.spherical.computeDistanceBetween(a,b))/14;
+            var dist = (google.maps.geometry.spherical.computeDistanceBetween(a,b));
       
 
 			start_point = new google.maps.LatLng(stcordinates[0], stcordinates[1]); 
@@ -262,7 +262,7 @@
 				height: window.innerHeight,
 				zoom: 1,
 				use_lookat: false,
-				distance_between_points: 7,
+				distance_between_points: 2,
 				max_points: dist,
 				elevation: _elevation
 			});
@@ -355,7 +355,7 @@
 			//var gui = new dat.GUI();
 
 			var o = {
-				distance_between_points:7, 
+				distance_between_points:2, 
 				max_points:dist, 
 				fov: 80, 
 				elevation:Math.floor(_elevation), 
