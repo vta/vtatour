@@ -14,12 +14,13 @@ global base_dir,pdir,pairname,routename,dirname,video,newpano,data
 pairname='undefined'
 app = Flask(__name__)
 cors = CORS(app, resources={r'/*': {"origins": '*'}})
-base_dir = os.path.realpath("")
+#base_dir = os.path.realpath("")
+base_dir = '/home/crowdplat'
 data=list(); 
 newpano='init_0'
 fps='2.01'
+pdir='/vtatour/videoscript/' # Project directory
 
-pdir='/vta_tour/videoscript/' # Project directory
 
 
 
