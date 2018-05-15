@@ -40,7 +40,7 @@
           box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(2, 82, 138, 0.19);
           margin-top: 16px;
           width: 86%;
-          margin-left: 5%;
+          margin-left: 14%!important;
         }
         paper-input-autocomplete,paper-dropdown-menu{
           border: 1px solid #02528a!important;
@@ -87,6 +87,11 @@
           .route-selection-message {
             margin-left: 15%;
           }
+          .quiz-area {
+            padding-left: 5%!important;
+            padding-right: 5%!important;
+        }
+
 
         }
 
@@ -118,7 +123,109 @@
         .header-frontend .navbar{
               min-height: 52px !important;
         }
+        .dataTables_info {
+            color: #fff!important;
+            margin-top: 38px!important;
+        }
 
+
+        .f-box i {
+            font-size: 25px;
+            line-height: normal;
+            margin-top: 27px;
+            display: block;
+            color: #fff;
+        }
+
+        .dataTables_info {
+            color: #fff!important;
+            margin-top: 8px;
+        }
+
+        .f-box {
+
+            height: 104px!important;
+
+        }
+        @media (max-width: 768px){
+
+        	.top-header .header-item {
+
+             margin-left:0px!important;
+        ;
+            /* padding-top: 4px; */
+        }
+        .top-header {
+
+            height:36px!important;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+      }
+
+      .training-quiz h3{ font-size:21px !important; color:#02528a!important; font-weight: 345}
+      .training-quiz{ padding-bottom:1px;}
+      .background-color,.background-color .training-quiz{
+        padding-bottom:0px;
+      }
+      .quiz-area{ padding-left:1%!important; padding-right:10%!important; }
+      .quiz2{ line-height:33px!important;}
+      .inner-content{
+        padding-bottom: 1px !important;
+        margin: 2px 0px !important;
+      }
+      .training-quiz.training-quiz h3.training-quiz{
+            padding-top: 20px;
+      }
+      .f-box{
+        cursor: pointer;
+      }
+      #saveOperationResultModal {
+        width: auto;
+        background-color: transparent;
+        color: var(--vta-white);
+        box-shadow: none;
+      }
+
+      #saveOperationResultModal .icon {
+        text-align: center;
+      }
+
+      #saveOperationResultModal iron-icon {
+        width: 140px;
+        height: 140px;
+        padding: 20px;
+        text-align: center;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+      }
+
+      #saveOperationResultModal .message-wrapper.success iron-icon {
+        background-color: var(--primary-color);
+      }
+
+      #saveOperationResultModal .message-wrapper.error iron-icon {
+        background-color: var(--secondary-color);
+      }
+
+      #saveOperationResultModal .message {
+        text-align: center;
+        font-size: 2.5em;
+        line-height: 1;
+        text-transform: none;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .special-messge{
+        padding: 2px!important;
+        border-radius: 10px!important;
+        background-color: #FFF!important;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(2, 82, 138, 0.19);
+        margin-top: 10px;
+        width: 61%;
+        margin-left: 20%!important;
+        text-align: center;
+      }
       </style>
       <firebase-document
         app-name="vta"
@@ -142,9 +249,93 @@
       </div>
 
       <div class="inner-content">
-        <!-- <h2 class="page-title" tabindex="-1">Choose your Route</h2> -->
+        <template is="dom-if" if="[[!_qa.length]]">
+          <div class="special-messge">
+            <h3>Preparing Training Q&A Please wait.....<iron-icon icon="icons:hourglass-empty"></iron-icon></h3>
+          </div>
+        </template>
+        <template is="dom-if" if="[[_allQuestionAnswered]]">
+          <div class="special-messge">
+            <h3>Thanks for completing quiz, you can review your answers below or go to main screen and continue exploring different routes</h3>
+          </div>
+        </template>
 
-    <template is="dom-if" if="[[_qa.length]]">
+        <template is="dom-if" if="[[_qa.length]]">
+        <div class="quiz_content">
+          <section class="banner">
+          <div class="container quiz-area">
+          	<div class="panel-body style-scope training-quiz">
+            <div class="col-md-6 col-xs-12">
+              <template is="dom-if" if="[[_currentQA.mainRoute.routeDetails.a.videoGeoPoints]]">
+              <route-map id="routeMap" geo-points="{{_currentQA.mainRoute.routeDetails.a.videoGeoPoints}}"></route-map>
+              </template>
+            </div>
+            <div class="col-md-6 col-xs-12">
+                    <div class="style-scope training-quiz">
+                      <h3 class="style-scope training-quiz">Q[[_getQuestionNumber(_currentQAIndex)]]: [[_currentQA.questionText]]</h3>
+                      <div class="style-scope training-quiz">
+                        <template is="dom-repeat" items="[[_currentQA.options]]" as="optionItem" >
+                          <span class="style-scope training-quiz quiz2">
+                              <input id="answer_option_[[index]]" name="optionAnswer" type="radio" value="[[index]]" class="optionAnswer clearAbleCheck"/> [[optionItem.name]]
+                          <!-- <template is="dom-if" if="[[optionItem.isCorrect]]">
+                               <span> -- Right Answer</span>
+                          </template> -->
+                          <template is="dom-if" class="style-scope training-quiz"></template>
+                          </span>
+                          <br class="style-scope training-quiz">
+                        </template>
+                      </div>
+                      </div>
+                </div>
+              <div class="clearfix"></div>
+            </div>
+           </div>
+         </section>
+
+
+            <!--container start-->
+            <div class="background-color">
+            <div class="container">
+                <div class="row">
+                    <!--feature start-->
+                    <div class="button-area">
+                    <div class="col-lg-4 col-sm-4 col-xs-4 icon">
+                        <section>
+                            <div class="f-box" on-click="_showPreviousAnswer">
+                                <i><img style=" width:30px;" src="../../images/back02.svg" alt=""></i>
+
+                            </div>
+
+                        </section>
+                    </div>
+                    <div class="col-lg-4 col-sm-4 col-xs-4 icon">
+                        <section>
+                            <div class="f-box">
+                              <div class="dataTables_info" id="sample_1_info">Showing [[_getQuestionNumber(_currentQAIndex)]] of [[_qa.length]] entries</div>
+                            </div>
+
+                        </section>
+                    </div>
+                    <div style=" border-right:1px solid #fff" class="col-lg-4 col-sm-4 col-xs-4 icon" >
+                        <section>
+                            <div class="f-box" on-click="_checkAnswer">
+                                 <i><img style=" width:30px;" src="../../images/right-arrow.svg" alt=""></i>
+
+                            </div>
+
+                        </section>
+                    </div>
+                    </div>
+                    <!--feature end-->
+                </div>
+
+            </div>
+          </div>
+
+        </div>
+      </template>
+
+    <!-- <template is="dom-if" if="[[_qa.length]]">
       <template is="dom-repeat" items="[[_qa]]" as="qaItem" >
         <div class="panel-body">
             <div>
@@ -164,12 +355,8 @@
 
         </div>
       </template>
-    </template>
-    <template is="dom-if" if="[[!_qa.length]]">
-      <div class="panel-body">
-        <h3>Generating Train Q&A Please wait.....</h3>
-      </div>
-    </template>
+    </template> -->
+
 
         <!-- <template is="dom-if" if="{{_sameStops}}">
           <div class="route-selection-message">
@@ -179,7 +366,28 @@
       </div>
 
       <!-- <paper-fab id="viewRide" label="View Route" raised disabled on-click="_onGoClick"></paper-fab> -->
+
+      <paper-dialog id="saveOperationResultModal" modal>
+        <template is="dom-if" if="{{_operationSuccess}}">
+          <div class="message-wrapper success">
+            <div class="icon">
+              <iron-icon icon="icons:check"></iron-icon>
+            </div>
+            <div class="message">{{_operationMessageDetail}}</div>
+          </div>
+        </template>
+        <template is="dom-if" if="{{!_operationSuccess}}">
+          <div class="message-wrapper success">
+            <div class="icon">
+              <iron-icon icon="icons:close"></iron-icon>
+            </div>
+            <div class="message">{{_operationMessageDetail}}</div>
+          </div>
+        </template>
+      </paper-dialog>
+      <maps-utils id="mapsUtils"></maps-utils>
     </template>
+
 </dom-module>
 
 <script>
@@ -193,6 +401,15 @@
           type: Array,
           value: []
         },
+        _currentQA:{
+            type: Object,
+        },
+        _currentQAIndex:{
+            type: Number,
+        },
+        _allQuestionAnswered:{
+          type: Boolean,
+        }
       },
 
       _generateQASet:function(processedRoutes){
@@ -276,7 +493,9 @@
           var questionAnswerObject = {
             questionText:question,
             answerIndex : answer,
-            options:shuffleArray(options)
+            options:shuffleArray(options),
+            mainRoute:tempRoute,
+            direction:direction
           }
           qa.push(questionAnswerObject);
         }
@@ -284,6 +503,8 @@
         this._qa = qa;
         console.log('Final QA');
         console.log(this._qa);
+        this._currentQAIndex = 0;
+        this._currentQA = this._qa[this._currentQAIndex];
 
       },
       _combineRouteAndRouteDetails: function(routes,routeDetailses){
@@ -324,6 +545,7 @@
          return parseInt(index)+1;
       },
       ready: function() {
+        this._allQuestionAnswered = false;
         var self = this;
         var routes = [];
         var routesDetailses = [];
@@ -346,6 +568,100 @@
              console.log(error);
            });
       },
+      _showOperationResultModal: function(isSuccess, operationDetailMessage) {
+        this.$.saveOperationResultModal.open();
+        var self = this;
+        this._operationSuccess = isSuccess;
+        this._operationMessageDetail = operationDetailMessage;
+      },
+      _closeOperationResultModal: function() {
+        this.$.saveOperationResultModal.close();
+      },
+      _showPreviousAnswer:function(e){
+        if(this._currentQAIndex<=0){
+          return false;
+        }{
+          this._currentQAIndex -= 1;
+        }
+
+        this._currentQA = this._qa[this._currentQAIndex];
+        console.log(this._currentQA);
+        for(var i=0;i<this._currentQA.options.length;i++){
+          if(this._currentQA.options[i].isCorrect==true){
+              $('#answer_option_'+i).prop('checked', true);
+          }
+        }
+        //alert(this._currentQA.alreadyAnswered)
+      },
+      _checkAnswer:function(e){
+        var self = this;
+        console.log('it is working');
+        var answer = $("input:radio.optionAnswer:checked");
+        console.log(answer);
+        if(!answer.length){
+          console.log('Please select answer');
+          this.$.saveOperationResultModal.close();
+          this._showOperationResultModal(false,"Please select an answer");
+          setTimeout(function(){
+             self.$.saveOperationResultModal.close();
+          }, 1000);
+        }
+        var answerIndex = answer.val();
+        if(this._currentQA.options[answerIndex]){
+          console.log('check below');
+          console.log(this._currentQA.options[answerIndex]);
+          if(this._currentQA.options[answerIndex] && this._currentQA.options[answerIndex].isCorrect===true){
+
+            console.log('Current Index: '+this._currentQAIndex +' qa length: '+this._qa.length);
+              this._currentQAIndex += 1;
+            console.log('Next Index: '+this._currentQAIndex +' qa length: '+this._qa.length);
+            if(!this._currentQA.alreadyAnswered){
+              this._qa[this._currentQAIndex-1].alreadyAnswered = true;
+              if(this._currentQAIndex>=this._qa.length){
+                  this._showOperationResultModal(true,"All questions answered");
+                  setTimeout(function(){
+                     self.$.saveOperationResultModal.close();
+                  }, 1000);
+                  this._allQuestionAnswered = true;
+                  this._currentQAIndex -= 1;
+                  return false;
+              }
+              console.log('Correct Answer, moving to next question');
+              this._showOperationResultModal(true,"Correct answer, moving to next question");
+              setTimeout(function(){
+                 self.$.saveOperationResultModal.close();
+              }, 1000);
+            }
+            this._currentQA = this._qa[this._currentQAIndex];
+            if(this._currentQA){
+                $('.clearAbleCheck').prop('checked', false);
+            }else if(this._allQuestionAnswered){
+              this._currentQAIndex = this._qa.length - 1;
+              this._currentQA = this._qa[this._currentQAIndex];
+              this._showOperationResultModal(true,"All questions answered");
+              setTimeout(function(){
+                 self.$.saveOperationResultModal.close();
+              }, 1000);
+            }
+            if(this._currentQA && this._currentQA.alreadyAnswered){
+              for(var i=0;i<this._currentQA.options.length;i++){
+                if(this._currentQA.options[i].isCorrect==true){
+                    $('#answer_option_'+i).prop('checked', true);
+                }
+              }
+            }
+          }else{
+            console.log('Wrong Answer, please try again');
+            this.$.saveOperationResultModal.close();
+            this._showOperationResultModal(false,"Wrong answer, Please select the correct answer");
+            var self = this;
+            setTimeout(function(){
+               self.$.saveOperationResultModal.close();
+            }, 1000);
+          }
+        }
+      }
+
     });
   })();
 </script>

@@ -1,0 +1,136 @@
+<dom-module id="route-map">
+  <template>
+    <style>
+      google-map {
+        height: 300px;
+      }
+    </style>
+
+    <google-map
+      api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"
+      id="map"
+      map="{{_map}}"
+      additional-map-options='{"zoomControl":"true"}'
+      mapType="satellite">
+      <template is="dom-if" if="[[_isValidCords(_departure.lat,_departure.lng)]]">
+        <google-map-marker
+          latitude="[[_departure.lat]]"
+          longitude="[[_departure.lng]]"
+          icon="/images/fa-map-marker-origin.png">
+        </google-map-marker>
+      </template>
+
+      <template is="dom-if" if="[[_isValidCords(_destination.lat,_destination.lng)]]">
+        <google-map-marker
+          latitude="[[_destination.lat]]"
+          longitude="[[_destination.lng]]"
+          icon="/images/fa-map-marker-destination.png">
+        </google-map-marker>
+      </template>
+    </google-map>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    try{
+      Polymer({
+        is: 'route-map',
+
+        properties: {
+          geoPoints: {
+            type: Object,
+            observer: '_geoPointsChange'
+          },
+          _map : {
+            type: Object
+          },
+          _departure: {
+            type: Object
+          },
+          _destination: {
+            type: Object
+          }
+        },
+
+        _geoPointsChange: function(newVideoGeoPoints) {
+          var self = this;
+          setTimeout(function(){
+            if (newVideoGeoPoints) {
+              var videoKeys = self._getJsonKeys(newVideoGeoPoints);
+
+              if (videoKeys && videoKeys.length > 0) {
+                self._loadRoutePath();
+                self._departure = newVideoGeoPoints[videoKeys[0]];
+                self._destination = newVideoGeoPoints[videoKeys[videoKeys.length - 1]];
+              }
+            }
+          },2000);
+
+        },
+
+        /**
+         * Draw a line in the map using the route geo points. Centers the map in the line.
+         */
+        _loadRoutePath : function() {
+          if (this.geoPoints) {
+            var points = this.geoPoints;
+            var length = points.length;
+            var cords = [];
+            var bounds = new google.maps.LatLngBounds();
+            var self = this;
+
+            // Build a cords array from the points
+            for (var key in points) {
+              var point = points[key];
+              cords.push(point);
+              bounds.extend(new google.maps.LatLng(point.lat, point.lng));
+            }
+
+            if (this._mapPolyline) {
+              this._mapPolyline.setMap(null);
+            }
+
+            this._mapPolyline = new google.maps.Polyline({
+              path: cords,
+              geodesic: true,
+              strokeColor: '#009FDD',
+              strokeOpacity: 1.0,
+              strokeWeight: 2
+            });
+
+            setTimeout(function(){
+              self._mapPolyline.setMap(self._map);
+              self._map.fitBounds(bounds);
+            },100);
+          }
+        },
+
+        _getJsonKeys: function(json) {
+          var keys = [];
+
+          for (var key in json) {
+            keys.push(key);
+          }
+
+          return keys;
+        },
+        _isValidCords:function(lat,lng){
+          if(isNaN(parseFloat(lat))){
+            return false;
+          }
+          if(isNaN(parseFloat(lng))){
+            return false;
+          }
+          return true;
+        }
+      });
+    }catch(err){
+      console.log('route map error');
+      console.log(err);
+    }
+
+
+  })();
+  </script>
+</dom-module>
