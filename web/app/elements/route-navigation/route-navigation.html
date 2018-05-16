@@ -66,6 +66,15 @@
       poi-detail.active {
         display: block;
       }
+      #direction-display{
+        width:100%;
+        text-align:center;
+        font-size:16px;
+        color:#02528a;
+        border-bottom:1px solid #02528a;
+        border-top:1px solid #02528a;
+        background-color:#edeef1;
+      }
 
       @media all and (min-width: 361px) and (orientation: landscape) {
         .navigation-wrapper {
@@ -123,7 +132,7 @@
         position: fixed;
         bottom: 0;
       }
-      #spacer_div{
+      .spacer_div{
         display: none;
       }
       /*  Extra Media queries */
@@ -148,21 +157,18 @@
           .top-header .header-item{
             margin-left: 3px !important;
           }
-          .f-box{
-            padding:0px;
-            padding-top:5%;
-          }
-          .f-box h2{
-            font-size: 0.9em;
-          }
-          .f-box img{
-            width: 27px;
-          }
-
       }
       @media (max-width: 480px) {
         .navbar-header{
           margin: 2px 0 !important;
+        }
+
+        #direction-display{
+          font-size: 12px;
+        }
+
+        .navbar-collapse{
+          display:none;
         }
 
         .f-box{
@@ -170,9 +176,9 @@
           padding-top:5%!important;
         }
         .f-box h2{
-          font-size: 0.0em!important;
+          font-size: 10px!important;
         }
-        .f-box img{
+        /* .f-box img{
           width: 16px !important;
         }
         .background-color{
@@ -183,7 +189,7 @@
         }
         .top-header .header-item{
           font-size: 12px;
-        }
+        } */
 
         /* .arrow-icons{
           margin-top: 3%!important;
@@ -197,8 +203,6 @@
         } */
 
       }
-
-
 
     </style>
       <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
@@ -334,14 +338,22 @@
           lat-origin="{{_nextStopGeoPoint.lat}}" lng-origin="{{_nextStopGeoPoint.lng}}"></poi-detail>
       </div>
 
-    <div id="spacer_div"><br/></div>
+      <br>
+<br/>
+
+    <div id="spacer_div" clss="spacer_div"><br/></div>
+    <div id="spacer_div_2" clss="spacer_div"><br/></div>
+    <div id="spacer_div_3" clss="spacer_div"><br/></div>
+    <div id="spacer_div_4" clss="spacer_div"><br/></div>
+
 
       <div class="background-color">
+      <div id="direction-display" hidden$="{{!_direction}}"></div>
       <div class="container">
           <div class="row">
               <!--feature start-->
               <div class="button-area">
-              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="restartVideo" on-click="_restartVideo" title="Restart">
+              <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="restartVideo" on-click="_restartVideo" title="Restart">
                   <section>
                       <div class="f-box">
                           <i><img style=" width:30px;" src="../../images/restart.svg" alt=""></i>
@@ -350,7 +362,7 @@
 
                   </section>
               </div>
-              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="playVideo" on-click="_playVideo" hidden$="{{_shouldHidePlay}}" disabled$="{{!_startedOnce}}" title="Play">
+              <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="playVideo" on-click="_playVideo" hidden$="{{_shouldHidePlay}}" disabled$="{{!_startedOnce}}" title="Play">
                   <section>
                       <div class="f-box ">
                           <i><img style=" width:30px;" src="../../images/play.svg" alt=""></i>
@@ -359,7 +371,7 @@
 
                   </section>
               </div>
-              <div class="col-lg-4 col-sm-4 col-xs-4 icon" id="pauseVideo" on-click="_pauseVideo" hidden$="{{!_isVideoPlaying}}" title="Pause">
+              <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="pauseVideo" on-click="_pauseVideo" hidden$="{{!_isVideoPlaying}}" title="Pause">
                   <section>
                       <div class="f-box ">
                           <i><img style=" width:30px;" src="../../images/pause.svg" alt=""></i>
@@ -368,11 +380,20 @@
 
                   </section>
               </div>
-              <div style=" border-right:1px solid #fff" class="col-lg-4 col-sm-4 col-xs-4 icon" id="stopVideo" on-click="_stopVideo" disabled title="View PIO's">
+              <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="stopVideo" on-click="_stopVideo" disabled title="View PIO's">
                   <section>
                       <div class="f-box">
                            <i><img style=" width:30px;" src="../../images/view.svg" alt=""></i>
                            <a href="javascript:void(0);"><h2>VIEW PIOs</h2></a>
+                      </div>
+
+                  </section>
+              </div>
+              <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="navigationAction" on-click="_toggleDirectionNavigation"  title="Navigation" >
+                  <section>
+                      <div class="f-box">
+                           <i><img style=" width:30px;" src="../../images/navigation.svg" alt=""></i>
+                           <a href="javascript:void(0);"><h2>NAVIGATION</h2></a>
                       </div>
 
                   </section>
@@ -532,6 +553,9 @@ var map;
           _currentLng: {
             type: Number
           },
+          _direction: {
+            type: Boolean
+          },
         },
 
         SECONDS_INTERVAL_FOR_STOPS : 10,
@@ -546,6 +570,7 @@ var map;
           this.$.routeDetails.path = null;
           this.$.routeInfo.path = null;
           this._pois = [];
+          this._direction = false;
           this.reFocused = false;
           this._isValidZoom = false;
 
@@ -758,7 +783,12 @@ var map;
           console.log('zoom level: '+this._map.getZoom());
 
           var point = this._routeDetails.videoGeoPoints[newVideoCurrentTime - 1];
-
+          var nextPoint = this._routeDetails.videoGeoPoints[newVideoCurrentTime];
+          if(point && nextPoint && point.lat && point.lng && nextPoint.lat && nextPoint.lng){
+            var currentLatLong = point.lat +','+point.lng;
+            var nextLatLong = nextPoint.lat +','+nextPoint.lng;
+            this._getDirectionData(currentLatLong,nextLatLong);
+          }
           // Calculate the progress bar value
           this._progressBarValue = this._calculateVideoProgress(this._videoStartTime, this._videoEndTime, newVideoCurrentTime);
 
@@ -866,7 +896,6 @@ var map;
           if (this._pois) {
             this._pois = null;
           }
-
           // Send the event to Google Analytics
           ga('send', 'event', 'Tour', 'play', this._routeInfo.name);
         },
@@ -1357,6 +1386,47 @@ var map;
           }else{
             this._isValidZoom = false;
           }
+        },
+        _getDirectionData: function(startLat,endLatLng) {
+          if(!this._direction){
+            return false;
+          }
+          var directionsService = new google.maps.DirectionsService();
+          var start = startLat;
+          var end = endLatLng;
+          var request = {
+            origin: start,
+            destination: end,
+            travelMode: 'DRIVING'
+          };
+          var self = this;
+          directionsService.route(request, function(result, status) {
+            if (status == 'OK') {
+              console.log('check experimental direction data below');
+              console.log(result);
+              //directionsDisplay.setDirections(result);
+              if(result){
+                if(result.routes && result.routes.length){
+                    if(result.routes[0].legs && result.routes[0].legs.length){
+                        if(result.routes[0].legs[0].steps && result.routes[0].legs[0].steps.length){
+                          var directionData = result.routes[0].legs[0].steps && result.routes[0].legs[0].steps[0];
+                          var instruction = directionData.instructions;
+                          if(directionData.maneuver){
+                             instruction = instruction +' ('+directionData.maneuver+')';
+                          }
+                          $('#direction-display').html(instruction);
+                        }
+                    }
+                }
+              }
+            }
+          });
+
+          //this.$.search.getDetails(newSelectedPoi.place_id);
+
+        },
+        _toggleDirectionNavigation:function(){
+          this._direction = this._direction ? false:true;
         }
       });
     }catch(err){
