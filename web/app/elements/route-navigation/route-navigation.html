@@ -348,7 +348,7 @@
 
 
       <div class="background-color">
-      <div id="direction-display" hidden$="{{!_direction}}"></div>
+      <div id="direction-display" ></div>
       <div class="container">
           <div class="row">
               <!--feature start-->
@@ -389,14 +389,16 @@
 
                   </section>
               </div>
-              <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="navigationAction" on-click="_toggleDirectionNavigation"  title="Navigation" >
+              <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="navigationAction" on-click="_pauseVideo"  title="Navigation" >
+                <a href="https://www.google.com/maps/dir/?api=1&origin=[[_departureStop.lat]],[[_departureStop.lng]]&destination=[[_destinationStop.lat]],[[_destinationStop.lng]]" target="_blank">
                   <section>
                       <div class="f-box">
                            <i><img style=" width:30px;" src="../../images/navigation.svg" alt=""></i>
-                           <a href="javascript:void(0);"><h2>NAVIGATION</h2></a>
+                           <h2>NAVIGATION</h2>
                       </div>
 
                   </section>
+                  </a>
               </div>
               </div>
               <!--feature end-->
@@ -1388,9 +1390,6 @@ var map;
           }
         },
         _getDirectionData: function(startLat,endLatLng) {
-          if(!this._direction){
-            return false;
-          }
           var directionsService = new google.maps.DirectionsService();
           var start = startLat;
           var end = endLatLng;
