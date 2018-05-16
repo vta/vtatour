@@ -1410,6 +1410,11 @@ var map;
                         if(result.routes[0].legs[0].steps && result.routes[0].legs[0].steps.length){
                           var directionData = result.routes[0].legs[0].steps && result.routes[0].legs[0].steps[0];
                           var instruction = directionData.instructions;
+                          if(instruction){
+                            instruction = instruction.replace('Head','Heading');
+                            var instructionArray = instruction.split("<div");
+                            instruction = instructionArray[0];
+                          }
                           if(directionData.maneuver){
                              instruction = instruction +' ('+directionData.maneuver+')';
                           }
