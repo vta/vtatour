@@ -276,6 +276,12 @@
                       <div class="stop-lng-value"> &nbsp;[[stop.lng]]</div>
                     </div>
                   </div>
+                  <div class="stop-departure-destination">
+                    <div class="stop-lng">
+                      <div class="stop-lng-header">Connect Route: </div>
+                      <div class="stop-lng-value"> &nbsp;[[stop.route_list]]</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="stop-operations">
                   <paper-button on-click="_toggleStop" data-stop-index$="[[index]]">
@@ -320,7 +326,11 @@
                             <div role="listbox">
                               <template is="dom-repeat" items="{{route.routeDetails.a.stops}}" as="stop">
                                 <paper-item>
-                                  <paper-item-body>[[stop.name]]</paper-item-body>
+                                  <paper-item-body>[[stop.name]]
+                                      <template is="dom-if" if="{{stop.route_list}}">
+                                        (Connect route: [[stop.route_list]])
+                                      </template>
+                                  </paper-item-body>
                                 </paper-item>
                               </template>
                             </div>
@@ -334,7 +344,11 @@
                             <div role="listbox">
                               <template is="dom-repeat" items="{{route.routeDetails.b.stops}}" as="stop">
                                 <paper-item>
-                                  <paper-item-body>[[stop.name]]</paper-item-body>
+                                  <paper-item-body>[[stop.name]]
+                                    <template is="dom-if" if="{{stop.route_list}}">
+                                      (Connect route: [[stop.route_list]])
+                                    </template>
+                                  </paper-item-body>
                                 </paper-item>
                               </template>
                             </div>
@@ -506,6 +520,10 @@
 
              for(var i=0;i<rawStopsData.length;i++){
                  var rawStopObject = rawStopsData[i];
+                 var route_list = "";
+                 if(rawStopObject.route_list){
+                    route_list = rawStopObject.route_list.replace('{','').replace('}','').trim();
+                 }
                  var stopObject = {
                    backofficeName:rawStopObject.stop_id+' - '+rawStopObject.stop_name,
                    lat:rawStopObject.stop_lat,
@@ -514,6 +532,7 @@
                    type:rawStopObject.stop_type,
                    id:rawStopObject.stop_id,
                    code:rawStopObject.stop_code,
+                   route_list:route_list
                  }
                  if(stopObject.id){
                     stopListArray.push(stopObject);
@@ -642,6 +661,7 @@
                             lng:parseFloat(pasedProcesedStopObject.lng),
                             name:pasedProcesedStopObject.name,
                             code:pasedProcesedStopObject.id,
+                            route_list:pasedProcesedStopObject.route_list,
                           })
                         }
                       }
@@ -659,6 +679,7 @@
                             lng:parseFloat(pasedProcesedStopObject.lng),
                             name:pasedProcesedStopObject.name,
                             code:pasedProcesedStopObject.id,
+                            route_list:pasedProcesedStopObject.route_list,
                           })
                         }
                       }
@@ -867,10 +888,10 @@
               }).then(function(data) {
                 // console.log('check route detailed data');
                 // console.log(data);
-                if(data && data.a && data.a.stops.length && data.a.stops[0] && data.a.stops[0].sec && data.a.stops[0].sec !=null  ){
+                if(data && data.a && data.a.stops.length && data.a.videoUrl){
                   alreadyHadRouteDetailsData = true;
                 }
-                if(alreadyHadRouteInfoData && alreadyHadRouteDetailsData){
+                if(alreadyHadRouteDetailsData){
                   startUpdate(index+1);
                 }else{
                   //alert('safe to proceed to final store');
