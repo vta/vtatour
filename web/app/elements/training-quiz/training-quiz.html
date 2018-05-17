@@ -441,6 +441,15 @@
       _generateQASet:function(processedRoutes){
         var qa = [];
         console.log('Received routes to create qa');
+        var shuffleArray = function (array) {
+              for (var i = array.length - 1; i > 0; i--) {
+                  var j = Math.floor(Math.random() * (i + 1));
+                  var temp = array[i];
+                  array[i] = array[j];
+                  array[j] = temp;
+              }
+              return array;
+          }
         console.log(processedRoutes);
         for(var index in  processedRoutes){
           var tempQuizItem = {};
@@ -459,15 +468,17 @@
           var question = ""
           var answer = null;
           var options = [];
-          var shuffleArray = function (array) {
-                for (var i = array.length - 1; i > 0; i--) {
-                    var j = Math.floor(Math.random() * (i + 1));
-                    var temp = array[i];
-                    array[i] = array[j];
-                    array[j] = temp;
-                }
-                return array;
-            }
+
+          var existingRouteListRelatedQuestion = 0;
+          var existingDirectionRelatedQuestion = 0;
+          var existingStopPositionRelatedQuestion = 0;
+
+          // for(var i=0;i<qa.length;i++){
+          //   if(qa.)
+          // }
+
+
+
           if(questionType<=1){
             var randomStopSelection = Math.floor(Math.random() * (tempRoute.routeDetails[direction].stops.length - 2)) + 1;
             if(randomStopSelection>=tempRoute.routeDetails[direction].stops.length){
@@ -521,12 +532,13 @@
             answerIndex : answer,
             options:shuffleArray(options),
             mainRoute:tempRoute,
-            direction:direction
+            direction:direction,
+            quesrtionType:'stop_position_related'
           }
           qa.push(questionAnswerObject);
         }
 
-        this._qa = qa;
+        this._qa = shuffleArray(qa);
         console.log('Final QA');
         console.log(this._qa);
         this._currentQAIndex = 0;
