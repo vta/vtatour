@@ -76,6 +76,16 @@
         background-color:#edeef1;
       }
 
+      #route-list-display{
+        width:100%;
+        text-align:center;
+        font-size:14px;
+        color:#02528a;
+        border-bottom:1px solid #02528a;
+        border-top:1px solid #02528a;
+        background-color:#edeef1;
+      }
+
       @media all and (min-width: 361px) and (orientation: landscape) {
         .navigation-wrapper {
           @apply(--layout-horizontal);
@@ -165,6 +175,9 @@
 
         #direction-display{
           font-size: 12px;
+        }
+        #route-list-display{
+            font-size: 12px;
         }
 
         .navbar-collapse{
@@ -365,6 +378,13 @@
 
 
       <div class="background-color">
+      <template is="dom-if" if="[[_nextStop]]">
+      <div id="route-list-display">[[_nextStop.name]]
+        <template is="dom-if" if="[[_nextStop.route_list]]">
+        (Connects - [[_nextStop.route_list]])
+         </template>
+      </div>
+     </template>
       <div id="direction-display" ></div>
       <div class="container">
           <div class="row">
@@ -1137,6 +1157,7 @@ var map;
             lat: nextStopOrigin.lat,
             lng: nextStopOrigin.lng,
             name: nextStopOrigin.name,
+            route_list:nextStopOrigin.route_list,
             sec: nextStopSec - this.SECONDS_INTERVAL_FOR_STOPS,
             endSec: nextStopSec + this.SECONDS_INTERVAL_FOR_STOPS
           };
