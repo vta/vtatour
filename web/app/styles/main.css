@@ -2339,12 +2339,6 @@ ul#filters > .active > span {
 }
 }
 
-@media (max-width:320px) {
-
-
-}
-
-
 .navbar .container-fluid{
   background-color: #fff !important;
 }
@@ -2366,6 +2360,10 @@ ul#filters > .active > span {
     width:84% !important;
   }
 }
+.header-frontend .nav li a, .header-frontend .nav li.active ul.dropdown-menu li a{
+  border-right: transparent !important;
+  border-left: 1px solid #02528a!important;
+}
 @media all and (max-width: 768px) {
   paper-fab{
     margin-left: 40%;
@@ -2377,16 +2375,48 @@ ul#filters > .active > span {
     width:76% !important;
   }
 
+  .navbar-brand>img{
+    margin-left: 40%;
+    padding-top: 4px;
+    height: 50px;
+  }
+
+
 }
 @media (max-width: 480px) {
   #suggestionsWrapper{
     width:66% !important;
   }
+  .navbar-brand>img{
+    margin-left: 5%;
+    padding-top: 1px;
+    height: 46px !important;
+    margin-top: 11px !important;
+  }
   /* #dropdown{
     left:15% !important;
   } */
+  .navbar-collapse{
+    float: right !important;
+    margin-top: -12%;
+  }
+  .header-frontend .navbar{
+        min-height: 50px;
+  }
 
 }
+@media (max-width:320px) {
+  .navbar-brand>img{
+    margin-top: 28px !important;
+    height: 34px !important;
+    margin-left: -10px;
+  }
+  .navbar-header{
+    margin-top: -10%;
+  }
+
+}
+
 /* .training-quiz{ padding-bottom:15px;}
 .training-quiz-0 .panel-body.training-quiz {
     padding: 10px!important;
@@ -2399,3 +2429,10 @@ ul#filters > .active > span {
 }
 
 .quiz-area{ padding-left:10%!important; padding-right:10%!important; } */
+
+.navbar-default .navbar-collapse, .navbar-default .navbar-form{
+  border-color: transparent !important;
+}
+.header-frontend .nav li a, .header-frontend .nav li.active ul.dropdown-menu li a{
+  /* border-right: transparent !important; */
+}
