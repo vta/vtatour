@@ -2447,3 +2447,7 @@ ul#filters > .active > span {
 .navbar-default .navbar-collapse, .navbar-default .navbar-form{
   border-color: transparent !important;
 }
+
+#mainContainer{
+  background-color: #ffff;
+}

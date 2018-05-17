@@ -66,25 +66,26 @@
       poi-detail.active {
         display: block;
       }
-      #direction-display{
-        width:100%;
-        text-align:center;
-        font-size:16px;
-        color:#02528a;
-        /* border-bottom:1px solid #02528a;
-        border-top:1px solid #02528a; */
-        background-color:#ffff;
-      }
-
       #route-list-display{
         width:100%;
         text-align:center;
         font-size:14px;
         color:#02528a;
-        /* border-bottom:1px solid #02528a;
-        border-top:1px solid #02528a; */
+        /* border-bottom:1px solid #02528a; */
+        /* border-top:1px solid #02528a; */
         background-color:#ffff;
       }
+      #direction-display{
+        width:100%;
+        text-align:center;
+        font-size:16px;
+        color:#02528a;
+        /* border-bottom:1px solid #02528a; */
+        /* border-top:1px solid #02528a; */
+        background-color:#ffff;
+      }
+
+
 
       @media all and (min-width: 361px) and (orientation: landscape) {
         .navigation-wrapper {
@@ -378,14 +379,14 @@
 
 
       <div class="background-color">
-      <template is="dom-if" if="[[_nextStop]]">
-      <div id="route-list-display">[[_nextStop.name]]
+      <template is="dom-if" if="[[_nextStop]]" >
+      <div id="route-list-display" hidden$="{{!_isVideoPlaying}}">[[_nextStop.name]]
         <template is="dom-if" if="[[_nextStop.route_list]]">
         (Connects - [[_nextStop.route_list]])
          </template>
       </div>
      </template>
-      <div id="direction-display" ></div>
+      <div id="direction-display" hidden$="{{!_isVideoPlaying}}"></div>
       <div class="container">
           <div class="row">
               <!--feature start-->
