@@ -273,6 +273,9 @@
           position: fixed;
           bottom: 0;
         }
+        google-map {
+          height: 300px;
+        }
       </style>
       <firebase-document
         app-name="vta"
@@ -313,8 +316,17 @@
           <div class="container quiz-area">
           	<div class="panel-body style-scope training-quiz">
             <div class="col-md-6 col-xs-12">
-              <template is="dom-if" if="[[_currentQA.mainRoute.routeDetails.a.videoGeoPoints]]">
-              <route-map id="routeMap" geo-points="{{_currentQA.mainRoute.routeDetails.a.videoGeoPoints}}"></route-map>
+              <template is="dom-if" if="[[_currentQA.lat]]">
+              <!-- <route-map id="routeMap" geo-points="{{_currentQA.mainRoute.routeDetails.a.videoGeoPoints}}"></route-map> -->
+              <google-map
+                api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"
+                additional-map-options='{"zoomControl":"true"}'
+                latitude="[[_currentQA.lat]]"
+                longitude="[[_currentQA.lng]]"
+                mapType="satellite"
+                zoom="15"
+                >
+              </google-map>
               </template>
             </div>
             <div class="col-md-6 col-xs-12">
@@ -559,7 +571,9 @@
             options:shuffleArray(options),
             mainRoute:tempRoute,
             direction:direction,
-            quesrtionType:'stop_position_related'
+            quesrtionType:'stop_position_related',
+            lat:answerStop.lat,
+            lng:answerStop.lng
           }
           qa.push(questionAnswerObject);
         }
