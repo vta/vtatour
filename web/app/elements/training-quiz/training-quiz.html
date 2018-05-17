@@ -310,15 +310,14 @@
           </div>
         </template>
 
-        <template is="dom-if" if="[[_qa.length]]">
-        <div class="quiz_content">
+        <div class="quiz_content" hidden$="{{!_qa.length}}">
           <section class="banner">
           <div class="container quiz-area">
           	<div class="panel-body style-scope training-quiz">
             <div class="col-md-6 col-xs-12">
-              <template is="dom-if" if="[[_currentQA.lat]]">
-              <!-- <route-map id="routeMap" geo-points="{{_currentQA.mainRoute.routeDetails.a.videoGeoPoints}}"></route-map> -->
-              <google-map
+              <!-- <template is="dom-if" if="[[_currentQA.lat]]"> -->
+              <route-map id="routeMap" geo-points="{{_currentQA.geoPoints}}"></route-map>
+              <!-- <google-map
                 api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"
                 additional-map-options='{"zoomControl":"true"}'
                 latitude="[[_currentQA.lat]]"
@@ -326,8 +325,8 @@
                 mapType="satellite"
                 zoom="15"
                 >
-              </google-map>
-              </template>
+              </google-map> -->
+              <!-- </template> -->
             </div>
             <div class="col-md-6 col-xs-12">
                     <div class="style-scope training-quiz">
@@ -397,7 +396,6 @@
           </div>
 
         </div>
-      </template>
 
     <!-- <template is="dom-if" if="[[_qa.length]]">
       <template is="dom-repeat" items="[[_qa]]" as="qaItem" >
@@ -573,7 +571,8 @@
             direction:direction,
             quesrtionType:'stop_position_related',
             lat:answerStop.lat,
-            lng:answerStop.lng
+            lng:answerStop.lng,
+            geoPoints:tempRoute.routeDetails[direction].videoGeoPoints
           }
           qa.push(questionAnswerObject);
         }
@@ -583,7 +582,7 @@
         console.log(this._qa);
         this._currentQAIndex = 0;
         this._currentQA = this._qa[this._currentQAIndex];
-
+        this._setMapFocus();
       },
       _combineRouteAndRouteDetails: function(routes,routeDetailses){
         var finalRoutes = [];
@@ -663,6 +662,7 @@
         }
 
         this._currentQA = this._qa[this._currentQAIndex];
+        this._setMapFocus();
         console.log(this._currentQA);
         for(var i=0;i<this._currentQA.options.length;i++){
           if(this._currentQA.options[i].isCorrect==true){
@@ -721,6 +721,7 @@
                  self.$.saveOperationResultModal.close();
               }, 1000);
             }
+            this._setMapFocus();
             if(this._currentQA && this._currentQA.alreadyAnswered){
               for(var i=0;i<this._currentQA.options.length;i++){
                 if(this._currentQA.options[i].isCorrect==true){
@@ -737,6 +738,15 @@
                self.$.saveOperationResultModal.close();
             }, 1000);
           }
+        }
+      },
+      _setMapFocus:function(){
+        var lat = this._currentQA.lat;
+        var lng = this._currentQA.lng;
+        var zoomLevel = 15;
+        var self = this;
+        if(self.$.routeMap){
+          self.$.routeMap._setMapFocusAndZoom(lat,lng,zoomLevel);
         }
       }
 

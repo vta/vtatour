@@ -50,7 +50,16 @@
           },
           _destination: {
             type: Object
-          }
+          },
+          _latitude:{
+            type: String
+          },
+          _longtitude:{
+            type: String
+          },
+          _zoomLevel:{
+            type: Number
+          },
         },
 
         _geoPointsChange: function(newVideoGeoPoints) {
@@ -101,9 +110,20 @@
 
             setTimeout(function(){
               self._mapPolyline.setMap(self._map);
-              self._map.setZoom(12);
               self._map.fitBounds(bounds);
+              if(self._latitude && self._longtitude){
+                console.log('has Value before settings up value');
+                self._map.latitude = self._latitude;
+                self._map.longitude = self._longtitude;
+              }
+              if(self._zoomLevel){
+                  self._map.setZoom(self._zoomLevel);
+              }
 
+
+              // //  = lat;
+              // // this._map.longitude = lng;
+              // //this._map.setZoom(16);
             },100);
           }
         },
@@ -125,6 +145,12 @@
             return false;
           }
           return true;
+        },
+        _setMapFocusAndZoom:function(lat,lng,zoomLevel){
+          console.log('Special case')
+          this._latitude = lat;
+          this._longtitude = lng;
+          this._zoomLevel = zoomLevel;
         }
       });
     }catch(err){
