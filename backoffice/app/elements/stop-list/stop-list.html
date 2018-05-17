@@ -19,7 +19,12 @@
       <div role="listbox">
         <template is="dom-repeat" items="{{stops}}" as="stop">
           <paper-item>
-            <paper-item-body>[[stop.name]]</paper-item-body>
+            <paper-item-body>[[stop.name]]
+              <template is="dom-if" if="{{stop.route_list}}">
+                <br/>
+                (Connect route: [[stop.route_list]])
+              </template>
+            </paper-item-body>
             <paper-icon-button icon="icons:delete" alt="Delete" on-click="_deleteStop" data-stop-index$="[[index]]"></paper-icon-button>
           </paper-item>
         </template>
