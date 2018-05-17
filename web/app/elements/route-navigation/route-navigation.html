@@ -859,6 +859,8 @@ var map;
           } else if (this._nextStop && newVideoCurrentTime > this._nextStop.endSec) {
             this._nextStop = this._calculateNextStop(this._stopsSlot, newVideoCurrentTime);
             this._disableNextStop();
+          }else{
+              this._nextStop = this._calculateNextStop(this._stopsSlot, newVideoCurrentTime);
           }
         },
 
