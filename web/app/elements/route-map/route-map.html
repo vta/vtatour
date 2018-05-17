@@ -101,7 +101,9 @@
 
             setTimeout(function(){
               self._mapPolyline.setMap(self._map);
+              self._map.setZoom(12);
               self._map.fitBounds(bounds);
+
             },100);
           }
         },

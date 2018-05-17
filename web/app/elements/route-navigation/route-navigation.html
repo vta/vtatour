@@ -380,13 +380,13 @@
 
       <div class="background-color">
       <template is="dom-if" if="[[_nextStop]]" >
-      <div id="route-list-display" hidden$="{{!_isVideoPlaying}}">[[_nextStop.name]]
+      <div id="route-list-display" hidden$="{{!_startedOnce}}">[[_nextStop.name]]
         <template is="dom-if" if="[[_nextStop.route_list]]">
         (Connects - [[_nextStop.route_list]])
          </template>
       </div>
      </template>
-      <div id="direction-display" hidden$="{{!_isVideoPlaying}}"></div>
+      <div id="direction-display" hidden$="{{!_startedOnce}}"></div>
       <div class="container">
           <div class="row">
               <!--feature start-->

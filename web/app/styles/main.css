@@ -2216,7 +2216,7 @@ ul#filters > .active > span {
 
     .header-frontend .nav li ul.dropdown-menu li a {
         margin-left: 0px;
-        color: #999!important;
+        color: #02528a !important;
     }
 
     .header-frontend .nav li .dropdown-menu li a:hover, .header-frontend .nav li .dropdown-menu li.active a {
@@ -2384,6 +2384,7 @@ ul#filters > .active > span {
   .header-frontend .nav li a, .header-frontend .nav li.active ul.dropdown-menu li a{
     /* border-right: transparent !important; */
     font-weight: 300 !important;
+    color: #02528a !important;
   }
 
 }
@@ -2411,6 +2412,7 @@ ul#filters > .active > span {
   .header-frontend .nav li a, .header-frontend .nav li.active ul.dropdown-menu li a{
     /* border-right: transparent !important; */
     font-weight: 300 !important;
+      color: #02528a !important;
   }
 
 }
@@ -2427,7 +2429,9 @@ ul#filters > .active > span {
   .header-frontend .nav li a, .header-frontend .nav li.active ul.dropdown-menu li a{
     /* border-right: transparent !important; */
     font-weight: 300 !important;
+    color: #02528a !important;
   }
+
 
 }
 
