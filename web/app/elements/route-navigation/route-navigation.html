@@ -1141,6 +1141,7 @@ var map;
           var mapHeight;
 
           console.log('player height');
+          console.log(this.$.mainRouteVideo);
           console.log(this.$.mainRouteVideo.offsetHeight);
 
           // Check if the device is in landscape or is a high resolution screen to resize the google map to the same size that the map
@@ -1151,7 +1152,11 @@ var map;
             mapHeight = this.$.mainRouteVideo.offsetHeight;//this._calculateMapHeight();
           }
 
+          if(mapHeight<=0){
+            mapHeight = $('.video-player-wrapper').find('video').height();
+          }
           this.$.map.style.height = mapHeight+ 'px';
+          this.$.map.style.minHeight = mapHeight+ 'px';
           google.maps.event.trigger(this._map, 'resize');
         },
 
