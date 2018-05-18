@@ -477,6 +477,9 @@
       _generateQASet:function(processedRoutes){
         var qa = [];
         console.log('Received routes to create qa');
+        var existingRouteListRelatedQuestion = 0;
+        var existingDirectionRelatedQuestion = 0;
+        var existingStopPositionRelatedQuestion = 0;
         var shuffleArray = function (array) {
               for (var i = array.length - 1; i > 0; i--) {
                   var j = Math.floor(Math.random() * (i + 1));
@@ -486,95 +489,164 @@
               }
               return array;
           }
+
+        var generateUniqueRandom = function(n,range){
+            var arr = []
+            while(arr.length < n){
+                var randomnumber = Math.floor(Math.random()*range) + 1;
+                if(arr.indexOf(randomnumber) > -1) continue;
+                arr[arr.length] = randomnumber;
+            }
+            return arr;
+        }
         console.log(processedRoutes);
         for(var index in  processedRoutes){
-          var tempQuizItem = {};
-          var tempRoute = processedRoutes[index];
-          var direction = Math.random() < 0.5 ? 'a' : 'b';
-          var questionType =  Math.floor(Math.random() * 2) + 1;
-          console.log('Direction: '+ direction);
-          console.log('question type:'+ questionType);
-          var directionName = "";
-          console.log(tempRoute);
-          if(direction=='a'){
-            directionName = tempRoute.directionAName;
-          }else{
-            directionName = tempRoute.directionBName;
+
+         if(qa.length<10){
+           //console.log('QA Length: '+this._qa.length);
+           var tempQuizItem = {};
+           var tempRoute = processedRoutes[index];
+           var direction = Math.random() < 0.5 ? 'a' : 'b';
+           var questionType =  Math.floor(Math.random() * 2) + 1;
+           console.log('Direction: '+ direction);
+           console.log('question type:'+ questionType);
+           var directionName = "";
+           console.log(tempRoute);
+           if(direction=='a'){
+             directionName = tempRoute.directionAName;
+           }else{
+             directionName = tempRoute.directionBName;
+           }
+           var question = ""
+           var answer = null;
+           var options = [];
+           for(var i=0;i<qa.length;i++){
+             if(qa[i].quesrtionType=='stop_position_related'){
+               existingStopPositionRelatedQuestion ++;
+             }
+             if(qa[i].quesrtionType=='route_list_related'){
+               existingRouteListRelatedQuestion ++;
+             }
+           }
+
+           if(existingRouteListRelatedQuestion>=4){
+             if(questionType<=1){
+               var randomStopSelection = Math.floor(Math.random() * (tempRoute.routeDetails[direction].stops.length - 2)) + 1;
+               if(randomStopSelection>=tempRoute.routeDetails[direction].stops.length){
+                 randomStopSelection = randomStopSelection -1;
+               }
+               question = "What is the next stop after "+tempRoute.routeDetails[direction].stops[randomStopSelection].name+" on "+ tempRoute.name + " "+directionName + " bound";
+
+               answer = randomStopSelection +1;
+               var answerStop = tempRoute.routeDetails[direction].stops[answer];
+               console.log(answer);
+               console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+               answerStop.isCorrect = true;
+               options.push(answerStop);
+               var arr = [answer];
+               var length = tempRoute.routeDetails[direction].stops.length >4?4:tempRoute.routeDetails[direction].stops.length;
+               while(arr.length < length){
+                   var randomnumber = Math.floor(Math.random()*tempRoute.routeDetails[direction].stops.length) + 1;
+                   if(arr.indexOf(randomnumber) > -1 && randomnumber !=randomStopSelection) continue;
+                   console.log('random number: '+randomnumber);
+                   if(tempRoute.routeDetails[direction].stops[randomnumber] && tempRoute.routeDetails[direction].stops[randomnumber].name !=answerStop.name){
+                     arr[arr.length] = randomnumber;
+                     options.push(tempRoute.routeDetails[direction].stops[randomnumber]);
+                   }
+               }
+
+             }else{
+               var randomStopSelection = Math.floor(Math.random() * (tempRoute.routeDetails[direction].stops.length - 1)) + 1;
+               question = "What is the stop before "+tempRoute.routeDetails[direction].stops[randomStopSelection].name+" on "+ tempRoute.name + " "+directionName + " bound";
+               answer = randomStopSelection -1;
+               console.log(answer);
+               console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+               var answerStop = tempRoute.routeDetails[direction].stops[answer];
+               answerStop.isCorrect = true;
+               console.log(answer);
+               console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+               options.push(answerStop);
+               var arr = [answer];
+               var length = tempRoute.routeDetails[direction].stops.length >4?4:tempRoute.routeDetails[direction].stops.length;
+               while(arr.length < length){
+                   var randomnumber = Math.floor(Math.random()*tempRoute.routeDetails[direction].stops.length) + 1;
+                   if(arr.indexOf(randomnumber) > -1 && randomnumber !=randomStopSelection) continue;
+                   console.log('random number: '+randomnumber);
+                   if(tempRoute.routeDetails[direction].stops[randomnumber] && tempRoute.routeDetails[direction].stops[randomnumber].name !=answerStop.name){
+                     arr[arr.length] = randomnumber;
+                     options.push(tempRoute.routeDetails[direction].stops[randomnumber]);
+                   }
+               }
+             }
+             var questionAnswerObject = {
+               questionText:question,
+               //answerIndex : answer,
+               options:shuffleArray(options),
+               //mainRoute:tempRoute,
+               direction:direction,
+               quesrtionType:'stop_position_related',
+               lat:answerStop.lat,
+               lng:answerStop.lng,
+               geoPoints:tempRoute.routeDetails[direction].videoGeoPoints
+             }
+             qa.push(questionAnswerObject);
+           }else{
+             //existingRouteListRelatedQuestion++;
+             var tempStops = tempRoute.routeDetails[direction].stops;
+             var tempStopsThatHasRouteConnection = [];
+             for(var i=0;i<tempStops.length;i++){
+               if(tempStops[i].route_list){
+                 var connectsArray = tempStops[i].route_list.split(',');
+                 if(connectsArray.length>=2){
+                   tempStopsThatHasRouteConnection.push(tempStops[i])
+                 }
+               }
+             }
+
+             if(tempStopsThatHasRouteConnection.length){
+               var randomStopSelection = Math.floor(Math.random() * (tempStopsThatHasRouteConnection.length));
+               console.log('Stop Selection')
+               console.log(randomStopSelection)
+               var randomlySelectedStop = tempStopsThatHasRouteConnection[randomStopSelection];
+               console.log(randomlySelectedStop);
+               console.log(tempRoute.code+': This rote has total route conneter stops: '+tempStopsThatHasRouteConnection.length);
+               question = "which routes is connected by stop "+randomlySelectedStop.name+" on "+ tempRoute.name + " "+directionName + " bound";
+               var correctAnswer = {
+                 name:randomlySelectedStop.name+' connects route '+randomlySelectedStop.route_list,
+                 isCorrect:true
+               }
+               var actualAnswerArray = randomlySelectedStop.route_list.split(',')
+               options.push(correctAnswer);
+               var wrongOption1 = generateUniqueRandom(actualAnswerArray,1000)
+               var wrongAnswer1 = {
+                 name:randomlySelectedStop.name+' connects route '+generateUniqueRandom(actualAnswerArray.length,1000)
+               }
+               options.push(wrongAnswer1);
+
+               var wrongAnswer2 = {
+                 name:randomlySelectedStop.name+' connects route '+generateUniqueRandom(actualAnswerArray.length,1000)
+               }
+               options.push(wrongAnswer2);
+               var wrongAnswer3 = {
+                 name:randomlySelectedStop.name+' connects route '+generateUniqueRandom(actualAnswerArray.length,1000)
+               }
+               options.push(wrongAnswer3);
+               var questionAnswerObject = {
+                 questionText:question,
+                 //answerIndex : answer,
+                 options:shuffleArray(options),
+                 //mainRoute:tempRoute,
+                 direction:direction,
+                 quesrtionType:'route_list_related',
+                 lat:randomlySelectedStop.lat,
+                 lng:randomlySelectedStop.lng,
+                 geoPoints:tempRoute.routeDetails[direction].videoGeoPoints
+               }
+               qa.push(questionAnswerObject);
+             }
+           }
           }
-          var question = ""
-          var answer = null;
-          var options = [];
 
-          var existingRouteListRelatedQuestion = 0;
-          var existingDirectionRelatedQuestion = 0;
-          var existingStopPositionRelatedQuestion = 0;
-
-          // for(var i=0;i<qa.length;i++){
-          //   if(qa.)
-          // }
-
-
-
-          if(questionType<=1){
-            var randomStopSelection = Math.floor(Math.random() * (tempRoute.routeDetails[direction].stops.length - 2)) + 1;
-            if(randomStopSelection>=tempRoute.routeDetails[direction].stops.length){
-              randomStopSelection = randomStopSelection -1;
-            }
-            question = "What is the next stop after "+tempRoute.routeDetails[direction].stops[randomStopSelection].name+" on "+ tempRoute.name + " "+directionName + " bound";
-
-            answer = randomStopSelection +1;
-            var answerStop = tempRoute.routeDetails[direction].stops[answer];
-            console.log(answer);
-            console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
-            answerStop.isCorrect = true;
-            options.push(answerStop);
-            var arr = [answer];
-            var length = tempRoute.routeDetails[direction].stops.length >4?4:tempRoute.routeDetails[direction].stops.length;
-            while(arr.length < length){
-                var randomnumber = Math.floor(Math.random()*tempRoute.routeDetails[direction].stops.length) + 1;
-                if(arr.indexOf(randomnumber) > -1 && randomnumber !=randomStopSelection) continue;
-                console.log('random number: '+randomnumber);
-                if(tempRoute.routeDetails[direction].stops[randomnumber] && tempRoute.routeDetails[direction].stops[randomnumber].name !=answerStop.name){
-                  arr[arr.length] = randomnumber;
-                  options.push(tempRoute.routeDetails[direction].stops[randomnumber]);
-                }
-            }
-
-          }else{
-            var randomStopSelection = Math.floor(Math.random() * (tempRoute.routeDetails[direction].stops.length - 1)) + 1;
-            question = "What is the stop before "+tempRoute.routeDetails[direction].stops[randomStopSelection].name+" on "+ tempRoute.name + " "+directionName + " bound";
-            answer = randomStopSelection -1;
-            console.log(answer);
-            console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
-            var answerStop = tempRoute.routeDetails[direction].stops[answer];
-            answerStop.isCorrect = true;
-            console.log(answer);
-            console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
-            options.push(answerStop);
-            var arr = [answer];
-            var length = tempRoute.routeDetails[direction].stops.length >4?4:tempRoute.routeDetails[direction].stops.length;
-            while(arr.length < length){
-                var randomnumber = Math.floor(Math.random()*tempRoute.routeDetails[direction].stops.length) + 1;
-                if(arr.indexOf(randomnumber) > -1 && randomnumber !=randomStopSelection) continue;
-                console.log('random number: '+randomnumber);
-                if(tempRoute.routeDetails[direction].stops[randomnumber] && tempRoute.routeDetails[direction].stops[randomnumber].name !=answerStop.name){
-                  arr[arr.length] = randomnumber;
-                  options.push(tempRoute.routeDetails[direction].stops[randomnumber]);
-                }
-            }
-          }
-          var questionAnswerObject = {
-            questionText:question,
-            answerIndex : answer,
-            options:shuffleArray(options),
-            mainRoute:tempRoute,
-            direction:direction,
-            quesrtionType:'stop_position_related',
-            lat:answerStop.lat,
-            lng:answerStop.lng,
-            geoPoints:tempRoute.routeDetails[direction].videoGeoPoints
-          }
-          qa.push(questionAnswerObject);
         }
 
         this._qa = shuffleArray(qa);
@@ -605,7 +677,7 @@
         //randomly selecting 10 routes
         var arr = [];
         var ranDomRoutes = [];
-        while(arr.length < 10){
+        while(arr.length < 20){
             var randomnumber = Math.floor(Math.random()*finalRoutes.length) + 1;
             if(arr.indexOf(randomnumber) > -1) continue;
             console.log('random number: '+randomnumber);
