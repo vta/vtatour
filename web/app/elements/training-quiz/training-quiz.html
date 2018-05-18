@@ -610,7 +610,7 @@
                var randomlySelectedStop = tempStopsThatHasRouteConnection[randomStopSelection];
                console.log(randomlySelectedStop);
                console.log(tempRoute.code+': This rote has total route conneter stops: '+tempStopsThatHasRouteConnection.length);
-               question = "which routes is connected by stop "+randomlySelectedStop.name+" on "+ tempRoute.name + " "+directionName + " bound";
+               question = "Which routes is connected by stop "+randomlySelectedStop.name+" on "+ tempRoute.name + " "+directionName + " bound";
                var correctAnswer = {
                  name:randomlySelectedStop.name+' connects route '+randomlySelectedStop.route_list,
                  isCorrect:true
