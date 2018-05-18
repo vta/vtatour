@@ -787,6 +787,27 @@ var map;
           return windowHeight - mainToolbarHeight - pageTitleHeight - videoHeight - videoProggressHeight - videoControlsHeight;
         },
 
+        _setEndMessage: function(){
+          var endRouteListMessage = "";
+          var route_list ="";
+          if(this._destinationStop && this._destinationStop.route_list){
+            route_list = this._destinationStop.route_list.toString();
+            var routeListArray = route_list.split(',');
+            if(routeListArray.length==1){
+              endRouteListMessage = ', Connection is available for route: '+this._destinationStop.route_list
+            }else if(routeListArray.length>1){
+              endRouteListMessage = ', Connections are available for routes: '+this._destinationStop.route_list
+            }
+
+          }
+          $('#direction-display').html('Reached destination'+endRouteListMessage);
+          // var endStopMessage = this._destinationStop.name;
+          // if(this._destinationStop.route_list){
+          //   endStopMessage+' (connects - '+this._destinationStop.route_list+')';
+          // }
+          // $('#route-list-display').html(endStopMessage);
+        },
+
         _videoCurrentTimeChange: function(newVideoCurrentTime) {
           if (!this._routeDetails || !this.player) {
             return;
@@ -810,10 +831,12 @@ var map;
           }
           if(newVideoCurrentTime == (this._videoEndTime+1)){
             this.player.pause();
+            this._setEndMessage();
             return;
           }else if(newVideoCurrentTime > (this._videoEndTime+1)){
             this.player.pause();
             this.player.currentTime(this._videoEndTime);
+            this._setEndMessage()
             return;
           }else if (newVideoCurrentTime >= this.player.duration()) {
             this.player.pause();
@@ -920,6 +943,8 @@ var map;
           this.player.play();
           // this.player.currentTime(this._videoStartTime);
           this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
+
+          $('#direction-display').html('');
 
           // Send the event to Google Analytics
           ga('send', 'event', 'Tour', 'restart', this._routeInfo.name);
