@@ -205,6 +205,8 @@
 
             <paper-input id="departure" value="{{_routeInfo.departure}}" label="Departure" placeholder="Text" required></paper-input>
             <paper-input id="destination" value="{{_routeInfo.destination}}" label="Destination" placeholder="Text" required></paper-input>
+            <paper-input id="latitude" value="{{_routeInfo.latitude}}" label="Latitude" placeholder="Text" required></paper-input>
+            <paper-input id="longitude" value="{{_routeInfo.longitude}}" label="Longitude" placeholder="Text" required></paper-input>
 
           </div>
           <div class="column2">
@@ -451,7 +453,11 @@
           this._routeInfo = newRouteInfo;
         }
       },
-
+      _setDefaultLatLng:function(lat,lng){
+        console.log(lat,lng);
+        this._routeInfo.latitude = lat;
+        this._routeInfo.longitude = lng;
+      },
       _routeDetailsOriginChange: function(newRouteDetails) {
         if (this._jsonHasKeys(newRouteDetails)) {
           this._routeDetails = newRouteDetails;
@@ -624,6 +630,11 @@
 
         console.log(this._routeDetails);
         console.log('above data is old one');
+        if(!this._routeInfo.latitude && !this._routeInfo.longitude){
+          if(this._routeDetails.a && this._routeDetails.a.videoGeoPoints && this._routeDetails.a.videoGeoPoints[1]){
+            this._setDefaultLatLng (this._routeDetails.a.videoGeoPoints[1].lat, this._routeDetails.a.videoGeoPoints[1].lng);
+          }
+        }
 
         if(this._routeDetails.a && this._routeDetails.a.stops && this._routeDetails.a.stops.length ){
           for(var a=0;a<this._routeDetails.a.stops.length;a++){

@@ -317,6 +317,14 @@
                       <div class="route-detail-header">Destination</div>
                       <div class="route-detail-value">[[route.destination]]</div>
                     </div>
+                    <div class="route-departure">
+                      <div class="route-detail-header">Latitude</div>
+                      <div class="route-detail-value">[[route.latitude]]</div>
+                    </div>
+                    <div class="route-departure">
+                      <div class="route-detail-header">Longitude</div>
+                      <div class="route-detail-value">[[route.longitude]]</div>
+                    </div>
                   </div>
                   <div class="container item stop-list-listing">
                     <div class="column1">
@@ -693,6 +701,12 @@
                    var geoPointsArrayString = "["+rawRouteObject.routeshape+"]";
                    var geoPointsArray = eval(geoPointsArrayString);
                    routeObject.routeDetails.a.videoGeoPoints = objectifyLatLon(geoPointsArray);
+                   if(geoPointsArray && geoPointsArray.length){
+                     console.log('check important below');
+                     console.log(geoPointsArray[0]);
+                     routeObject.latitude = geoPointsArray[0].lat;
+                     routeObject.longitude = geoPointsArray[0].lon;
+                   }
                  }
                  if(rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.routeshape){
                    var geoPointsArrayString = "["+rawRouteObjectOtherDirection.routeshape+"]";
