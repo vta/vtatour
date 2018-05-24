@@ -221,7 +221,31 @@
           margin-left: -25px !important;
         }
 
+        .fullscreen-button{
+              margin-left: 338px !important;
+          }
+
       }
+      .fullscreen-button{
+        position: absolute;
+        z-index: 9999999;
+        --iron-icon-height: 30px;
+        margin-left: 46%;
+        margin-top: 3px;
+        color: white;
+        cursor: pointer;
+      }
+
+      @media (max-width: 425px) {
+        .fullscreen-button{
+              margin-left: 185px !important;
+          }
+        }
+        @media (max-width: 375px) {
+          .fullscreen-button{
+                margin-left: 330px !important;
+            }
+          }
 
       @media (max-width:320px) {
         .top-header .header-item{
@@ -233,7 +257,13 @@
           margin-top: 9px !important;
           margin-left: -25px !important;
         }
+
+        .fullscreen-button{
+              margin-left: 279px !important;
+          }
       }
+
+
 
     </style>
       <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
@@ -264,6 +294,7 @@
       	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
 
       </div>
+      <iron-icon icon="icons:fullscreen" class="fullscreen-button"></iron-icon>
       <div class="navigation-wrapper">
         <div class="video-player-wrapper">
           <video id="mainRouteVideo" class="video-js vjs-default-skin" controls preload="auto" webkit-playsinline playsinline>
@@ -1295,6 +1326,16 @@ var map;
             page.back(navPage);
           }
         },
+        reAlightElements: function(){
+
+          // console.log('Resizing fullscreen button');
+          // var fullSkinButton = document.querySelector('.video-js .vjs-fullscreen-control');
+          // fullSkinButton.style.display = 'block';
+          // var videoHeight = parseInt($('video').outerHeight() || $('video').height());
+          // fullSkinButton.style.marginTop = '-'+(videoHeight * .9290)+'px';//'-57.5%';
+          // fullSkinButton.style.position = 'relative';
+          // fullSkinButton.style.fontSize = '17px';
+        },
         _bingVideo:function(src){
 
             if(!videojs){
@@ -1313,11 +1354,11 @@ var map;
                 for (var i = 0; i < playButton.length; i++) {
                   playButton[i].style.display = 'none';
                 }
-                var fullSkinButton = document.querySelector('.video-js .vjs-fullscreen-control');
-                fullSkinButton.style.display = 'block';
-                fullSkinButton.style.marginTop = '-57.5%';
-                fullSkinButton.style.position = 'relative';
-                fullSkinButton.style.fontSize = '17px';
+                self.reAlightElements();
+                $('.fullscreen-button').on('click',function(){
+                  $('.video-js .vjs-fullscreen-control').click();
+                });
+
                 var progressBar = document.querySelector('.video-js .vjs-progress-control');
                 progressBar.style.visibility='hidden';
                 var timeRemaing = document.querySelector('.vjs-remaining-time-display');
@@ -1328,6 +1369,7 @@ var map;
                 self._adjustMapSize();
                 window.addEventListener("resize", function(){
                   self._adjustMapSize();
+                  self.reAlightElements();
                 });
                 setTimeout(function(){
                      self._adjustMapSize();
@@ -1362,6 +1404,7 @@ var map;
                   console.log('Video Played');
                   self._playVideo();
                   self._adjustMapSize();
+                  self.reAlightElements();
                 });
                 self.player.on('pause', function() {
                   console.log('Video Paused');
@@ -1372,11 +1415,13 @@ var map;
                     //alert('resized')
                     console.log('full screen event');
                     self._adjustMapSize();
+                    self.reAlightElements();
                   });
 
                 self.player.on('timeupdate', function () {
                     //console.log(this.currentTime());
-                  self._videoCurrentTimeChange(parseInt(this.currentTime()))
+                  self._videoCurrentTimeChange(parseInt(this.currentTime()));
+                  self.reAlightElements();
                 });
               });
 

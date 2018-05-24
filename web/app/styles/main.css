@@ -2387,6 +2387,9 @@ ul#filters > .active > span {
     color: #02528a !important;
   }
 
+  /* .video-js .vjs-fullscreen-control{
+    margin-top:-190.664px !important;
+  } */
 }
 @media (max-width: 480px) {
   #suggestionsWrapper{
