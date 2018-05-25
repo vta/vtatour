@@ -102,11 +102,11 @@ var ajax_call = function() {
                   }
                   if (data=='101') {
 
- $("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_forward.mp4">https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'_forward.mp4</a><br>');
-$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_backward.mp4">https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'_backward.mp4</a><br>');
-$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_right.mp4">https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'_right.mp4</a><br>');
-$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_left.mp4">https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'_left.mp4</a><br>');
-$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'.kml">https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'_forward.mp4</a><br>');
+ $("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_forward.mp4">Forward</a><br>');
+$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_backward.mp4">Backward</a><br>');
+$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_right.mp4">Right</a><br>');
+$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_left.mp4">Left</a><br>');
+$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'.kml">KML</a><br>');
 
                    
                   }
@@ -201,9 +201,7 @@ $("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+r
    <form class="form-horizontal tasi-form" id="map_form" >
    
                                   <div class="form-group">
-                                        <div class="col-md-4 ">
-                 <div id="map" style="width: 800px; height: 415px; float: right; padding: 0;"></div>
-                </div>
+                    
                                       <div class="col-lg-8">
                                      
                                        <div class="panel-body">
@@ -217,8 +215,8 @@ $("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+r
                                          <label class="col-lg-2 control-label">Direction</label>
                                           <select id="ddldir" class="form-control input-sm m-bot15">
                                               <option>Choose direction of the route</option>
-                                              <option value="0" >West and East</option>
-                                              <option value="1">North South</option>
+                                              <option value="0" >West - East</option>
+                                              <option value="1">North - South</option>
                                           </select>
                                       </div>
                                      
@@ -230,6 +228,11 @@ $("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+r
                            
                                   
                                   </div>
+                                    <div class="col-lg-4"  >  
+                                       <div class="panel-body2">
+                                  <div id="progress"></div> 
+                                  <div id="urls"></div> 
+                                    </div>
                                   
                                   
                                   
@@ -241,13 +244,10 @@ $("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+r
                              
     
       </div>  </div></div>
-  <div id="progress"></div>
-    <div id="urls"></div>
+  
               
 
-    <div id="text" style="width: 555px; height: 50px; float: left; padding-top: 10px; z-index:0; border-style:solid; border-width:medium;"></div>
-        <div id="spinner" style="width: 555px; height: 50px; float: left; padding-top: 10px; z-index:0; border-style:solid; border-width:medium;">Generating video, please wait...</div>
-  </div>
+    
   </section>
 
    
