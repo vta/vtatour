@@ -221,31 +221,20 @@
           margin-left: -25px !important;
         }
 
-        .fullscreen-button{
-              margin-left: 338px !important;
-          }
-
       }
       .fullscreen-button{
-        position: absolute;
+        /* position: absolute; */
         z-index: 9999999;
         --iron-icon-height: 30px;
-        margin-left: 46%;
+        /* margin-left: 46%; */
         margin-top: 3px;
         color: white;
         cursor: pointer;
+        float:right;
+        margin-right: 10px;
       }
 
-      @media (max-width: 425px) {
-        .fullscreen-button{
-              margin-left: 185px !important;
-          }
-        }
-        @media (max-width: 375px) {
-          .fullscreen-button{
-                margin-left: 330px !important;
-            }
-          }
+
 
       @media (max-width:320px) {
         .top-header .header-item{
@@ -258,9 +247,7 @@
           margin-left: -25px !important;
         }
 
-        .fullscreen-button{
-              margin-left: 279px !important;
-          }
+
       }
 
 
@@ -294,9 +281,10 @@
       	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
 
       </div>
-      <iron-icon icon="icons:fullscreen" class="fullscreen-button"></iron-icon>
+
       <div class="navigation-wrapper">
         <div class="video-player-wrapper">
+            <iron-icon icon="icons:fullscreen" class="fullscreen-button"></iron-icon>
           <video id="mainRouteVideo" class="video-js vjs-default-skin" controls preload="auto" webkit-playsinline playsinline>
                 <!-- <source src="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/ALUMROCKTRANSITCENTER-SANTACLARA%2628TH/1024x1024-SANTA_CLARA_28TH-ALUM_ROCK_TRANSIT_CENTER.mp4" type='video/mp4'> -->
                 <p class="vjs-no-js">
@@ -666,12 +654,14 @@ var map;
         },
 
         _routeDetailsChange: function(newRouteDetails) {
+          this._adjustMapSize();
           if (!newRouteDetails || (!this.departureStopId && !this.destinationStopId)) {
             return;
           }
 
           console.log('check new route details')
           console.log(newRouteDetails)
+
           this._assignSource(newRouteDetails.videoUrl);
 
           if(newRouteDetails.videoUrl){
@@ -1166,13 +1156,15 @@ var map;
         },
 
         _adjustMapSize : function(){
+          var self = this;
+          console.log('Map Getting Adjusted');
           if(!this._mapsApiLoaded){
             return;
           }
           var mapHeight;
 
           console.log('player height');
-          console.log(this.$.mainRouteVideo);
+          // console.log(this.$.mainRouteVideo);
           console.log(this.$.mainRouteVideo.offsetHeight);
 
           // Check if the device is in landscape or is a high resolution screen to resize the google map to the same size that the map
@@ -1185,6 +1177,17 @@ var map;
 
           if(mapHeight<=0){
             mapHeight = $('.video-player-wrapper').find('video').height();
+            console.log('From Dom: '+mapHeight);
+            if(mapHeight<=0){
+              mapHeight = $('.video-player-wrapper').height();
+              if(!mapHeight){
+                  mapHeight = 450;
+                  setTimeout(function(){
+                     self._adjustMapSize();
+                  }, 1000);
+              }
+            }
+            console.log('Final Map Height: '+mapHeight);
           }
           this.$.map.style.height = mapHeight+ 'px';
           this.$.map.style.minHeight = mapHeight+ 'px';
@@ -1337,7 +1340,6 @@ var map;
           // fullSkinButton.style.fontSize = '17px';
         },
         _bingVideo:function(src){
-
             if(!videojs){
               return;
             }
@@ -1411,6 +1413,10 @@ var map;
                   self._pauseVideo();
                   self._adjustMapSize();
                 });
+                self.player.on('error', function(e) {
+                  console.log('Video error');
+                  console.log(e);
+                });
                   self.player.on('fullscreenchange', function() {
                     //alert('resized')
                     console.log('full screen event');
@@ -1429,7 +1435,6 @@ var map;
 
         },
         _assignSource : function(src){
-
           if(this.player){
             this.player.src({type: "video/mp4", src: src});
             var self = this;
@@ -1472,6 +1477,7 @@ var map;
             //   'background':'#44B5E3',
             //   'height':'20px'
             // })
+
           })
         },
         _isValidCords:function(lat,lng){

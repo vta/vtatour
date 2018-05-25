@@ -476,7 +476,7 @@
 
       _generateQASet:function(processedRoutes){
         var qa = [];
-        console.log('Received routes to create qa');
+        //console.log('Received routes to create qa');
         var existingRouteListRelatedQuestion = 0;
         var existingDirectionRelatedQuestion = 0;
         var existingStopPositionRelatedQuestion = 0;
@@ -499,19 +499,19 @@
             }
             return arr;
         }
-        console.log(processedRoutes);
+        //console.log(processedRoutes);
         for(var index in  processedRoutes){
 
          if(qa.length<10){
-           //console.log('QA Length: '+this._qa.length);
+           ////console.log('QA Length: '+this._qa.length);
            var tempQuizItem = {};
            var tempRoute = processedRoutes[index];
            var direction = Math.random() < 0.5 ? 'a' : 'b';
            var questionType =  Math.floor(Math.random() * 2) + 1;
-           console.log('Direction: '+ direction);
-           console.log('question type:'+ questionType);
+           //console.log('Direction: '+ direction);
+           //console.log('question type:'+ questionType);
            var directionName = "";
-           console.log(tempRoute);
+           //console.log(tempRoute);
            if(direction=='a'){
              directionName = tempRoute.directionAName;
            }else{
@@ -539,8 +539,8 @@
 
                answer = randomStopSelection +1;
                var answerStop = tempRoute.routeDetails[direction].stops[answer];
-               console.log(answer);
-               console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+               //console.log(answer);
+               //console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
                answerStop.isCorrect = true;
                options.push(answerStop);
                var arr = [answer];
@@ -548,7 +548,7 @@
                while(arr.length < length){
                    var randomnumber = Math.floor(Math.random()*tempRoute.routeDetails[direction].stops.length) + 1;
                    if(arr.indexOf(randomnumber) > -1 && randomnumber !=randomStopSelection) continue;
-                   console.log('random number: '+randomnumber);
+                   //console.log('random number: '+randomnumber);
                    if(tempRoute.routeDetails[direction].stops[randomnumber] && tempRoute.routeDetails[direction].stops[randomnumber].name !=answerStop.name){
                      arr[arr.length] = randomnumber;
                      options.push(tempRoute.routeDetails[direction].stops[randomnumber]);
@@ -559,19 +559,19 @@
                var randomStopSelection = Math.floor(Math.random() * (tempRoute.routeDetails[direction].stops.length - 1)) + 1;
                question = "What is the stop before "+tempRoute.routeDetails[direction].stops[randomStopSelection].name+" on "+ tempRoute.name + " "+directionName + " bound";
                answer = randomStopSelection -1;
-               console.log(answer);
-               console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+               //console.log(answer);
+               //console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
                var answerStop = tempRoute.routeDetails[direction].stops[answer];
                answerStop.isCorrect = true;
-               console.log(answer);
-               console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
+               //console.log(answer);
+               //console.log('total length: '+tempRoute.routeDetails[direction].stops.length);
                options.push(answerStop);
                var arr = [answer];
                var length = tempRoute.routeDetails[direction].stops.length >4?4:tempRoute.routeDetails[direction].stops.length;
                while(arr.length < length){
                    var randomnumber = Math.floor(Math.random()*tempRoute.routeDetails[direction].stops.length) + 1;
                    if(arr.indexOf(randomnumber) > -1 && randomnumber !=randomStopSelection) continue;
-                   console.log('random number: '+randomnumber);
+                   //console.log('random number: '+randomnumber);
                    if(tempRoute.routeDetails[direction].stops[randomnumber] && tempRoute.routeDetails[direction].stops[randomnumber].name !=answerStop.name){
                      arr[arr.length] = randomnumber;
                      options.push(tempRoute.routeDetails[direction].stops[randomnumber]);
@@ -605,11 +605,11 @@
 
              if(tempStopsThatHasRouteConnection.length){
                var randomStopSelection = Math.floor(Math.random() * (tempStopsThatHasRouteConnection.length));
-               console.log('Stop Selection')
-               console.log(randomStopSelection)
+               //console.log('Stop Selection')
+               //console.log(randomStopSelection)
                var randomlySelectedStop = tempStopsThatHasRouteConnection[randomStopSelection];
-               console.log(randomlySelectedStop);
-               console.log(tempRoute.code+': This rote has total route conneter stops: '+tempStopsThatHasRouteConnection.length);
+               //console.log(randomlySelectedStop);
+               //console.log(tempRoute.code+': This rote has total route conneter stops: '+tempStopsThatHasRouteConnection.length);
                question = "Which routes is connected by stop "+randomlySelectedStop.name+" on "+ tempRoute.name + " "+directionName + " bound";
                var correctAnswer = {
                  name:randomlySelectedStop.name+' connects route '+randomlySelectedStop.route_list,
@@ -650,45 +650,45 @@
         }
 
         this._qa = shuffleArray(qa);
-        console.log('Final QA');
-        console.log(this._qa);
+        //console.log('Final QA');
+        //console.log(this._qa);
         this._currentQAIndex = 0;
         this._currentQA = this._qa[this._currentQAIndex];
         this._setMapFocus();
       },
       _combineRouteAndRouteDetails: function(routes,routeDetailses){
         var finalRoutes = [];
-        // console.log('routes parameter');
-        // console.log(routes);
-        // console.log('Route Detailses parameter');
-        // console.log(routeDetailses);
+        // //console.log('routes parameter');
+        // //console.log(routes);
+        // //console.log('Route Detailses parameter');
+        // //console.log(routeDetailses);
         for (var routeKey in routes) {
           var tempRoute = routes[routeKey]
               if(tempRoute){
-                console.log(tempRoute.code);
+                //console.log(tempRoute.code);
                 if(routeDetailses && routeDetailses[routeKey] && routeDetailses[routeKey].a && routeDetailses[routeKey].a.stops && routeDetailses[routeKey].b && routeDetailses[routeKey].b.stops){
                   tempRoute.routeDetails = routeDetailses[routeKey];
                   finalRoutes.push(tempRoute);
                 }
               }
         }
-        console.log('Final Routes Data');
-        console.log(finalRoutes);
+        //console.log('Final Routes Data');
+        //console.log(finalRoutes);
         //randomly selecting 10 routes
         var arr = [];
         var ranDomRoutes = [];
         while(arr.length < 20){
             var randomnumber = Math.floor(Math.random()*finalRoutes.length) + 1;
             if(arr.indexOf(randomnumber) > -1) continue;
-            console.log('random number: '+randomnumber);
+            //console.log('random number: '+randomnumber);
             if(finalRoutes[randomnumber]){
               arr[arr.length] = randomnumber;
               ranDomRoutes.push(finalRoutes[randomnumber]);
             }
         }
         this._generateQASet(ranDomRoutes);
-        // console.log('uniqure routes selected for question');
-        // console.log(ranDomRoutes);
+        // //console.log('uniqure routes selected for question');
+        // //console.log(ranDomRoutes);
       },
       _getQuestionNumber : function(index){
          return parseInt(index)+1;
@@ -700,21 +700,21 @@
         var routesDetailses = [];
          this.$.routeDataProcessing.getStoredValue('/routes')
            .then(function(data) {
-             // console.log('Rotues Data');
-             // console.log(data);
-             // console.log(data.length);
+             // //console.log('Rotues Data');
+             // //console.log(data);
+             // //console.log(data.length);
              routes = data;
              self.$.routeDataProcessing.getStoredValue('/route-details')
                .then(function(data) {
-                 // console.log('Rotue Details Data');
-                 // console.log(data);
+                 // //console.log('Rotue Details Data');
+                 // //console.log(data);
                  routesDetailses = data;
                  self._combineRouteAndRouteDetails(routes,routesDetailses);
                }).catch(function(error) {
-                 console.log(error);
+                 //console.log(error);
                });
            }).catch(function(error) {
-             console.log(error);
+             //console.log(error);
            });
       },
       _showOperationResultModal: function(isSuccess, operationDetailMessage) {
@@ -735,7 +735,7 @@
 
         this._currentQA = this._qa[this._currentQAIndex];
         this._setMapFocus();
-        console.log(this._currentQA);
+        //console.log(this._currentQA);
         for(var i=0;i<this._currentQA.options.length;i++){
           if(this._currentQA.options[i].isCorrect==true){
               $('#answer_option_'+i).prop('checked', true);
@@ -745,11 +745,11 @@
       },
       _checkAnswer:function(e){
         var self = this;
-        console.log('it is working');
+        //console.log('it is working');
         var answer = $("input:radio.optionAnswer:checked");
-        console.log(answer);
+        //console.log(answer);
         if(!answer.length){
-          console.log('Please select answer');
+          //console.log('Please select answer');
           this.$.saveOperationResultModal.close();
           this._showOperationResultModal(false,"Please select an answer");
           setTimeout(function(){
@@ -758,13 +758,13 @@
         }
         var answerIndex = answer.val();
         if(this._currentQA.options[answerIndex]){
-          console.log('check below');
-          console.log(this._currentQA.options[answerIndex]);
+          //console.log('check below');
+          //console.log(this._currentQA.options[answerIndex]);
           if(this._currentQA.options[answerIndex] && this._currentQA.options[answerIndex].isCorrect===true){
 
-            console.log('Current Index: '+this._currentQAIndex +' qa length: '+this._qa.length);
+            //console.log('Current Index: '+this._currentQAIndex +' qa length: '+this._qa.length);
               this._currentQAIndex += 1;
-            console.log('Next Index: '+this._currentQAIndex +' qa length: '+this._qa.length);
+            //console.log('Next Index: '+this._currentQAIndex +' qa length: '+this._qa.length);
             if(!this._currentQA.alreadyAnswered){
               this._qa[this._currentQAIndex-1].alreadyAnswered = true;
               if(this._currentQAIndex>=this._qa.length){
@@ -776,7 +776,7 @@
                   this._currentQAIndex -= 1;
                   return false;
               }
-              console.log('Correct Answer, moving to next question');
+              //console.log('Correct Answer, moving to next question');
               this._showOperationResultModal(true,"Correct answer, moving to next question");
               setTimeout(function(){
                  self.$.saveOperationResultModal.close();
@@ -802,7 +802,7 @@
               }
             }
           }else{
-            console.log('Wrong Answer, please try again');
+            //console.log('Wrong Answer, please try again');
             this.$.saveOperationResultModal.close();
             this._showOperationResultModal(false,"Wrong answer, Please select the correct answer");
             var self = this;
