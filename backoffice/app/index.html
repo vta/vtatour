@@ -45,6 +45,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- Tile icon for Win8 (144x144) -->
   <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
 
+
+
+  <!-- Bootstrap core CSS -->
+  <!-- <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" > -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
   <!-- build:css styles/main.css -->
   <link rel="stylesheet" href="styles/main.css">
   <!-- endbuild-->
@@ -85,11 +92,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <!-- Main Area -->
       <paper-scroll-header-panel main id="headerPanelMain" condenses keep-condensed-header>
         <!-- Main Toolbar -->
-        <paper-toolbar id="mainToolbar" class="tall">
-          <div class="top-container">
-            <!-- <a class="back-btn" href="/routes" tabindex="-1">
-              <paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
-            </a> -->
+        <paper-toolbar id="mainToolbar" class="tall" style="display:none;">
+          <!-- <div class="top-container">
             <ul>
               <li>
                 <a data-route="import-data" href="{{baseUrl}}import-data">
@@ -103,19 +107,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <span>Routes</span>
                 </a>
               </li>
-              <!-- <li>
-                <a data-route="users" href="{{baseUrl}}users">
-                  <iron-icon icon="vta-icons:users"></iron-icon>
-                  <span>Users</span>
-                </a>
-              </li> -->
             </ul>
 
             <a data-route="logout" href="{{baseUrl}}logout/1">
               <span>Logout</span>
               <iron-icon icon="icons:exit-to-app"></iron-icon>
             </a>
-          </div>
+          </div> -->
 
           <!-- Application name -->
           <div class="middle middle-container">
@@ -132,6 +130,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="bottom-title"></div>
           </div>
         </paper-toolbar>
+
+        <header class="header-frontend">
+            <div class="navbar navbar-default navbar-static-top">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+
+                        <a class="navbar-brand" href="#"><img style="margin-top:4px; height:48px"  src="images/vtavirtualtransit-logo.jpg" alt=""></a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="top-header">
+                <div class="container-fluid header-area">
+                    <div class="pull-left">
+                        <div class="header-item"><img class="arrow-icons" src="../../images/back.svg" alt="" ></div>
+                    </div>
+                    <div class="pull-right">
+                      <a data-route="import-data" href="{{baseUrl}}import-data">
+                        <img class="importButton"src="images/import.svg">
+                        <span>Import</span>
+                      </a>
+                      <a data-route="routes" href="{{baseUrl}}routes">
+                        <iron-icon icon="vta-icons:routes"></iron-icon>
+                        <span>Routes</span>
+                      </a>
+                      <a data-route="logout" href="{{baseUrl}}logout/1">
+                        <span>Logout</span>
+                        <iron-icon icon="icons:exit-to-app"></iron-icon>
+                      </a>
+                    </div>
+                    <!-- #top-social end -->
+                </div>
+          </div>
 
         <!-- Main Content -->
         <div class="content">
@@ -187,5 +218,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script src="scripts/app.js"></script>
   <!-- endbuild-->
 </body>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </html>
