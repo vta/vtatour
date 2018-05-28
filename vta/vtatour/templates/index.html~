@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Mosaddek">
+    
+    <link rel="shortcut icon" href="img/favicon.png">
+
+    <title> Home</title>
+    <!-- js placed at the end of the document so the pages load faster -->
+  <!-- jQuery library -->
+
+ 
+   <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+
+ 
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/theme.css" rel="stylesheet">
+    <link href="/static/bootstrap-reset.css" rel="stylesheet">
+    <!--external css-->
+    <link href="/static/font-awesome.css" rel="stylesheet" />
+   
+    
+
+    <!-- Custom styles for this template -->
+    <link href="/static/font-awesome.css" rel="stylesheet">
+    <link href="/static/le-responsive.css.css" rel="stylesheet" />
+    <link href="/static/style.css" rel="stylesheet" />
+<style>
+	.top-header {
+    background-color: #02528a;
+    border-bottom: 1px solid #DDDDDD;
+    padding: 6px 0;
+    height:38px!important;
+    /* padding-left: 15px; */
+    padding-right: 15px;
+}
+@media (min-width: 992px){
+.container {
+    max-width: 670px!important;
+}
+
+
+
+@media (max-width: 768px){
+	
+
+
+.top-header .header-item {
+    display: inline-block;
+    margin-left: 19px!important;
+    margin-right: 20px;
+    font-size: 14px;
+    color: #FFF;
+    /* padding-top: 4px; */
+}}
+</style>
+   <script> 
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+console.log("ret cookie");
+    return cookieValue;
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+console.log("b4 send 1")
+console.log(settings.url)
+        //if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+                console.log("Asdas");
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        //}
+    }
+});
+
+   var refreshIntervalId;
+$(document).ready(function() {
+
+var obj,len,progress,routeid,direction,urllen,forward,backward,left,right,pstatus;
+pstatus=0;
+    $.ajaxSetup({ cache: false });
+    var interval = 1000; // seconds
+     console.log("pstatus1:"+pstatus);
+ 
+      //refreshIntervalId =  setInterval(ajax_call, interval); 
+ 
+
+
+}); 
+
+var ajax_call = function() {
+      var e = document.getElementById("ddldir");
+      dir_1 = e.options[e.selectedIndex].value;
+      routename_1 = document.getElementById("routeid").value;
+      if (routename_1!=undefined) {
+        $.ajax({
+            url : "/static/"+routename_1+"_"+dir_1+".txt",
+            dataType: "json",
+            contentType: "json",
+      
+      success : function (data) {
+             
+                  if (data=='100') {
+                    $("#progress").html("Generating video");
+                  }
+                  else {
+                    $("#progress").html(data+"% Completed.");
+                  }
+                  if (data=='101') {
+
+ $("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_forward.mp4">Forward</a><br>');
+$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_backward.mp4">Backward</a><br>');
+$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_right.mp4">Right</a><br>');
+$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'_left.mp4">Left</a><br>');
+$("#urls").append('<a href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/'+routename_1+'/'+routename_1+'_'+dir_1+'.kml">KML</a><br>');
+
+                   
+                  }
+    
+            },
+            error: function(data, errorThrown)
+          {
+              //alert('this is else condition no file found, pass your ajax request here');
+             // clearInterval(refreshIntervalId); //to stop the auto refresh
+          }
+      });}
+ };
+
+      var dir;
+      var routedirid=[];
+    function getrouteinfo() {
+     
+     var interval =1000;
+     //refreshIntervalId =  setInterval(ajax_call, interval); 
+ 
+      var e = document.getElementById("ddldir");
+      dir = e.options[e.selectedIndex].value;
+      routename = document.getElementById("routeid").value;
+ 
+      
+      routedirid[0]="rid";
+      routedirid[1]=routename;
+      routedirid[2]=dir;
+
+     
+      
+            var stationJson = JSON.stringify(routedirid);
+            console.log(stationJson)
+            var pythonUrl = "/vt/"; //python url to post data 
+            var sendCordinates = $.ajax({
+                  type: 'POST',
+                  url: pythonUrl,
+                  dataType: "json",
+                  data: stationJson,
+                  contentType: 'application/json',
+                  
+                  "beforeSend": function(xhr, settings) {
+                  console.log("Before Send");
+                  
+                  $.ajaxSettings.beforeSend(xhr, settings);
+                  },
+                  success: function(resultData) {  
+                  console.log("done"); }
+            });
+
+      
+    }
+
+     
+     
+  </script> 
+  </head>
+
+  <body>
+    <!--header start-->
+    <header class="header-frontend">
+        <div class="navbar navbar-default navbar-static-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+             
+                    <a class="navbar-brand" href="#"><img style="margin-top:4px; height:48px"  src="/static/vtavirtualtransit-logo.jpg" alt=""></a>
+                </div>
+                
+            </div>
+        </div>
+    </header>
+    
+    <div class="top-header hidden-sm">
+            <div class="container-fluid header-area">
+                <div class="pull-left">
+
+                    <div style="height:30px;" class="header-item">Choose your route</div>
+      
+                </div>
+                <div class="pull-right  ">
+
+
+                </div>
+                <!-- #top-social end -->
+
+            </div>
+
+        </div>
+    <!--header end-->
+
+
+ <section class="home-services">
+      <div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
+
+ <div id="controls" >
+    <div class="container">
+      <div class="row">
+      
+   <form class="form-horizontal tasi-form" id="map_form" >
+                                        {% csrf_token %}
+                                  <div class="form-group">
+                    
+                                      <div class="col-lg-8">
+                                     
+                                       <div class="panel-body">
+                                         <label class="col-lg-2 control-label">Routes</label>
+                                        <input type="text" class="form-control " name="routeid" id="routeid"  placeholder="Type your route">
+                                        
+                                      </div>
+                                      
+                                       
+                                       <div class="panel-body">
+                                         <label class="col-lg-2 control-label">Direction</label>
+                                          <select id="ddldir" class="form-control input-sm m-bot15">
+                                              <option>Choose direction of the route</option>
+                                              <option value="a" >West - East</option>
+                                              <option value="b">North - South</option>
+                                          </select>
+                                      </div>
+                                     
+                                         <div style="margin-left:auto; margin-right:auto; width:130px; padding-top:10px;">
+                                        
+                                          <button type="button" id="searchButton" class="btn btn-kool-default"  onclick="getrouteinfo()">Generate</button>
+
+                                        </div>  
+                           
+                                  
+                                  </div>
+                                    <div class="col-lg-4"  >  
+                                       <div class="panel-body2">
+                                  <div id="progress"></div> 
+                                  <div id="urls"></div> 
+                                    </div>
+                                  
+                                  
+                                  
+                                  </div>
+                              </form>
+                              
+                              
+                           
+                             
+    
+      </div>  </div></div>
+  
+              
+
+    
+  </section>
+
+   
+
+
+
+
+ 
+
+
+
+
+  </body>
+</html>
