@@ -846,20 +846,33 @@ var map;
 
           console.log('current Time: '+newVideoCurrentTime)
           console.log('duration: '+this.player.duration());
+          var finalPoint = {
+            lat: this._destinationStop.lat,
+            lng:this._destinationStop.lng
+          }
           // Check if the video reaches the end of the tour
           if(newVideoCurrentTime<this._videoStartTime){
             this.player.currentTime(this._videoStartTime);
           }
           if(newVideoCurrentTime == (this._videoEndTime+1)){
+            this._currentLat = parseFloat(finalPoint.lat);
+            this._currentLng = parseFloat(finalPoint.lng);
+            this._map.panTo(finalPoint);
             this.player.pause();
             this._setEndMessage();
             return;
           }else if(newVideoCurrentTime > (this._videoEndTime+1)){
+            this._currentLat = parseFloat(finalPoint.lat);
+            this._currentLng = parseFloat(finalPoint.lng);
+            this._map.panTo(finalPoint);
             this.player.pause();
             this.player.currentTime(this._videoEndTime);
             this._setEndMessage()
             return;
           }else if (newVideoCurrentTime >= this.player.duration()) {
+            this._currentLat = parseFloat(finalPoint.lat);
+            this._currentLng = parseFloat(finalPoint.lng);
+            this._map.panTo(finalPoint);
             this.player.pause();
             return;
           }
@@ -1157,6 +1170,9 @@ var map;
 
         _adjustMapSize : function(){
           var self = this;
+          if(!this.code){
+            return;
+          }
           console.log('Map Getting Adjusted');
           if(!this._mapsApiLoaded){
             return;

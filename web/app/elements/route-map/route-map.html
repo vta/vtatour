@@ -115,6 +115,10 @@
                 console.log('has Value before settings up value');
                 self._map.latitude = self._latitude;
                 self._map.longitude = self._longtitude;
+                self._map.panTo({
+                  lat:self._map.latitude,
+                  lng:self._map.longitude
+                });
               }
               if(self._zoomLevel){
                   self._map.setZoom(self._zoomLevel);
@@ -151,7 +155,14 @@
           this._latitude = lat;
           this._longtitude = lng;
           this._zoomLevel = zoomLevel;
-        }
+
+        },
+        _adjustMapSize : function(height){
+          var self = this;
+          this.$.map.style.height = height+ 'px';
+          this.$.map.style.minHeight = height+ 'px';
+          google.maps.event.trigger(this._map, 'resize');
+        },
       });
     }catch(err){
       console.log('route map error');

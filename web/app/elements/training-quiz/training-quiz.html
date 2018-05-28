@@ -276,6 +276,33 @@
         google-map {
           height: 300px;
         }
+        /* (1600x900) HD+ Display */
+        @media  screen and (max-width: 2560px) and (min-width: 1600px){
+            /* insert styles here */
+            .container{
+              min-width:1600px;
+              width:100%;
+            }
+            .panel-body{
+              height:650px;
+            }
+            .quiz_content{
+              /* margin-top: 10%; */
+            }
+            .training-quiz h3{
+              font-size: 40px !important;
+            }
+            .quiz2{
+                  line-height: 60px!important;
+                  font-size: 25px;
+            }
+            google-map,.map_wrapper{
+              height: 600px !important;
+            }
+            .dataTables_info{
+              font-size: 18px;
+            }
+        }
       </style>
       <firebase-document
         app-name="vta"
@@ -314,7 +341,7 @@
           <section class="banner">
           <div class="container quiz-area">
           	<div class="panel-body style-scope training-quiz">
-            <div class="col-md-6 col-xs-12">
+            <div class="col-md-6 col-xs-12 map_wrapper">
               <!-- <template is="dom-if" if="[[_currentQA.lat]]"> -->
               <route-map id="routeMap" geo-points="{{_currentQA.geoPoints}}"></route-map>
               <!-- <google-map
@@ -815,10 +842,11 @@
       _setMapFocus:function(){
         var lat = this._currentQA.lat;
         var lng = this._currentQA.lng;
-        var zoomLevel = 15;
+        var zoomLevel = 16;
         var self = this;
         if(self.$.routeMap){
           self.$.routeMap._setMapFocusAndZoom(lat,lng,zoomLevel);
+          self.$.routeMap._adjustMapSize($('.map_wrapper').height());
         }
       }
 

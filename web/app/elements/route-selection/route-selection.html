@@ -267,7 +267,12 @@
       },
 
       _directionDropdownSelect: function(event) {
+        this.$.departureDropdown._setSelectedItem();
+        this.$.departureDropdownListBox.selected = -1;
+        this.$.destinationDropdown._setSelectedItem();
+        this.$.destinationDropdownListBox.selected = -1;
         this._direction = this._getDropdownSelectedValue(event);
+
 
         if (this._direction) {
           var self = this;
