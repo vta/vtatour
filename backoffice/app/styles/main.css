@@ -2124,7 +2124,7 @@ ul#filters > .active > span {
     background-color: #02528a;
     border-bottom: 1px solid #02528a;
     padding: 6px 0;
-    height: 35px;
+    height: 50px;
     padding-left: 15px;
     padding-right: 15px;
 }
@@ -2484,8 +2484,14 @@ ul#filters > .active > span {
 #mainContainer{
   background-color: #ffff;
 }
-
+.pull-right{
+      margin-top: 8px;
+}
 .pull-right a{
   color:#FFFFFF;
-  margin-right: 30px;
+  margin-right: 22px;
+}
+.pull-right a[data-selected="true"] {
+  border-bottom: 2px solid white;
+  padding-bottom: 10px;
 }
