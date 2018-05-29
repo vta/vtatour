@@ -2458,3 +2458,7 @@ ul#filters > .active > span {
 #mainContainer{
   background-color: #ffff;
 }
+
+.routeDirectionSteps div{
+  font-size: 13px !important;
+}
