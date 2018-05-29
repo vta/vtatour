@@ -290,11 +290,11 @@
               /* margin-top: 10%; */
             }
             .training-quiz h3{
-              font-size: 40px !important;
+              font-size: 30px !important;
             }
             .quiz2{
                   line-height: 60px!important;
-                  font-size: 25px;
+                  font-size: 18px;
             }
             google-map,.map_wrapper{
               height: 600px !important;
@@ -355,7 +355,7 @@
               </google-map> -->
               <!-- </template> -->
             </div>
-            <div class="col-md-6 col-xs-12">
+            <div class="col-md-6 col-xs-12 question_wrapper">
                     <div class="style-scope training-quiz">
                       <h3 class="style-scope training-quiz">Q[[_getQuestionNumber(_currentQAIndex)]]: [[_currentQA.questionText]]</h3>
                       <div class="style-scope training-quiz">
@@ -381,6 +381,7 @@
          <div id="spacer_div_2" clss="spacer_div"><br/></div>
          <div id="spacer_div_3" clss="spacer_div"><br/></div>
          <div id="spacer_div_4" clss="spacer_div"><br/></div>
+         <br/>
 
 
             <!--container start-->
@@ -682,6 +683,17 @@
         this._currentQAIndex = 0;
         this._currentQA = this._qa[this._currentQAIndex];
         this._setMapFocus();
+
+        var self = this;
+        setInterval(function(){
+          var mapWapperHeight = $('.map_wrapper').height();
+          var questionWrapperHeight = $('.question_wrapper').height();
+          var mapHeight = mapWapperHeight>questionWrapperHeight && screen.width>1000? mapWapperHeight:questionWrapperHeight;
+          $('.map_wrapper').height(mapHeight);
+          if(self.$.routeMap){
+            self.$.routeMap._adjustMapSize(mapHeight);
+          }
+        }, 2000);
       },
       _combineRouteAndRouteDetails: function(routes,routeDetailses){
         var finalRoutes = [];

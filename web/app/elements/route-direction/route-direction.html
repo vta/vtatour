@@ -1,4 +1,4 @@
-<dom-module id="route-navigation">
+<dom-module id="route-direction">
   <template>
     <style is="custom-style" include="shared-styles"></style>
     <style>
@@ -250,7 +250,15 @@
 
       }
 
+      .routeDirectionSteps{
+        margin-left: 3%;
+        margin-top: 1%;
+        line-height: 31px;
 
+      }
+       b{
+        color: red;
+      }
 
     </style>
       <iron-media-query query="(min-width: 600px) and (orientation: landscape)" query-matches="{{isDesktop}}"></iron-media-query>
@@ -283,7 +291,12 @@
       </div>
 
       <div class="navigation-wrapper">
-        <div class="video-player-wrapper">
+        <div class="video-player-wrapper routeDirectionSteps">
+          <template is="dom-repeat" items="[[_directions]]" as="directionObject">
+            <div inner-h-t-m-l="{{directionObject.instructions}}"></div>
+          </template>
+        </div>
+        <div class="video-player-wrapper" style="display:none;">
             <iron-icon icon="icons:fullscreen" class="fullscreen-button"></iron-icon>
           <video id="mainRouteVideo" class="video-js vjs-default-skin" controls preload="auto" webkit-playsinline playsinline>
                 <!-- <source src="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/ALUMROCKTRANSITCENTER-SANTACLARA%2628TH/1024x1024-SANTA_CLARA_28TH-ALUM_ROCK_TRANSIT_CENTER.mp4" type='video/mp4'> -->
@@ -388,13 +401,6 @@
           lat-origin="{{_nextStopGeoPoint.lat}}" lng-origin="{{_nextStopGeoPoint.lng}}"></poi-detail>
       </div>
 
-      <br>
-<br/>
-
-    <div id="spacer_div" clss="spacer_div"><br/></div>
-    <div id="spacer_div_2" clss="spacer_div"><br/></div>
-    <div id="spacer_div_3" clss="spacer_div"><br/></div>
-    <div id="spacer_div_4" clss="spacer_div"><br/></div>
 
 
       <div class="background-color">
@@ -406,9 +412,9 @@
       </div>
      </template>
       <div id="direction-display" hidden$="{{!_startedOnce}}"></div>
-      <div class="container">
+      <div class="container" style="display:none;">
           <div class="row">
-              <!--feature start-->
+
               <div class="button-area">
               <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="restartVideo" on-click="_restartVideo" title="Restart">
                   <section>
@@ -447,7 +453,7 @@
                   </section>
               </div>
               <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="navigationAction" on-click="_pauseVideo"  title="Navigation" >
-                <a href="/routes/[[code]]/direction/[[direction]]/[[departureStopId]]/[[destinationStopId]]" target="_blank">
+                <a href="https://www.google.com/maps/dir/?api=1&origin=[[_departureStop.lat]],[[_departureStop.lng]]&destination=[[_destinationStop.lat]],[[_destinationStop.lng]]" target="_blank">
                   <section>
                       <div class="f-box">
                            <i><img style=" width:30px;" src="../../images/navigation.svg" alt=""></i>
@@ -458,7 +464,6 @@
                   </a>
               </div>
               </div>
-              <!--feature end-->
           </div>
 
       </div>
@@ -492,7 +497,7 @@ var map;
     'use strict';
     try{
       Polymer({
-        is: 'route-navigation',
+        is: 'route-direction',
         properties: {
           player: {
             type: Object
@@ -615,10 +620,16 @@ var map;
           _direction: {
             type: Boolean
           },
+          _directions:{
+            type: Array,
+            value: []
+          }
         },
 
         SECONDS_INTERVAL_FOR_STOPS : 10,
-
+        setDirections: function(directions) {
+          this._directions = directions;
+        },
         clearRouteSelection: function() {
           this.code = null;
           this.departureStopId = null;
@@ -751,6 +762,7 @@ var map;
           setTimeout(function(){
               self._loadRoutePath(tourSlot);
           },1000);
+          this._getDirectionData(this._departureStop,this._destinationStop);
 
 
         },
@@ -1192,7 +1204,7 @@ var map;
           }
 
           if(mapHeight<=0){
-            mapHeight = $('.video-player-wrapper').find('video').height();
+            mapHeight = $('.video-player-wrapper').find('video').height() || $('.routeDirectionSteps').height();
             console.log('From Dom: '+mapHeight);
             if(mapHeight<=0){
               mapHeight = $('.video-player-wrapper').height();
@@ -1200,7 +1212,7 @@ var map;
                   mapHeight = 450;
                   setTimeout(function(){
                      self._adjustMapSize();
-                  }, 1000);
+                  }, 5000);
               }
             }
             console.log('Final Map Height: '+mapHeight);
@@ -1546,6 +1558,7 @@ var map;
                 if(result.routes && result.routes.length){
                     if(result.routes[0].legs && result.routes[0].legs.length){
                         if(result.routes[0].legs[0].steps && result.routes[0].legs[0].steps.length){
+                          self.setDirections(result.routes[0].legs[0].steps);
                           var directionData = result.routes[0].legs[0].steps && result.routes[0].legs[0].steps[0];
                           var instruction = directionData.instructions;
                           if(instruction){

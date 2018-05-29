@@ -92,6 +92,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       routeNavigation.showTour();
     });
 
+    page('/routes/:code/direction/:direction/:departureStopId/:destinationStopId', function(data) {
+      var routeNavigation = document.querySelector('route-direction');
+
+      app.hideBackBtn();
+      app.hideViewsBtn();
+      app.route = 'route-direction';
+      app.params = data.params;
+      routeNavigation.code = data.params.code;
+      routeNavigation.departureStopId = data.params.departureStopId;
+      routeNavigation.direction = data.params.direction;
+      routeNavigation.destinationStopId = data.params.destinationStopId;
+      setFocus(app.route);
+      app.condenseHeader();
+      // Sets the page full screen when the device is a phone.
+      if (window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches && !app.$.fsapi.fullscreen) {
+        app.$.fsapi.toggleFullscreen();
+      }
+
+      routeNavigation.showTour();
+    });
     page('/routes/:code/navigation/:direction/:departureStopId/:destinationStopId/pois', function(data) {
       var routeNavigation = document.querySelector('route-navigation');
       if(routeNavigation.code){
