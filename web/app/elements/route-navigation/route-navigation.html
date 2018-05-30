@@ -1108,6 +1108,14 @@ var map;
           // });
           console.log('final cords');
           console.log(cords);
+          cords.unshift({
+            lat:this._departureStop.lat,
+            lng:this._departureStop.lng,
+          })
+          cords.push({
+            lat:this._destinationStop.lat,
+            lng:this._destinationStop.lng,
+          })
              try{
                self._mapPolyline = new google.maps.Polyline({
                  path: cords,
