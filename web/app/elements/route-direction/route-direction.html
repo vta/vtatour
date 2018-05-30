@@ -411,7 +411,7 @@
          </template>
       </div>
      </template>
-      <div id="direction-display" hidden$="{{!_startedOnce}}"></div>
+      <!-- <div id="direction-display" hidden$="{{!_startedOnce}}"></div> -->
       <div class="container" style="display:none;">
           <div class="row">
 
@@ -833,7 +833,7 @@ var map;
             }
 
           }
-          $('#direction-display').html('Reached destination'+endRouteListMessage);
+          //$('#direction-display').html('Reached destination'+endRouteListMessage);
           // var endStopMessage = this._destinationStop.name;
           // if(this._destinationStop.route_list){
           //   endStopMessage+' (connects - '+this._destinationStop.route_list+')';
@@ -991,7 +991,7 @@ var map;
           // this.player.currentTime(this._videoStartTime);
           this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
 
-          $('#direction-display').html('');
+          //$('#direction-display').html('');
 
           // Send the event to Google Analytics
           ga('send', 'event', 'Tour', 'restart', this._routeInfo.name);
@@ -1568,17 +1568,17 @@ var map;
                     if(result.routes[0].legs && result.routes[0].legs.length){
                         if(result.routes[0].legs[0].steps && result.routes[0].legs[0].steps.length){
                           self.setDirections(result.routes[0].legs[0].steps);
-                          var directionData = result.routes[0].legs[0].steps && result.routes[0].legs[0].steps[0];
-                          var instruction = directionData.instructions;
-                          if(instruction){
-                            instruction = instruction.replace('Head','Heading');
-                            var instructionArray = instruction.split("<div");
-                            instruction = instructionArray[0];
-                          }
-                          if(directionData.maneuver){
-                             instruction = instruction +' ('+directionData.maneuver+')';
-                          }
-                          $('#direction-display').html(instruction);
+                          // var directionData = result.routes[0].legs[0].steps && result.routes[0].legs[0].steps[0];
+                          // var instruction = directionData.instructions;
+                          // if(instruction){
+                          //   instruction = instruction.replace('Head','Heading');
+                          //   var instructionArray = instruction.split("<div");
+                          //   instruction = instructionArray[0];
+                          // }
+                          // if(directionData.maneuver){
+                          //    instruction = instruction +' ('+directionData.maneuver+')';
+                          // }
+                          // $('#direction-display').html(instruction);
                         }
                     }
                 }
