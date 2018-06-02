@@ -328,7 +328,7 @@
                   </div>
                   <div class="container item stop-list-listing">
                     <div class="column1">
-                      <div class="video-wrapper">
+                      <!-- <div class="video-wrapper">
                           <h3>Direction A - Videos</h3>
                             <div>
                               <span>Front Video: <br/></span> <a target="_blank" href="[[route.routeDetails.a.videoUrl]]"><span>[[route.routeDetails.a.videoUrl]]</span></a>
@@ -342,7 +342,7 @@
                             <div>
                               <span>Right Video: </span><br/> <a target="_blank" href="[[route.routeDetails.a.videoRightUrl]]"><span>[[route.routeDetails.a.videoRightUrl]]</span></a>
                             </div>
-                      </div>
+                      </div> -->
                         <div class="stops-wrapper">
                           <h3>Direction A - Stops</h3>
                           <div class="stop-list">
@@ -361,7 +361,7 @@
                         </div>
                     </div>
                     <div class="column1">
-                      <div class="video-wrapper">
+                      <!-- <div class="video-wrapper">
                           <h3>Direction B - Videos</h3>
                             <div>
                               <span>Front Video: </span> <br/><a target="_blank" href="[[route.routeDetails.b.videoUrl]]"><span>[[route.routeDetails.b.videoUrl]]</span></a>
@@ -375,7 +375,7 @@
                             <div>
                               <span>Right Video: </span> <br/><a target="_blank" href="[[route.routeDetails.b.videoRightUrl]]"><span>[[route.routeDetails.b.videoRightUrl]]</span></a>
                             </div>
-                      </div>
+                      </div> -->
                         <div class="stops-wrapper">
                           <h3>Direction B - Stops</h3>
                           <div class="stop-list">
@@ -617,17 +617,26 @@
       },
       _setRoutes : function(routeListArray){
         var self = this;
-        this._setKmlFiles(routeListArray,function(newRouteListArray){
-          self._imported_routes = routeListArray;
-          console.log('Final Routes array after processing KML files');
-          console.log(self._imported_routes);
-          self.selectedTab = 1;
-          self.$.saveOperationResultModal.close();
-          self._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
-          setTimeout(function(){
-             self.$.saveOperationResultModal.close();
-          }, 2000);
-        })
+        self._imported_routes = routeListArray;
+        // console.log('Final Routes array after processing KML files');
+        // console.log(self._imported_routes);
+        self.selectedTab = 1;
+        self.$.saveOperationResultModal.close();
+        self._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
+        setTimeout(function(){
+           self.$.saveOperationResultModal.close();
+        }, 2000);
+        // this._setKmlFiles(routeListArray,function(newRouteListArray){
+        //   self._imported_routes = routeListArray;
+        //   console.log('Final Routes array after processing KML files');
+        //   console.log(self._imported_routes);
+        //   self.selectedTab = 1;
+        //   self.$.saveOperationResultModal.close();
+        //   self._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
+        //   setTimeout(function(){
+        //      self.$.saveOperationResultModal.close();
+        //   }, 2000);
+        // })
 
       },
       _readStops:function(opt_startByte,opt_stopByte){
@@ -823,15 +832,15 @@
                  routeObject.routeDetails.a.stops = routesStopsArray;
                  routeObject.routeDetails.b.stops = routesStopsOtherDirectionArray;
                  var videoCode = routeObject.code;
-                 routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
-                 routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
-                 routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
-                 routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
-
-                 routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
-                 routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
-                 routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
-                 routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
+                 // routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
+                 // routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
+                 // routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
+                 // routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
+                 //
+                 // routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
+                 // routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
+                 // routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
+                 // routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
 
                  if(rawRouteObject.routeshape){
                    var geoPointsArrayString = "["+rawRouteObject.routeshape+"]";
