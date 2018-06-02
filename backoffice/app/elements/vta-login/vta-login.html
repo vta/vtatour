@@ -23,6 +23,7 @@
         @apply(--layout-end);
         color: var(--primary-color);
         font-weight: 500;
+        width: 100% !important;
       }
 
       .fields-wrapper {
@@ -58,7 +59,7 @@
           top: 2px;
           margin-left: 15px;
         };
-        
+
         --paper-input-container-input: {
           top: 2px;
           margin-left: 15px;
@@ -78,9 +79,9 @@
       }
     </style>
 
-    <firebase-auth 
-      app-name="vta" 
-      id="auth" 
+    <firebase-auth
+      app-name="vta"
+      id="auth"
       user="{{user}}">
     </firebase-auth>
 
@@ -107,7 +108,7 @@
         </div>
 
         <paper-button on-click="_login" raised>Login</paper-button>
-        
+
         <div class="paper-checkbox-wrapper">
           <paper-checkbox id="remember">Remember me</paper-checkbox>
         </div>

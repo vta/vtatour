@@ -433,6 +433,7 @@
       </template>
     </paper-dialog>
     <maps-utils id="mapsUtils"></maps-utils>
+    <kml-parser id="tempKmlParser"></kml-parser>
   </template>
   <script>
   (function() {
@@ -524,15 +525,110 @@
            self.$.saveOperationResultModal.close();
         }, 1000);
       },
-      _setRoutes : function(routeListArray){
-        this._imported_routes = routeListArray;
-        this.selectedTab = 1;
-        this.$.saveOperationResultModal.close();
-        this._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
+      _setKmlFiles: function(routeListArray, callback){
+        console.log('Going to start Processing KML file');
         var self = this;
-        setTimeout(function(){
-           self.$.saveOperationResultModal.close();
-        }, 2000);
+        var processKmlUrl = function(url,cb){
+          // console.log("processing: "+url);
+          // var settings = {
+          //     "async": true,
+          //     "crossDomain": true,
+          //     "url": "http://localhost:5001/kml_file/10_a.kml",
+          //     "method": "GET",
+          //   }
+          //
+          //   $.ajax(settings).done(function (response) {
+          //     console.log(response);
+          //     if(response.status==200){
+          //       self.$.tempKmlParser.parseFromText(response.responseText,cb);
+          //     }else{
+          //       cb(null);
+          //     }
+          //   });
+          var data = null;
+
+          var xhr = new XMLHttpRequest();
+          xhr.withCredentials = true;
+
+          xhr.addEventListener("readystatechange", function () {
+            console.log(this.readyState);
+            if (this.readyState === 4) {
+              console.log('check response');
+              console.log(this.responseText);
+              //console.log(this)
+              if(this.status==200){
+                 self.$.tempKmlParser.parseFromText(this.responseText,cb);
+              }else{
+                 cb(null);
+              }
+            }
+          });
+
+          xhr.open("GET", url);
+          //xhr.setRequestHeader("cache-control", "no-cache");
+          //xhr.setRequestHeader("postman-token", "861478f2-6ea2-0a27-a144-1475782148d3");
+
+          xhr.send(data);
+        }
+
+        var processRoute = function(index){
+          console.log('Processing: '+index);
+            if(index<routeListArray.length){
+              var fullRouteDetails = routeListArray[index];
+              var directionAKmlUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+fullRouteDetails.code+"/"+fullRouteDetails.code+"_a.kml";
+              var directionBKmlUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+fullRouteDetails.code+"/"+fullRouteDetails.code+"_b.kml"
+              processKmlUrl(directionAKmlUrl,function(parsedAData){
+                console.log('check parsed data');
+                console.log(parsedAData);
+                if(parsedAData){
+                    fullRouteDetails.routeDetails.a.videoGeoPoints = parsedAData;
+                    if(fullRouteDetails.routeDetails.a && fullRouteDetails.routeDetails.a.stops && fullRouteDetails.routeDetails.a.stops.length ){
+                      for(var a=0;a<fullRouteDetails.routeDetails.a.stops.length;a++){
+                        var tempStopObject = fullRouteDetails.routeDetails.a.stops[a];
+                          var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.a.videoGeoPoints);
+                          fullRouteDetails.routeDetails.a.stops[a].sec =  parseInt(point.key);
+                      }
+                    }
+                }
+                processKmlUrl(directionBKmlUrl,function(parsedBData){
+                if(parsedBData){
+                          fullRouteDetails.routeDetails.b.videoGeoPoints = parsedBData;
+                          if(fullRouteDetails.routeDetails.b && fullRouteDetails.routeDetails.b.stops && fullRouteDetails.routeDetails.b.stops.length ){
+                            for(var b=0;b<fullRouteDetails.routeDetails.b.stops.length;b++){
+                              var tempStopObject = fullRouteDetails.routeDetails.b.stops[b];
+                              var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.b.videoGeoPoints);
+                              fullRouteDetails.routeDetails.b.stops[b].sec = parseInt(point.key);
+                            }
+                          }
+                      }
+                  routeListArray[index] = fullRouteDetails;
+                  processRoute(index+1);
+                });
+              });
+
+            }else{
+              callback(routeListArray)
+            }
+        }
+        //callback(routeListArray)
+        processRoute(0);
+
+
+      },
+      _setRoutes : function(routeListArray){
+        var self = this;
+        this._setKmlFiles(routeListArray,function(newRouteListArray){
+          self._imported_routes = routeListArray;
+          console.log('Final Routes array after processing KML files');
+          console.log(self._imported_routes);
+          self.selectedTab = 1;
+          self.$.saveOperationResultModal.close();
+          self._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
+          setTimeout(function(){
+             self.$.saveOperationResultModal.close();
+          }, 2000);
+        })
+
       },
       _readStops:function(opt_startByte,opt_stopByte){
         var files = document.getElementById('stop_list').files;
@@ -742,7 +838,7 @@
                    var geoPointsArray = eval(geoPointsArrayString);
                    routeObject.routeDetails.a.videoGeoPoints = objectifyLatLon(geoPointsArray);
                    if(geoPointsArray && geoPointsArray.length){
-                     console.log('check important below');
+                     //console.log('check important below');
                      console.log(geoPointsArray[0]);
                      routeObject.latitude = geoPointsArray[0].lat;
                      routeObject.longitude = geoPointsArray[0].lon;
