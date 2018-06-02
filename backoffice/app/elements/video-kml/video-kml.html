@@ -1,0 +1,836 @@
+<dom-module id="video-kml">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      .item-wrapper,
+      .header {
+        border-bottom: 1px solid #ccc;
+      }
+      hr {
+
+        border-color: var(--primary-color);
+      }
+
+      .item-wrapper:hover {
+        background-color: var(--vta-light-gray);
+      }
+
+      .item-wrapper.active:hover {
+        background-color: var(--vta-white);
+      }
+
+      .item {
+        padding: 12px 5% 0;
+        @apply(--layout-horizontal);
+        font-size: 1.05em;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .item {
+        color: var(--primary-color);
+      }
+
+      .header {
+        padding: 20px 5% 18px;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+
+      .route-code,.stop-code {
+        min-width: 10%;
+        padding: 0 20px;
+        font-weight: bold;
+      }
+
+      .item-wrapper.active .route-name,.item-wrapper.active .stop-name {
+        margin-bottom: 20px;
+      }
+
+      .route-details,.stop-details {
+        @apply(--layout-flex);
+      }
+
+      .route-operations,.stop-operations {
+        padding: 0 20px;
+        margin-top: -12px;
+      }
+
+      paper-fab {
+        position: absolute;
+        right: 8%;
+        top: -28px;
+      }
+
+      paper-button {
+        top: 2px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+      }
+
+      paper-button iron-icon {
+        --iron-icon-height: 40px;
+        --iron-icon-width: 40px;
+      }
+
+      .route-departure-destination, .stop-departure-destination,.stop-list-listing {
+        margin-bottom: 20px;
+        display: none;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .route-departure-destination, .item-wrapper.active .stop-departure-destination, .item-wrapper.active .stop-list-listing {
+        @apply(--layout-horizontal);
+      }
+
+      .route-departure,
+      .route-destination,.stop-lat,
+      .stop-lng {
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+      }
+
+      .route-detail-header,.stop-lat-header {
+        font-weight: bold;
+        margin-right: 30px;
+      }
+
+      .edit-route-operation,.stop-route-operation {
+        display: none;
+        padding: 21px 5%;
+        font-size: 1.4em;
+        text-transform: capitalize;
+        text-align: right;
+      }
+
+      .item-wrapper.active paper-button iron-icon.expand,
+      .item-wrapper paper-button iron-icon.collapse,
+      .route-map-template,
+      .stop-map-template,
+      .item-wrapper route-map {
+        display: none;
+      }
+
+      .item-wrapper paper-button iron-icon.expand,
+      .item-wrapper.active paper-button iron-icon.collapse,
+      .item-wrapper.active route-map,
+      .item-wrapper.active .edit-route-operation {
+        display: block;
+      }
+      #byte_content {
+        margin: 5px 0;
+        max-height: 100px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      #byte_range { margin-top: 5px; }
+      .loadButtons{
+            width: 12%;
+            background: gainsboro;
+      }
+      .add-stop-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+        float: left;
+      }
+
+      .add-stop-wrapper paper-button {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.2em .6em;
+        width: 253px;
+
+      }
+      .clear-break{
+        clear:both;
+      }
+
+      paper-toolbar {
+        --paper-toolbar-background: var(--paper-blue-900);
+      }
+      paper-button.primary {
+        color: var(--primary-color);
+        font-size: 22px;
+      }
+      .column1 {
+        width: 50%;
+        padding: 0 20px 0 0;
+        margin-right: 16%;
+      }
+
+      .column-container {
+        width: 35%;
+      }
+      .stop-list-listing{
+        margin-left: 0px;
+        padding-left: 0px;
+        width: 100%;
+      }
+      .download-icon{
+        height: 20px;
+      }
+
+      #saveOperationResultModal {
+        width: auto;
+        background-color: transparent;
+        color: var(--vta-white);
+        box-shadow: none;
+      }
+
+      #saveOperationResultModal .icon {
+        text-align: center;
+      }
+
+      #saveOperationResultModal iron-icon {
+        width: 140px;
+        height: 140px;
+        padding: 20px;
+        text-align: center;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+      }
+
+      #saveOperationResultModal .message-wrapper.success iron-icon {
+        background-color: var(--primary-color);
+      }
+
+      #saveOperationResultModal .message-wrapper.error iron-icon {
+        background-color: var(--secondary-color);
+      }
+
+      #saveOperationResultModal .message {
+        text-align: center;
+        font-size: 2.5em;
+        line-height: 1;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+    </style>
+
+    <firebase-document
+      app-name="vta"
+      id="routeInfo"
+      data="{{_routeInfoOrigin}}">
+    </firebase-document>
+    <firebase-document
+      app-name="vta"
+      id="routeDetails"
+      data="{{_routeDetailsOrigin}}">
+    </firebase-document>
+    <firebase-document
+      app-name="vta"
+      id="routeDataProcessing">
+    </firebase-document>
+    <div class="inner-content">
+      <h2 class="page-title">Video</h2>
+
+      <div>
+        <div class="add-stop-wrapper">
+        <a href="http://52.9.113.34/" target="_blank">
+          <paper-button  >
+          <iron-icon icon="file-download" class="download-icon"></iron-icon>Video Generation
+        </paper-button>
+      </a>
+        <paper-button on-click="_startVideoUrlsAndStartKmlProcessing" >
+          <iron-icon icon="file-download" class="download-icon"></iron-icon>Video URL + KML Data Update
+        </paper-button>
+       </div>
+      </div>
+      <br/><br/>
+      <div>
+        WARNING: Use with caution. Updating URLs and KMLs for all videos have risk of  impacting website performance and may cause downtime.
+      </div>
+      <div class="clear-break">
+        <div class="add-stop-wrapper">
+
+       </div>
+      </div>
+
+      <br/><br/>
+      <div class="clear-break">
+        <paper-button  on-click="_batchImportRoutesListData" class="primary">Batch Update</paper-button>
+      </div>
+      <div>
+         &nbsp;&nbsp;Click on Batch Update to update changes in firebase
+      </div>
+      <paper-material elevation="1">
+        <paper-tabs scrollable selected="0" fit-container>
+          <paper-tab>Routes</paper-tab>
+        </paper-tabs>
+        <template is="dom-if" if="[[_routesTabIsSelected(selectedTab)]]">
+          <div class="item header">
+            <div class="route-code">Code</div>
+            <div class="route-details">Route name</div>
+            <div class="route-operations">
+
+            </div>
+          </div>
+          <template is="dom-repeat" items="[[_imported_routes]]" as="route">
+            <div class="item-wrapper" data-route-index$="[[index]]" data-route-code$="[[route.code]]">
+              <div class="item route">
+                <div class="route-code">[[route.code]]</div>
+                <div class="route-details">
+                  <div class="route-name">[[route.name]]</div>
+                  <div class="route-departure-destination">
+                    <div class="route-departure">
+                      <div class="route-detail-header">Departure</div>
+                      <div class="route-detail-value">[[route.departure]]</div>
+                    </div>
+                    <div class="route-destination">
+                      <div class="route-detail-header">Destination</div>
+                      <div class="route-detail-value">[[route.destination]]</div>
+                    </div>
+                    <div class="route-departure">
+                      <div class="route-detail-header">Latitude</div>
+                      <div class="route-detail-value">[[route.latitude]]</div>
+                    </div>
+                    <div class="route-departure">
+                      <div class="route-detail-header">Longitude</div>
+                      <div class="route-detail-value">[[route.longitude]]</div>
+                    </div>
+                  </div>
+                  <div class="container item stop-list-listing">
+                    <div class="column1">
+                      <div class="video-wrapper">
+                          <h3>Direction A - Videos</h3>
+                            <div>
+                              <span>Front Video: <br/></span> <a target="_blank" href="[[route.routeDetails.a.videoUrl]]"><span>[[route.routeDetails.a.videoUrl]]</span></a>
+                            </div>
+                            <div>
+                              <span>Back Video: </span><br/> <a target="_blank" href="[[route.routeDetails.a.videoBackUrl]]"><span>[[route.routeDetails.a.videoBackUrl]]</span></a>
+                            </div>
+                            <div>
+                              <span>Left Video: </span> <br/><a target="_blank" href="[[route.routeDetails.a.videoLeftUrl]]"><span>[[route.routeDetails.a.videoLeftUrl]]</span></a>
+                            </div>
+                            <div>
+                              <span>Right Video: </span><br/> <a target="_blank" href="[[route.routeDetails.a.videoRightUrl]]"><span>[[route.routeDetails.a.videoRightUrl]]</span></a>
+                            </div>
+                      </div>
+                        <div class="stops-wrapper">
+                          <h3>Direction A - Stops</h3>
+                          <div class="stop-list">
+                            <div role="listbox">
+                              <template is="dom-repeat" items="{{route.routeDetails.a.stops}}" as="stop">
+                                <paper-item>
+                                  <paper-item-body>[[stop.name]]
+                                      <template is="dom-if" if="{{stop.sec}}">
+                                        <br/>
+                                        (Second : [[stop.sec]])
+                                      </template>
+                                  </paper-item-body>
+                                </paper-item>
+                              </template>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="column1">
+                      <div class="video-wrapper">
+                          <h3>Direction B - Videos</h3>
+                            <div>
+                              <span>Front Video: </span> <br/><a target="_blank" href="[[route.routeDetails.b.videoUrl]]"><span>[[route.routeDetails.b.videoUrl]]</span></a>
+                            </div>
+                            <div>
+                              <span>Back Video: </span> <br/><a target="_blank" href="[[route.routeDetails.b.videoBackUrl]]"><span>[[route.routeDetails.b.videoBackUrl]]</span></a>
+                            </div>
+                            <div>
+                              <span>Left Video: </span> <br/><a target="_blank" href="[[route.routeDetails.b.videoLeftUrl]]"><span>[[route.routeDetails.b.videoLeftUrl]]</span></a>
+                            </div>
+                            <div>
+                              <span>Right Video: </span> <br/><a target="_blank" href="[[route.routeDetails.b.videoRightUrl]]"><span>[[route.routeDetails.b.videoRightUrl]]</span></a>
+                            </div>
+                      </div>
+                        <div class="stops-wrapper">
+                          <h3>Direction B - Stops</h3>
+                          <div class="stop-list">
+                            <div role="listbox">
+                              <template is="dom-repeat" items="{{route.routeDetails.b.stops}}" as="stop">
+                                <paper-item>
+                                  <paper-item-body>[[stop.name]]
+
+                                    <template is="dom-if" if="{{stop.sec}}">
+                                        <br/>
+                                      (Second : [[stop.sec]])
+                                    </template>
+                                  </paper-item-body>
+                                </paper-item>
+                              </template>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="route-operations">
+                  <paper-button on-click="_toggleRoute" data-route-index$="[[index]]">
+                    <iron-icon class="expand" icon="icons:expand-more"></iron-icon>
+                    <iron-icon class="collapse" icon="icons:expand-less"></iron-icon>
+                  </paper-button>
+                </div>
+              </div>
+              <div class="route-map"></div>
+            </div>
+          </template>
+
+          <div class="route-map-template">
+            <route-map id="routeMap" geo-points="{{_videoGeoPointsOrigin}}"></route-map>
+          </div>
+        </template>
+      </paper-material>
+    </div>
+    <paper-dialog id="saveOperationResultModal" modal>
+      <template is="dom-if" if="{{_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:check"></iron-icon>
+          </div>
+          <div class="message">Done</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+      <template is="dom-if" if="{{!_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:cached"></iron-icon>
+          </div>
+          <div class="message">Processing...</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+    </paper-dialog>
+    <maps-utils id="mapsUtils"></maps-utils>
+    <kml-parser id="tempKmlParser"></kml-parser>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'video-kml',
+
+      properties: {
+        _imported_routes: {
+          type: Array,
+          value: []
+        },
+        _imported_stops: {
+          type: Array,
+          value: []
+        },
+        _activeStopCode: {
+          type: String,
+          value: ''
+        },
+        _routes: {
+          type: Array
+        },
+        _activeRouteCode: {
+          type: String,
+          value: ''
+        },
+        selectedTab: {
+          type: Number,
+          value: 0
+        },
+        _videoGeoPointsOrigin:{
+          type: Object,
+          value: {}
+        },
+        _routeInfoOrigin: {
+          type: Object,
+          //observer: '_routeInfoOriginChange'
+        },
+        _routeInfo: {
+          type: Object,
+          value: {}
+        },
+        _routeDetailsOrigin: {
+          type: Object,
+          //observer: '_routeDetailsOriginChange'
+        },
+        _routeDetails: {
+          type: Object,
+          value: {
+            a: {
+              stops: [],
+              videoGeoPoints: {},
+              videoId: null,
+              videoUrl: null
+            },
+            b: {
+              stops: [],
+              videoGeoPoints: {},
+              videoId: null,
+              videoUrl: null
+            }
+          }
+        },
+      },
+      _showOperationResultModal: function(isSuccess, operationDetailMessage) {
+        this.$.saveOperationResultModal.open();
+        var self = this;
+        this._operationSuccess = isSuccess;
+        this._operationMessageDetail = operationDetailMessage;
+      },
+      _closeOperationResultModal: function() {
+        this.$.saveOperationResultModal.close();
+      },
+      _stopTabIsSelected: function(selectedTB) {
+         return selectedTB === 0;
+       },
+       _routesTabIsSelected: function(selectedTB) {
+          return selectedTB === 1;
+        },
+      _setStops : function(stopListArray){
+        this._imported_stops = stopListArray;
+        this.selectedTab = 0;
+        this.$.saveOperationResultModal.close();
+        this._showOperationResultModal(true,"Stop list data loaded, after all stops data loaded you can load route list data");
+        var self = this;
+        setTimeout(function(){
+           self.$.saveOperationResultModal.close();
+        }, 1000);
+      },
+      _setKmlFiles: function(routeListArray, callback){
+        console.log('Going to start Processing KML file');
+        var self = this;
+        var processKmlUrl = function(url,cb){
+          // console.log("processing: "+url);
+          // var settings = {
+          //     "async": true,
+          //     "crossDomain": true,
+          //     "url": "http://localhost:5001/kml_file/10_a.kml",
+          //     "method": "GET",
+          //   }
+          //
+          //   $.ajax(settings).done(function (response) {
+          //     console.log(response);
+          //     if(response.status==200){
+          //       self.$.tempKmlParser.parseFromText(response.responseText,cb);
+          //     }else{
+          //       cb(null);
+          //     }
+          //   });
+          var data = null;
+
+          var xhr = new XMLHttpRequest();
+          xhr.withCredentials = true;
+
+          xhr.addEventListener("readystatechange", function () {
+            console.log(this.readyState);
+            if (this.readyState === 4) {
+              console.log('check response');
+              console.log(this.responseText);
+              //console.log(this)
+              if(this.status==200){
+                 self.$.tempKmlParser.parseFromText(this.responseText,cb);
+              }else{
+                 cb(null);
+              }
+            }
+          });
+
+          xhr.open("GET", url);
+          //xhr.setRequestHeader("cache-control", "no-cache");
+          //xhr.setRequestHeader("postman-token", "861478f2-6ea2-0a27-a144-1475782148d3");
+
+          xhr.send(data);
+        }
+
+        var processRoute = function(index){
+          console.log('Processing: '+index);
+            if(index<routeListArray.length){
+              var fullRouteDetails = routeListArray[index];
+              var directionAKmlUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+fullRouteDetails.code+"/"+fullRouteDetails.code+"_a.kml";
+              var directionBKmlUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+fullRouteDetails.code+"/"+fullRouteDetails.code+"_b.kml"
+              processKmlUrl(directionAKmlUrl,function(parsedAData){
+                console.log('check parsed data');
+                console.log(parsedAData);
+                if(parsedAData){
+                    fullRouteDetails.routeDetails.a.videoGeoPoints = parsedAData;
+                    if(fullRouteDetails.routeDetails.a && fullRouteDetails.routeDetails.a.stops && fullRouteDetails.routeDetails.a.stops.length ){
+                      for(var a=0;a<fullRouteDetails.routeDetails.a.stops.length;a++){
+                        var tempStopObject = fullRouteDetails.routeDetails.a.stops[a];
+                          var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.a.videoGeoPoints);
+                          fullRouteDetails.routeDetails.a.stops[a].sec =  parseInt(point.key);
+                      }
+                    }
+                }
+                processKmlUrl(directionBKmlUrl,function(parsedBData){
+                if(parsedBData){
+                          fullRouteDetails.routeDetails.b.videoGeoPoints = parsedBData;
+                          if(fullRouteDetails.routeDetails.b && fullRouteDetails.routeDetails.b.stops && fullRouteDetails.routeDetails.b.stops.length ){
+                            for(var b=0;b<fullRouteDetails.routeDetails.b.stops.length;b++){
+                              var tempStopObject = fullRouteDetails.routeDetails.b.stops[b];
+                              var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.b.videoGeoPoints);
+                              fullRouteDetails.routeDetails.b.stops[b].sec = parseInt(point.key);
+                            }
+                          }
+                      }
+                  routeListArray[index] = fullRouteDetails;
+                  processRoute(index+1);
+                });
+              });
+
+            }else{
+              callback(routeListArray)
+            }
+        }
+        //callback(routeListArray)
+        processRoute(0);
+
+
+      },
+      _startVideoUrlsAndStartKmlProcessing:function(){
+        var self = this;
+        self.$.saveOperationResultModal.close();
+        self._showOperationResultModal(false,"Routes video links and KML data getting processed, it will take a while");
+        var tempRouteList = self._imported_routes_original;
+        for(var i=0;i<tempRouteList.length;i++){
+          var routeObject = tempRouteList[i];
+          var videoCode = routeObject.code;
+          routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
+          routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
+          routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
+          routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
+
+          routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
+          routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
+          routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
+          routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
+          tempRouteList[i] = routeObject;
+        }
+
+        this._setKmlFiles(tempRouteList,function(newRouteListArray){
+        console.log('Final Routes array before processing KML files');
+        console.log(self._imported_routes);
+        //self._setRoutes(newRouteListArray);
+          self._imported_routes = newRouteListArray;
+          self._imported_routes_original = newRouteListArray;
+          console.log('Final Routes array after processing KML files');
+          console.log(self._imported_routes);
+          self.selectedTab = 1;
+          self.$.saveOperationResultModal.close();
+          self._showOperationResultModal(true,"All Routes avilable KML data process and updated below list, click on Batch import to update in firebase ");
+          setTimeout(function(){
+             self.$.saveOperationResultModal.close();
+          }, 2000);
+      });
+      },
+      _setRoutes : function(routeListArray){
+        var self = this;
+        //this._imported_routes = routeListArray;
+        this._imported_routes_original = routeListArray;
+        // routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
+        // routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
+        // routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
+        // routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
+        //
+        // routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
+        // routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
+        // routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
+        // routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
+        console.log('Final Routes array');
+        console.log(self._imported_routes);
+        self.selectedTab = 1;
+        self.$.saveOperationResultModal.close();
+        self._showOperationResultModal(true,"All data loaded");
+        setTimeout(function(){
+           self.$.saveOperationResultModal.close();
+        }, 2000);
+        // this._setKmlFiles(routeListArray,function(newRouteListArray){
+        //   self._imported_routes = routeListArray;
+        //   console.log('Final Routes array after processing KML files');
+        //   console.log(self._imported_routes);
+        //   self.selectedTab = 1;
+        //   self.$.saveOperationResultModal.close();
+        //   self._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
+        //   setTimeout(function(){
+        //      self.$.saveOperationResultModal.close();
+        //   }, 2000);
+        // })
+
+      },
+      _combineRouteAndRouteDetails: function(routes,routeDetailses){
+        var finalRoutes = [];
+        // //console.log('routes parameter');
+        // //console.log(routes);
+        // //console.log('Route Detailses parameter');
+        // //console.log(routeDetailses);
+        for (var routeKey in routes) {
+          var tempRoute = routes[routeKey]
+              if(tempRoute){
+                //console.log(tempRoute.code);
+                if(routeDetailses && routeDetailses[routeKey] && routeDetailses[routeKey].a && routeDetailses[routeKey].a.stops && routeDetailses[routeKey].b && routeDetailses[routeKey].b.stops){
+                  tempRoute.routeDetails = routeDetailses[routeKey];
+                  finalRoutes.push(tempRoute);
+                }
+              }
+        }
+      this._setRoutes(finalRoutes);
+      },
+      _toggleRoute: function(e) {
+        var oldActiveRoute = Polymer.dom(this.root).querySelector('.item-wrapper.active');
+        var paperButton;
+        var routeIndex;
+        var activeRoute;
+
+        if (e.srcElement.localName === 'iron-icon') {
+          paperButton = e.srcElement.parentNode;
+        } else {
+          paperButton = e.srcElement;
+        }
+
+        // Get the info of the selected route
+        routeIndex = paperButton.getAttribute('data-route-index');
+        activeRoute = Polymer.dom(this.root).querySelector('.item-wrapper[data-route-index="' + routeIndex + '"]');
+
+        // Remove the active class
+        if (oldActiveRoute) {
+          oldActiveRoute.classList.remove('active');
+        }
+
+        // Check if the same route was collapsed
+        if (oldActiveRoute !== activeRoute) {
+          var routeMap = Polymer.dom(this.root).querySelector('#routeMap');
+
+          activeRoute.classList.add('active');
+
+          // Append the map element
+          Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
+          this._activeRouteCode = activeRoute.getAttribute('data-route-code');
+          this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.a.videoGeoPoints;
+
+        }
+      },
+
+      _saveRoute: function(fullRouteData,callback) {
+        var self = this;
+        if(!fullRouteData){
+            return callback({message:'data missing'},false);
+        }
+        if(!fullRouteData.code){
+            return callback({message:'data missing - before trim'},false);
+        }
+        var code = fullRouteData.code.trim();
+        if(!code){
+            return callback({message:'Code missing - after trim'},false)
+        }
+        var routeInfo = fullRouteData;
+        var routeDetails = routeInfo.routeDetails;
+        delete routeInfo.routeDetails;
+        var update = {};
+
+        update['routes/'+code] = routeInfo;
+        update['route-details/'+code] = routeDetails;
+        console.log('check below update deep path');
+        console.log(update)
+        //return callback(null,true);
+        //firebase.database().ref().update(update);
+        var firebaseDb = this.$.routeInfo.db;
+        var firebaseDbRef = firebaseDb.ref();
+        firebaseDbRef.update(update, function(error) {
+          if (error) {
+            console.log("Error updating data:", error);
+          }else{
+            console.log('Write Success');
+          }
+          return callback(null,true);
+        });
+      },
+      _batchImportRoutesListData:function(e) {
+        var self = this;
+
+        if(!this._imported_routes.length){
+          this.$.saveOperationResultModal.close();
+          alert('Please Click on "Video URL + KML Data Update" button first');
+          return;
+        }
+
+        if(!confirm('Are you sure? This action will update All Video and KML data for routes in database and also overwrite existing routes data.')){
+          return false;
+        }
+
+        this._showOperationResultModal(false,"Route list data getting updated in firebase db, it will take a while, please wait...");
+
+        var updateAble = 0;
+        var self = this;
+        var startUpdate =  function(index){
+          if(index<self._imported_routes.length){
+            var fullRouteDetails = {};
+            fullRouteDetails = self._imported_routes[index];
+            var alreadyHadRouteInfoData = false;
+            var alreadyHadRouteDetailsData = false;
+            var code = fullRouteDetails.code.trim();
+            self.$.routeInfo.getStoredValue('/routes/' + code)
+              .then(function(data) {
+                // console.log('check route root data');
+                // console.log(data);
+                // if(data && data.code){
+                //   alreadyHadRouteInfoData = true;
+                // }
+                return self.$.routeDetails.getStoredValue('/route-details/' + code);
+              }).then(function(data) {
+                // console.log('check route detailed data');
+                // console.log(data);
+                // if(data && data.a && data.a.stops.length && data.a.videoUrl){
+                //   alreadyHadRouteDetailsData = true;
+                // }
+                if(alreadyHadRouteDetailsData){
+                  startUpdate(index+1);
+                }else{
+                  //alert('safe to proceed to final store');
+                  self._saveRoute(fullRouteDetails,function(err,success){
+                      if(err){
+                        console.log('There is a error to check')
+                        console.log(err);
+                      }
+                      console.log('Success: '+success);
+                      startUpdate(index+1);
+                  })
+                }
+
+              }).catch(function(error) {
+                console.log(error);
+              });
+          }else{
+            self._showOperationResultModal(true,"All Routes Video and KML data in firebase db");
+            setTimeout(function(){
+               self.$.saveOperationResultModal.close();
+            }, 2000);
+            return;
+          }
+        }
+        startUpdate(0);
+      },
+      ready: function() {
+        var self = this;
+        var routes = [];
+        var routesDetailses = [];
+        this.$.saveOperationResultModal.close();
+        this._showOperationResultModal(false,"loading data...please wait ");
+         this.$.routeDataProcessing.getStoredValue('/routes')
+           .then(function(data) {
+             // //console.log('Rotues Data');
+             // //console.log(data);
+             // //console.log(data.length);
+             routes = data;
+             self.$.routeDataProcessing.getStoredValue('/route-details')
+               .then(function(data) {
+                 // //console.log('Rotue Details Data');
+                 // //console.log(data);
+                 routesDetailses = data;
+                 self._combineRouteAndRouteDetails(routes,routesDetailses);
+               }).catch(function(error) {
+                 //console.log(error);
+               });
+           }).catch(function(error) {
+             //console.log(error);
+           });
+      },
+    });
+  })();
+  </script>
+</dom-module>

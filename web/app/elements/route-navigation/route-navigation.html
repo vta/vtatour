@@ -1006,7 +1006,7 @@ var map;
           this._shouldHidePlay = false;
           this._isVideoPlaying = false;
           // this.$.routeVideo.pause();
-          // this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+          this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
 
           // Send the event to Google Analytics
           if(this._routeInfo){

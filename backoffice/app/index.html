@@ -152,6 +152,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <iron-icon icon="vta-icons:routes"></iron-icon>
                         <span>Routes</span>
                       </a>
+                      <a data-route="video-kml" href="{{baseUrl}}video-kml">
+                        <iron-icon icon="av:subscriptions"></iron-icon>
+                        <span>Video</span>
+                      </a>
                       <a data-route="logout" href="{{baseUrl}}logout/1">
                         <span>Logout</span>
                         <iron-icon icon="icons:exit-to-app"></iron-icon>
@@ -178,6 +182,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </section>
             <section data-route="import-data" tabindex="-1">
               <import-data></import-data>
+            </section>
+            <section data-route="video-kml" tabindex="-1">
+              <video-kml></video-kml>
             </section>
             <section data-route="vta-logout" tabindex="-1">
               <vta-logout action="{{params.action}}"></vta-logout>

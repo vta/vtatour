@@ -110,6 +110,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       setFocus(app.route);
       selectRouteLink(app.route);
     });
+    page('/video-kml', function() {
+      app.route = 'video-kml';
+      setFocus(app.route);
+      selectRouteLink(app.route);
+    });
 
     page('/logout/:action', function(data) {
       app.route = 'vta-logout';
