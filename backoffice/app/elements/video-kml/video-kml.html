@@ -583,41 +583,161 @@
 
 
       },
+      _videoLinkBindingExistenceCheck:function(routeListArray, callback){
+        console.log('Going to start Processing KML file');
+        var self = this;
+        var processVideoUrl = function(url,cb){
+          // console.log("processing: "+url);
+          // var settings = {
+          //     "async": true,
+          //     "crossDomain": true,
+          //     "url": "http://localhost:5001/kml_file/10_a.kml",
+          //     "method": "GET",
+          //   }
+          //
+          //   $.ajax(settings).done(function (response) {
+          //     console.log(response);
+          //     if(response.status==200){
+          //       self.$.tempKmlParser.parseFromText(response.responseText,cb);
+          //     }else{
+          //       cb(null);
+          //     }
+          //   });
+          var data = null;
+
+          var xhr = new XMLHttpRequest();
+          xhr.withCredentials = true;
+
+          xhr.addEventListener("readystatechange", function () {
+            console.log(this.readyState);
+            if (this.readyState === 4) {
+              console.log('check response');
+              console.log(this.responseText);
+              //console.log(this)
+              if(this.status==200){
+                 cb(true);
+              }else{
+                  cb(false);
+              }
+            }
+          });
+
+          xhr.open("HEAD", url);
+          //xhr.setRequestHeader("cache-control", "no-cache");
+          //xhr.setRequestHeader("postman-token", "861478f2-6ea2-0a27-a144-1475782148d3");
+
+          xhr.send(data);
+        }
+
+        var processRoute = function(index){
+          console.log('Processing: '+index);
+            if(index<routeListArray.length){
+              var fullRouteDetails = routeListArray[index];
+              var videoCode = fullRouteDetails.code;
+              var videoAUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
+              var videoALeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
+              var videoARightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
+              var videoABackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
+              var videoBUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
+              var videoBLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
+              var videoBRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
+              var videoBBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
+              //   tempRouteList[i] = routeObject;
+              processVideoUrl(videoAUrl,function(videoAUrlResult){
+              if(videoAUrlResult){
+                fullRouteDetails.routeDetails.a.videoUrl = videoAUrl;
+              }
+                processVideoUrl(videoALeftUrl,function(videoALeftUrlResult){
+                  if(videoALeftUrlResult){
+                    fullRouteDetails.routeDetails.a.videoLeftUrl = videoALeftUrl;
+                  }
+
+                  processVideoUrl(videoARightUrl,function(videoARightUrlResult){
+                    if(videoARightUrlResult){
+                      fullRouteDetails.routeDetails.a.videoRightUrl = videoARightUrl
+                    }
+
+                    processVideoUrl(videoABackUrl,function(videoABackUrlResult){
+                      if(videoABackUrlResult){
+                        fullRouteDetails.routeDetails.a.videoBackUrl = videoABackUrl
+                      }
+
+                      processVideoUrl(videoBUrl,function(videoBUrlResult){
+                        if(videoBUrlResult){
+                          fullRouteDetails.routeDetails.b.videoUrl = videoBUrl
+                        }
+
+                        processVideoUrl(videoBLeftUrl,function(videoBLeftUrlResult){
+                          if(videoBLeftUrlResult){
+                            fullRouteDetails.routeDetails.b.videoLeftUrl = videoBLeftUrl
+                          }
+
+                          processVideoUrl(videoBRightUrl,function(videoBRightUrlResult){
+                            if(videoBRightUrlResult){
+                              fullRouteDetails.routeDetails.b.videoRightUrl = videoBRightUrl
+                            }
+
+                                processVideoUrl(videoBBackUrl,function(videoBBackUrlResult){
+                                  if(videoBBackUrlResult){
+                                    fullRouteDetails.routeDetails.b.videoBackUrl = videoBBackUrl
+                                  }
+
+                                  routeListArray[index] = fullRouteDetails;
+                                  processRoute(index+1);
+                                });
+                          });
+                        });
+                      });
+                    });
+                  });
+
+                });
+
+              });
+
+            }else{
+              callback(routeListArray)
+            }
+        }
+        //callback(routeListArray)
+        processRoute(0);
+      },
       _startVideoUrlsAndStartKmlProcessing:function(){
         var self = this;
         self.$.saveOperationResultModal.close();
         self._showOperationResultModal(false,"Routes video links and KML data getting processed, it will take a while");
         var tempRouteList = self._imported_routes_original;
-        for(var i=0;i<tempRouteList.length;i++){
-          var routeObject = tempRouteList[i];
-          var videoCode = routeObject.code;
-          routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
-          routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
-          routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
-          routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
-
-          routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
-          routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
-          routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
-          routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
-          tempRouteList[i] = routeObject;
-        }
-
-        this._setKmlFiles(tempRouteList,function(newRouteListArray){
-        console.log('Final Routes array before processing KML files');
-        console.log(self._imported_routes);
-        //self._setRoutes(newRouteListArray);
-          self._imported_routes = newRouteListArray;
-          self._imported_routes_original = newRouteListArray;
-          console.log('Final Routes array after processing KML files');
-          console.log(self._imported_routes);
-          self.selectedTab = 1;
-          self.$.saveOperationResultModal.close();
-          self._showOperationResultModal(true,"All Routes avilable KML data process and updated below list, click on Batch import to update in firebase ");
-          setTimeout(function(){
-             self.$.saveOperationResultModal.close();
-          }, 2000);
-      });
+              this._videoLinkBindingExistenceCheck(tempRouteList,function(bindedNewRouteListArray){
+                self._setKmlFiles(bindedNewRouteListArray,function(newRouteListArray){
+                console.log('Final Routes array before processing KML files');
+                console.log(self._imported_routes);
+                //self._setRoutes(newRouteListArray);
+                  self._imported_routes = newRouteListArray;
+                  self._imported_routes_original = newRouteListArray;
+                  console.log('Final Routes array after processing KML files');
+                  console.log(self._imported_routes);
+                  self.selectedTab = 1;
+                  self.$.saveOperationResultModal.close();
+                  self._showOperationResultModal(true,"All Routes avilable KML data process and updated below list, click on Batch import to update in firebase ");
+                  setTimeout(function(){
+                     self.$.saveOperationResultModal.close();
+                  }, 2000);
+              });
+          })
+        // for(var i=0;i<tempRouteList.length;i++){
+        //   var routeObject = tempRouteList[i];
+        //   var videoCode = routeObject.code;
+        //   routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
+        //   routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
+        //   routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
+        //   routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
+        //
+        //   routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
+        //   routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
+        //   routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
+        //   routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
+        //   tempRouteList[i] = routeObject;
+        // }
       },
       _setRoutes : function(routeListArray){
         var self = this;
