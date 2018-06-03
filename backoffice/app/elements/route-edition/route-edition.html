@@ -662,18 +662,35 @@
 
         this._routeInfoOrigin = this._routeInfo;
         this._routeDetailsOrigin = this._routeDetails;
-
-
-
-        this.$.routeInfo.save('/routes', this._code)
-          .then(function() {
-            return self.$.routeDetails.save('/route-details', self._code);
-          }).then(function() {
-            self._showOperationResultModal(true);
-          }).catch(function(error) {
+        var code = this._routeInfo.code;
+        var update = {};
+        update['routes/'+code] = this._routeInfo;
+        update['route-details/'+code] = this._routeDetails;
+        console.log('check below update deep path data');
+        console.log(update);
+        var firebaseDb = this.$.routeInfo.db;
+        var firebaseDbRef = firebaseDb.ref();
+        firebaseDbRef.update(update, function(error) {
+          if (error) {
+            console.log("Error updating data:", error);
             self._showOperationResultModal(false, error);
-            console.log(error);
-          });
+          }else{
+            console.log('Write Success');
+              self._showOperationResultModal(true);
+          }
+        });
+
+        // 
+        //
+        // this.$.routeInfo.save('/routes', this._code)
+        //   .then(function() {
+        //     return self.$.routeDetails.save('/route-details', self._code);
+        //   }).then(function() {
+        //     self._showOperationResultModal(true);
+        //   }).catch(function(error) {
+        //     self._showOperationResultModal(false, error);
+        //     console.log(error);
+        //   });
       },
 
       _showOperationResultModal: function(isSuccess, operationDetailMessage) {
