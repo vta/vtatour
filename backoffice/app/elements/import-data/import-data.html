@@ -488,12 +488,14 @@
             a: {
               stops: [],
               videoGeoPoints: {},
+              originalVideoGeoPoints: {},
               videoId: null,
               videoUrl: null
             },
             b: {
               stops: [],
               videoGeoPoints: {},
+              originalVideoGeoPoints: {},
               videoId: null,
               videoUrl: null
             }
@@ -582,6 +584,8 @@
                 console.log(parsedAData);
                 if(parsedAData){
                     fullRouteDetails.routeDetails.a.videoGeoPoints = parsedAData;
+                    //fullRouteDetails.routeDetails.a.originalVideoGeoPoints = parsedAData;
+
                     if(fullRouteDetails.routeDetails.a && fullRouteDetails.routeDetails.a.stops && fullRouteDetails.routeDetails.a.stops.length ){
                       for(var a=0;a<fullRouteDetails.routeDetails.a.stops.length;a++){
                         var tempStopObject = fullRouteDetails.routeDetails.a.stops[a];
@@ -593,6 +597,7 @@
                 processKmlUrl(directionBKmlUrl,function(parsedBData){
                 if(parsedBData){
                           fullRouteDetails.routeDetails.b.videoGeoPoints = parsedBData;
+                          //fullRouteDetails.routeDetails.b.originalVideoGeoPoints = parsedBData;
                           if(fullRouteDetails.routeDetails.b && fullRouteDetails.routeDetails.b.stops && fullRouteDetails.routeDetails.b.stops.length ){
                             for(var b=0;b<fullRouteDetails.routeDetails.b.stops.length;b++){
                               var tempStopObject = fullRouteDetails.routeDetails.b.stops[b];
@@ -780,12 +785,14 @@
                        a: {
                          stops: [],
                          videoGeoPoints: {},
+                         originalVideoGeoPoints: {},
                          videoId: null,
                          videoUrl: null
                        },
                        b: {
                          stops: [],
                          videoGeoPoints: {},
+                         originalVideoGeoPoints: {},
                          videoId: null,
                          videoUrl: null
                        }
@@ -846,6 +853,7 @@
                    var geoPointsArrayString = "["+rawRouteObject.routeshape+"]";
                    var geoPointsArray = eval(geoPointsArrayString);
                    routeObject.routeDetails.a.videoGeoPoints = objectifyLatLon(geoPointsArray);
+                   routeObject.routeDetails.a.originalVideoGeoPoints = objectifyLatLon(geoPointsArray);
                    if(geoPointsArray && geoPointsArray.length){
                      //console.log('check important below');
                      console.log(geoPointsArray[0]);
@@ -857,6 +865,7 @@
                    var geoPointsArrayString = "["+rawRouteObjectOtherDirection.routeshape+"]";
                    var geoPointsArray = eval(geoPointsArrayString);
                    routeObject.routeDetails.b.videoGeoPoints = objectifyLatLon(geoPointsArray);
+                   routeObject.routeDetails.b.originalVideoGeoPoints = objectifyLatLon(geoPointsArray);
                  }
 
                  if(routeObject.code){
