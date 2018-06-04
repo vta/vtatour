@@ -233,7 +233,7 @@
           <iron-icon icon="file-download" class="download-icon"></iron-icon>Video Generation
         </paper-button>
       </a>
-        <paper-button on-click="_startVideoUrlsAndStartKmlProcessing" >
+        <paper-button on-click="_startVideoUrlsAndStartKmlPrepareDataAndStartProcessing" >
           <iron-icon icon="file-download" class="download-icon"></iron-icon>Video URL + KML Data Update
         </paper-button>
        </div>
@@ -554,7 +554,11 @@
                       for(var a=0;a<fullRouteDetails.routeDetails.a.stops.length;a++){
                         var tempStopObject = fullRouteDetails.routeDetails.a.stops[a];
                           var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.a.videoGeoPoints);
-                          fullRouteDetails.routeDetails.a.stops[a].sec =  parseInt(point.key);
+                          var sec = parseInt(point.key);
+                          if (!isNaN(sec)) {
+                            fullRouteDetails.routeDetails.a.stops[a].sec =  parseInt(point.key);
+                          }
+
                       }
                     }
                 }
@@ -565,7 +569,11 @@
                             for(var b=0;b<fullRouteDetails.routeDetails.b.stops.length;b++){
                               var tempStopObject = fullRouteDetails.routeDetails.b.stops[b];
                               var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.b.videoGeoPoints);
-                              fullRouteDetails.routeDetails.b.stops[b].sec = parseInt(point.key);
+                              var sec = parseInt(point.key);
+                              if (!isNaN(sec)) {
+                                fullRouteDetails.routeDetails.b.stops[b].sec = parseInt(point.key);
+                              }
+
                             }
                           }
                       }
@@ -702,6 +710,31 @@
         //callback(routeListArray)
         processRoute(0);
       },
+      _startVideoUrlsAndStartKmlPrepareDataAndStartProcessing:function(){
+        var self = this;
+        var routes = [];
+        var routesDetailses = [];
+        this.$.saveOperationResultModal.close();
+        this._showOperationResultModal(false,"loading data...please wait ");
+         this.$.routeDataProcessing.getStoredValue('/routes')
+           .then(function(data) {
+             // //console.log('Rotues Data');
+             // //console.log(data);
+             // //console.log(data.length);
+             routes = data;
+             self.$.routeDataProcessing.getStoredValue('/route-details')
+               .then(function(data) {
+                 // //console.log('Rotue Details Data');
+                 // //console.log(data);
+                 routesDetailses = data;
+                 self._combineRouteAndRouteDetails(routes,routesDetailses);
+               }).catch(function(error) {
+                 //console.log(error);
+               });
+           }).catch(function(error) {
+             //console.log(error);
+           });
+        },
       _startVideoUrlsAndStartKmlProcessing:function(){
         var self = this;
         self.$.saveOperationResultModal.close();
@@ -755,11 +788,11 @@
         console.log('Final Routes array');
         console.log(self._imported_routes);
         self.selectedTab = 1;
-        self.$.saveOperationResultModal.close();
-        self._showOperationResultModal(true,"All data loaded");
-        setTimeout(function(){
-           self.$.saveOperationResultModal.close();
-        }, 2000);
+        // self.$.saveOperationResultModal.close();
+        // self._showOperationResultModal(true,"All data loaded");
+        // setTimeout(function(){
+        //    self.$.saveOperationResultModal.close();
+        // }, 2000);
         // this._setKmlFiles(routeListArray,function(newRouteListArray){
         //   self._imported_routes = routeListArray;
         //   console.log('Final Routes array after processing KML files');
@@ -771,7 +804,7 @@
         //      self.$.saveOperationResultModal.close();
         //   }, 2000);
         // })
-
+        this._startVideoUrlsAndStartKmlProcessing();
       },
       _combineRouteAndRouteDetails: function(routes,routeDetailses){
         var finalRoutes = [];
@@ -926,29 +959,7 @@
         startUpdate(0);
       },
       ready: function() {
-        var self = this;
-        var routes = [];
-        var routesDetailses = [];
-        this.$.saveOperationResultModal.close();
-        this._showOperationResultModal(false,"loading data...please wait ");
-         this.$.routeDataProcessing.getStoredValue('/routes')
-           .then(function(data) {
-             // //console.log('Rotues Data');
-             // //console.log(data);
-             // //console.log(data.length);
-             routes = data;
-             self.$.routeDataProcessing.getStoredValue('/route-details')
-               .then(function(data) {
-                 // //console.log('Rotue Details Data');
-                 // //console.log(data);
-                 routesDetailses = data;
-                 self._combineRouteAndRouteDetails(routes,routesDetailses);
-               }).catch(function(error) {
-                 //console.log(error);
-               });
-           }).catch(function(error) {
-             //console.log(error);
-           });
+
       },
     });
   })();
