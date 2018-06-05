@@ -557,6 +557,8 @@
                           var sec = parseInt(point.key);
                           if (!isNaN(sec)) {
                             fullRouteDetails.routeDetails.a.stops[a].sec =  parseInt(point.key);
+                          }else{
+                            fullRouteDetails.routeDetails.a.stops[a].sec =  null;
                           }
 
                       }
@@ -572,6 +574,8 @@
                               var sec = parseInt(point.key);
                               if (!isNaN(sec)) {
                                 fullRouteDetails.routeDetails.b.stops[b].sec = parseInt(point.key);
+                              }else{
+                                  fullRouteDetails.routeDetails.b.stops[b].sec = null;
                               }
 
                             }
@@ -654,40 +658,63 @@
               processVideoUrl(videoAUrl,function(videoAUrlResult){
               if(videoAUrlResult){
                 fullRouteDetails.routeDetails.a.videoUrl = videoAUrl;
+              }else{
+                fullRouteDetails.routeDetails.a.videoUrl = "";
               }
                 processVideoUrl(videoALeftUrl,function(videoALeftUrlResult){
                   if(videoALeftUrlResult){
                     fullRouteDetails.routeDetails.a.videoLeftUrl = videoALeftUrl;
+                  }else{
+                    fullRouteDetails.routeDetails.a.videoLeftUrl = "";
                   }
 
                   processVideoUrl(videoARightUrl,function(videoARightUrlResult){
                     if(videoARightUrlResult){
                       fullRouteDetails.routeDetails.a.videoRightUrl = videoARightUrl
+                    }else{
+                      fullRouteDetails.routeDetails.a.videoRightUrl = ""
                     }
 
                     processVideoUrl(videoABackUrl,function(videoABackUrlResult){
                       if(videoABackUrlResult){
                         fullRouteDetails.routeDetails.a.videoBackUrl = videoABackUrl
+                      }else{
+                          fullRouteDetails.routeDetails.a.videoBackUrl = ""
                       }
 
                       processVideoUrl(videoBUrl,function(videoBUrlResult){
                         if(videoBUrlResult){
                           fullRouteDetails.routeDetails.b.videoUrl = videoBUrl
+                        }else{
+                            fullRouteDetails.routeDetails.b.videoUrl = ""
                         }
 
                         processVideoUrl(videoBLeftUrl,function(videoBLeftUrlResult){
                           if(videoBLeftUrlResult){
                             fullRouteDetails.routeDetails.b.videoLeftUrl = videoBLeftUrl
+                          }else{
+                              fullRouteDetails.routeDetails.b.videoLeftUrl = ""
                           }
 
                           processVideoUrl(videoBRightUrl,function(videoBRightUrlResult){
                             if(videoBRightUrlResult){
                               fullRouteDetails.routeDetails.b.videoRightUrl = videoBRightUrl
+                            }else{
+                              fullRouteDetails.routeDetails.b.videoRightUrl = ""
                             }
 
                                 processVideoUrl(videoBBackUrl,function(videoBBackUrlResult){
                                   if(videoBBackUrlResult){
                                     fullRouteDetails.routeDetails.b.videoBackUrl = videoBBackUrl
+                                  }else{
+                                      fullRouteDetails.routeDetails.b.videoBackUrl = ""
+                                  }
+
+                                  if(!fullRouteDetails.routeDetails.a.videoNightUrl){
+                                    fullRouteDetails.routeDetails.a.videoNightUrl = "";
+                                  }
+                                  if(!fullRouteDetails.routeDetails.b.videoNightUrl){
+                                    fullRouteDetails.routeDetails.b.videoNightUrl = "";
                                   }
 
                                   routeListArray[index] = fullRouteDetails;
@@ -890,6 +917,7 @@
           }else{
             console.log('Write Success');
           }
+          fullRouteData.routeDetails = routeDetails;
           return callback(null,true);
         });
       },
@@ -917,37 +945,14 @@
             var alreadyHadRouteInfoData = false;
             var alreadyHadRouteDetailsData = false;
             var code = fullRouteDetails.code.trim();
-            self.$.routeInfo.getStoredValue('/routes/' + code)
-              .then(function(data) {
-                // console.log('check route root data');
-                // console.log(data);
-                // if(data && data.code){
-                //   alreadyHadRouteInfoData = true;
-                // }
-                return self.$.routeDetails.getStoredValue('/route-details/' + code);
-              }).then(function(data) {
-                // console.log('check route detailed data');
-                // console.log(data);
-                // if(data && data.a && data.a.stops.length && data.a.videoUrl){
-                //   alreadyHadRouteDetailsData = true;
-                // }
-                if(alreadyHadRouteDetailsData){
-                  startUpdate(index+1);
-                }else{
-                  //alert('safe to proceed to final store');
-                  self._saveRoute(fullRouteDetails,function(err,success){
-                      if(err){
-                        console.log('There is a error to check')
-                        console.log(err);
-                      }
-                      console.log('Success: '+success);
-                      startUpdate(index+1);
-                  })
+            self._saveRoute(fullRouteDetails,function(err,success){
+                if(err){
+                  console.log('There is a error to check')
+                  console.log(err);
                 }
-
-              }).catch(function(error) {
-                console.log(error);
-              });
+                console.log('Success: '+success);
+                startUpdate(index+1);
+            })
           }else{
             self._showOperationResultModal(true,"All Routes Video and KML data in firebase db");
             setTimeout(function(){

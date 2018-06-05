@@ -812,6 +812,7 @@
                             name:pasedProcesedStopObject.name,
                             code:pasedProcesedStopObject.id,
                             route_list:pasedProcesedStopObject.route_list,
+                            sec:null
                           })
                         }
                       }
@@ -830,6 +831,7 @@
                             name:pasedProcesedStopObject.name,
                             code:pasedProcesedStopObject.id,
                             route_list:pasedProcesedStopObject.route_list,
+                            sec:null
                           })
                         }
                       }
@@ -839,15 +841,17 @@
                  routeObject.routeDetails.a.stops = routesStopsArray;
                  routeObject.routeDetails.b.stops = routesStopsOtherDirectionArray;
                  var videoCode = routeObject.code;
-                 // routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
-                 // routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
-                 // routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
-                 // routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
-                 //
-                 // routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
-                 // routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
-                 // routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
-                 // routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
+                 routeObject.routeDetails.a.videoUrl = "";
+                 routeObject.routeDetails.a.videoLeftUrl = "";
+                 routeObject.routeDetails.a.videoRightUrl = "";
+                 routeObject.routeDetails.a.videoBackUrl = "";
+                 routeObject.routeDetails.a.videoNightUrl = "";
+
+                 routeObject.routeDetails.b.videoUrl = "";
+                 routeObject.routeDetails.b.videoLeftUrl = "";
+                 routeObject.routeDetails.b.videoRightUrl = "";
+                 routeObject.routeDetails.b.videoBackUrl = "";
+                 routeObject.routeDetails.b.videoNightUrl = "";
 
                  if(rawRouteObject.routeshape){
                    var geoPointsArrayString = "["+rawRouteObject.routeshape+"]";
