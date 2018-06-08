@@ -12,8 +12,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <html lang="en">
 
 <head>
-  <base href="/backoffice/">
-  <!-- <base href="/"> -->
+  <!-- <base href="/backoffice/"> -->
+  <base href="/">
   <meta charset="utf-8">
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -156,6 +156,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <iron-icon icon="av:subscriptions"></iron-icon>
                         <span>Video</span>
                       </a>
+                      <a data-route="integrations" href="{{baseUrl}}integrations">
+                        <iron-icon icon="vta-icons:routes"></iron-icon>
+                        <span>Intergartions</span>
+                      </a>
                       <a data-route="logout" href="{{baseUrl}}logout/1">
                         <span>Logout</span>
                         <iron-icon icon="icons:exit-to-app"></iron-icon>
@@ -185,6 +189,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </section>
             <section data-route="video-kml" tabindex="-1">
               <video-kml></video-kml>
+            </section>
+            <section data-route="integrations" tabindex="-1">
+              <integration-list></integration-list>
             </section>
             <section data-route="vta-logout" tabindex="-1">
               <vta-logout action="{{params.action}}"></vta-logout>

@@ -1,0 +1,317 @@
+<dom-module id="integration-list">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      hr {
+        margin: 0 5%;
+        border-color: var(--primary-color);
+      }
+
+      .container {
+        margin-bottom: 40px;
+      }
+
+      .item {
+        padding: 12px 5% 0;
+        @apply(--layout-horizontal);
+        font-size: 1.05em;
+        color: var(--secondary-text-color);
+      }
+
+      .item.no-padding {
+        padding: 0;
+      }
+      .full-width{
+          width: 70%;
+      }
+
+      .header {
+        padding: 20px 5% 18px;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+
+      .route-code {
+        width: 15%;
+        padding: 0 20px 0 0;
+        font-weight: bold;
+      }
+
+      .route-details,
+      .column2 {
+        @apply(--layout-flex);
+      }
+
+      .column1 {
+        width: 35%;
+        padding: 0 20px 0 0;
+      }
+
+      .column-container {
+        width: 35%;
+      }
+
+      .operations {
+        text-transform: capitalize;
+        text-align: right;
+      }
+
+      .edit-route-operation {
+        padding: 21px 5%;
+        font-size: 1.4em;
+      }
+
+      .delete-route{
+        font-size: 0.5em;
+        text-align: left;
+        float:left;
+        color: var(--secondary-color);
+        top: 5px;
+      }
+
+      paper-button {
+        top: 2px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+      }
+
+      paper-button.primary {
+        color: var(--primary-color);
+      }
+
+      .direction-wrapper {
+        margin-bottom: 20px;
+      }
+
+      stop-list {
+        margin-bottom: 10px;
+      }
+
+      .add-stop-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+      }
+
+      .add-stop-wrapper paper-button {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.5em 1em;
+      }
+
+      google-map {
+        height: 300px;
+      }
+
+      #stopsModal {
+        width: 50%;
+      }
+
+      .buttons paper-button {
+        padding: 10px 15px;
+      }
+
+      #saveOperationResultModal {
+        width: auto;
+        background-color: transparent;
+        color: var(--vta-white);
+        box-shadow: none;
+      }
+
+      #saveOperationResultModal .icon {
+        text-align: center;
+      }
+
+      #saveOperationResultModal iron-icon {
+        width: 140px;
+        height: 140px;
+        padding: 20px;
+        text-align: center;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+      }
+
+      #saveOperationResultModal .message-wrapper.success iron-icon {
+        background-color: var(--primary-color);
+      }
+
+      #saveOperationResultModal .message-wrapper.error iron-icon {
+        background-color: var(--secondary-color);
+      }
+
+      #saveOperationResultModal .message {
+        text-align: center;
+        font-size: 2.5em;
+        line-height: 1;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .routeInfo{
+        padding-left: 0px;
+        margin-left: 5%;
+      }
+      .input-keys{
+        margin-right: 5%
+      }
+    </style>
+    <firebase-document
+      app-name="vta"
+      id="integration"
+      data="{{_integrationsOrigin}}">
+    </firebase-document>
+
+    <div class="inner-content">
+    <h2 class="page-title">Integrations</h2>
+      <paper-material elevation="1">
+        <div class="item header">
+          <div class="column2">
+            <div class="operations">
+              <paper-button class="primary" on-click="_saveIntegration">Save</paper-button>
+            </div>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="container item routeInfo">
+          <div class="full-width">
+            <h3>Meet Up Api Key</h3>
+            <paper-input id="meetUpApiKey" class="input-keys"  value="{{_integrations.meetUpApiKey}}" placeholder="Enter MeetUp Api Key" required></paper-input>
+          </div>
+          <div class="full-width">
+            <h3>Coord Api Key</h3>
+            <paper-input id="coordApiKey" class="input-keys" value="{{_integrations.coordApiKey}}" placeholder="Enter Coord Api Key" required></paper-input>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="operations edit-route-operation">
+          <paper-button class="primary" on-click="_saveIntegration">Save</paper-button>
+        </div>
+      </paper-material>
+    </div>
+
+
+
+
+    <paper-dialog id="saveOperationResultModal" modal>
+      <template is="dom-if" if="{{_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:check"></iron-icon>
+          </div>
+          <div class="message">Saved</div>
+        </div>
+      </template>
+      <template is="dom-if" if="{{!_operationSuccess}}">
+        <div class="message-wrapper error">
+          <div class="icon">
+            <iron-icon icon="icons:clear"></iron-icon>
+          </div>
+          <div class="message">Error</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+    </paper-dialog>
+
+    <maps-utils id="mapsUtils"></maps-utils>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'integration-list',
+      properties: {
+        _integrationsOrigin: {
+          type: Object,
+          observer: '_integrationsOriginChange'
+        },
+        _integrations: {
+          type: Object,
+          value: {
+            meetUpApiKey: "",
+          }
+        },
+      },
+
+
+      _integrationsOriginChange: function(newIntegrationsOriginChange) {
+        if (this._jsonHasKeys(newIntegrationsOriginChange)) {
+          this._integrations = newIntegrationsOriginChange;
+        }
+      },
+      _saveIntegration: function() {
+        var self = this;
+        console.log(this._routeDetails);
+        //return false;
+
+
+        this._integrationsOrigin = this._integrations;
+        var update = {};
+        update['integrations/'] = this._integrations;
+        console.log('check below update deep path data');
+        console.log(update);
+        //return false;
+        var firebaseDb = this.$.integration.db;
+        var firebaseDbRef = firebaseDb.ref();
+        firebaseDbRef.update(update, function(error) {
+          if (error) {
+            console.log("Error updating data:", error);
+            self._showOperationResultModal(false, error);
+          }else{
+            console.log('Write Success');
+              self._showOperationResultModal(true);
+          }
+        });
+
+        //
+        //
+        // this.$.routeInfo.save('/routes', this._code)
+        //   .then(function() {
+        //     return self.$.routeDetails.save('/route-details', self._code);
+        //   }).then(function() {
+        //     self._showOperationResultModal(true);
+        //   }).catch(function(error) {
+        //     self._showOperationResultModal(false, error);
+        //     console.log(error);
+        //   });
+      },
+
+      _showOperationResultModal: function(isSuccess, operationDetailMessage) {
+        var self = this;
+        this._operationSuccess = isSuccess;
+        this.$.saveOperationResultModal.open();
+        this._operationMessageDetail = operationDetailMessage;
+
+        setTimeout(function() {
+          self.$.saveOperationResultModal.close();
+        }, 2500)
+      },
+      _jsonHasKeys: function(json) {
+        if (json) {
+          for (var key in json) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+      ready: function() {
+        var self = this;
+        this.$.integration.getStoredValue('/integrations')
+          .then(function(data) {
+
+            self._integrationsOrigin = data;
+            console.log(self._integrationsOrigin);
+          });
+
+      },
+
+    });
+  })();
+  </script>
+</dom-module>

@@ -116,6 +116,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       selectRouteLink(app.route);
     });
 
+
+    page('/integrations', function() {
+          app.route = 'integrations';
+          setFocus(app.route);
+          selectRouteLink(app.route);
+    });
+
     page('/logout/:action', function(data) {
       app.route = 'vta-logout';
       app.params = data.params;
