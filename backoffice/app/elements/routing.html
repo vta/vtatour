@@ -123,6 +123,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           selectRouteLink(app.route);
     });
 
+    page('/customPois', function() {
+      app.route = 'customPois';
+      setFocus(app.route);
+      selectRouteLink(app.route);
+    });
+
+    page('/customPois/add', function() {
+      app.route = 'customPoi-edition';
+      app.params = { code : null };
+      setFocus(app.route);
+      selectRouteLink(app.route);
+    });
+
+    page('/customPois/:code', function(data) {
+      app.route = 'customPoi-details';
+      app.params = data.params;
+      setFocus(app.route);
+      selectRouteLink(app.route);
+    });
+
+    page('/customPois/:code/edit', function(data) {
+      app.route = 'customPoi-edition';
+      app.params = data.params;
+      setFocus(app.route);
+      selectRouteLink(app.route);
+    });
+
+
     page('/logout/:action', function(data) {
       app.route = 'vta-logout';
       app.params = data.params;

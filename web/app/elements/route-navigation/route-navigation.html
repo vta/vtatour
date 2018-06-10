@@ -264,6 +264,12 @@
         id="routeInfo"
         data="{{_routeInfoOrigin}}">
       </firebase-document>
+      <firebase-query
+        app-name="vta"
+        id="query"
+        path="/customPois"
+        data="{{_customPoisOrigin}}">
+      </firebase-query>
       <template is="dom-if" if="[[_routeInfo]]" >
       <div class="top-header">
               <div class="container-fluid header-area">
@@ -376,6 +382,15 @@
                 <h2>{{poi.name}}</h2>
                 <span>{{poi.formatted_address}}</span>
               </google-map-marker>
+            </template>
+            <template is="dom-repeat" items="{{_customPois}}" as="_customPoi">
+                <template is="dom-if" if="[[_isValidCords(_customPoi.lat,_customPoi.lng)]]">
+                    <google-map-marker latitude="{{_customPoi.latitude}}" longitude="{{_customPoi.longitude}}"
+                      click-events on-google-map-marker-click="_onPoiClick" icon="/images/poi-pointer.png">
+                      <h2>{{poi.name}}</h2>
+                      <!-- <span>{{poi.formatted_address}}</span> -->
+                    </google-map-marker>
+                </template>
             </template>
           </google-map>
         </div>
@@ -546,6 +561,12 @@ var map;
           _map : {
             type: Object
           },
+          _customPois: {
+            type: Array
+          },
+          _customPoisOrigin: {
+            type: Array
+          },
         	_tempRouteParams: {
         	  type: Object,
         	  value: {}
@@ -659,8 +680,8 @@ var map;
             return;
           }
 
-          console.log('check new route details')
-          console.log(newRouteDetails)
+          //spcl_console.log ('check new route details')
+          //spcl_console.log (newRouteDetails)
 
           this._assignSource(newRouteDetails.videoUrl);
 
@@ -704,8 +725,8 @@ var map;
           var tourSlot = this.getRouteSlot(newRouteDetails.videoGeoPoints, departurePointInt, destinationPointInt);
 
           // Set the names of the departure and destination stops
-          console.log('checking below departure');
-          console.log(newRouteDetails.stops[this.departureStopId]);
+          //spcl_console.log ('checking below departure');
+          //spcl_console.log (newRouteDetails.stops[this.departureStopId]);
 
           this._departureStop = newRouteDetails.stops[this.departureStopId];
           // if(this._departureStop){
@@ -844,8 +865,8 @@ var map;
               return;
           }
 
-          console.log('current Time: '+newVideoCurrentTime)
-          console.log('duration: '+this.player.duration());
+          //spcl_console.log ('current Time: '+newVideoCurrentTime)
+          //spcl_console.log ('duration: '+this.player.duration());
           var finalPoint = {
             lat: this._destinationStop.lat,
             lng:this._destinationStop.lng
@@ -877,7 +898,7 @@ var map;
             return;
           }
 
-          console.log('zoom level: '+this._map.getZoom());
+          //spcl_console.log ('zoom level: '+this._map.getZoom());
 
           var point = this._routeDetails.videoGeoPoints[newVideoCurrentTime - 1];
           var nextPoint = this._routeDetails.videoGeoPoints[newVideoCurrentTime];
@@ -890,9 +911,9 @@ var map;
           this._progressBarValue = this._calculateVideoProgress(this._videoStartTime, this._videoEndTime, newVideoCurrentTime);
 
           if (point && !isNaN(parseFloat(point.lat)) && !isNaN(parseFloat(point.lng))) {
-            console.log('check lat and lng');
-            console.log(point.lat);
-            console.log(point.lng);
+            //spcl_console.log ('check lat and lng');
+            //spcl_console.log (point.lat);
+            //spcl_console.log (point.lng);
             this._currentLat = parseFloat(point.lat);
             this._currentLng = parseFloat(point.lng);
             this._map.panTo(point)
@@ -901,9 +922,9 @@ var map;
               this.reFocused = true;
             }
           }
-          console.log('point');
-          console.log(point);
-          console.log('Current lat-lng: '+this._currentLat +'-'+this._currentLng);
+          //spcl_console.log ('point');
+          //spcl_console.log (point);
+          //spcl_console.log ('Current lat-lng: '+this._currentLat +'-'+this._currentLng);
 
           // Check if the video current time is in the range of the next stop
           if (this._nextStop && newVideoCurrentTime >= this._nextStop.sec &&
@@ -977,6 +998,12 @@ var map;
           this.player.play();
           // this.player.currentTime(this._videoStartTime);
           this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
+          if (this._pois) {
+            this._pois = null;
+          }
+          if(this._customPois){
+              this._customPois = null;
+          }
 
           $('#direction-display').html('');
 
@@ -997,6 +1024,9 @@ var map;
           if (this._pois) {
             this._pois = null;
           }
+          if(this._customPois){
+              this._customPois = null;
+          }
           // Send the event to Google Analytics
           ga('send', 'event', 'Tour', 'play', this._routeInfo.name);
         },
@@ -1008,6 +1038,9 @@ var map;
           // this.$.routeVideo.pause();
           if(this.$.mapsUtils && this._mapsApiLoaded && this._map){
             this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+            this._customPois = this._customPoisOrigin;
+            console.log('Custom Pois');
+            console.log(this._customPois);
           }
           // Send the event to Google Analytics
           if(this._routeInfo){
@@ -1019,6 +1052,10 @@ var map;
           this._isVideoPlaying = false;
           // this.$.routeVideo.pause();
           // this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+          if(this.$.mapsUtils && this._mapsApiLoaded && this._map){
+            this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+            this._customPois = this._customPoisOrigin;
+          }
 
           // Send the event to Google Analytics
           ga('send', 'event', 'Tour', 'end', this._routeInfo.name);
@@ -1050,7 +1087,7 @@ var map;
          */
         _onMapsApiLoad : function(){
           var self = this;
-          console.log('Maps Api Loaded');
+          //spcl_console.log ('Maps Api Loaded');
           setTimeout(function(){
             google.maps.event.addListener(self._map, 'mouseup', function(event){
               if(!self._isDragging && event.latLng){
@@ -1058,7 +1095,7 @@ var map;
               }
             });
             google.maps.event.addListener(self._map, 'zoom_changed', function(event){
-              console.log('zoom event changed')
+              //spcl_console.log ('zoom event changed')
               self._calculateValidZooomStatus();
             });
 
@@ -1083,8 +1120,8 @@ var map;
           if(!points || !this._mapsApiLoaded){
             return;
           }
-          console.log('check points');
-          console.log(points);
+          //spcl_console.log ('check points');
+          //spcl_console.log (points);
 
           var length = points.length;
           var cords = [];
@@ -1099,16 +1136,16 @@ var map;
           var self = this;
           // var map = document.querySelector('google-map');
           // map.addEventListener('google-map-ready', function(e) {
-          //   console.log('Map loaded!');
+          //   //spcl_console.log ('Map loaded!');
           // });
-          // console.log('map instance on ready');
+          // //spcl_console.log ('map instance on ready');
           // map = new google.maps.Map(document.getElementById('map'),{});
-          // console.log(map);
+          // //spcl_console.log (map);
           // map.addEventListener('google-map-ready', function(e) {
-          //   console.log('Map loaded!');
+          //   //spcl_console.log ('Map loaded!');
           // });
-          console.log('final cords');
-          console.log(cords);
+          //spcl_console.log ('final cords');
+          //spcl_console.log (cords);
           cords.unshift({
             lat:this._departureStop.lat,
             lng:this._departureStop.lng,
@@ -1127,7 +1164,7 @@ var map;
                });
 
                // Draw the route line
-               console.log(self._map)
+               //spcl_console.log (self._map)
                self._mapPolyline.setMap(self._map);
                self._map.fitBounds(bounds);
 
@@ -1138,11 +1175,11 @@ var map;
                  }
                });
              }catch(err){
-               console.log('map specific error');
-               console.log(err);
-               // console.log(map);
-               // console.log('element');
-               // console.log(self.$.map)
+               //spcl_console.log ('map specific error');
+               //spcl_console.log (err);
+               // //spcl_console.log (map);
+               // //spcl_console.log ('element');
+               // //spcl_console.log (self.$.map)
                // map = new google.maps.Map(self.$.map, {});
              }
         },
@@ -1182,15 +1219,15 @@ var map;
           if(!this.code){
             return;
           }
-          console.log('Map Getting Adjusted');
+          //spcl_console.log ('Map Getting Adjusted');
           if(!this._mapsApiLoaded){
             return;
           }
           var mapHeight;
 
-          console.log('player height');
-          // console.log(this.$.mainRouteVideo);
-          console.log(this.$.mainRouteVideo.offsetHeight);
+          //spcl_console.log ('player height');
+          // //spcl_console.log (this.$.mainRouteVideo);
+          //spcl_console.log (this.$.mainRouteVideo.offsetHeight);
 
           // Check if the device is in landscape or is a high resolution screen to resize the google map to the same size that the map
           if (window.matchMedia("(min-width: 361px) and (orientation: landscape)").matches) {
@@ -1202,7 +1239,7 @@ var map;
 
           if(mapHeight<=0){
             mapHeight = $('.video-player-wrapper').find('video').height();
-            console.log('From Dom: '+mapHeight);
+            //spcl_console.log ('From Dom: '+mapHeight);
             if(mapHeight<=0){
               mapHeight = $('.video-player-wrapper').height();
               if(!mapHeight){
@@ -1212,7 +1249,7 @@ var map;
                   }, 1000);
               }
             }
-            console.log('Final Map Height: '+mapHeight);
+            //spcl_console.log ('Final Map Height: '+mapHeight);
           }
           this.$.map.style.height = mapHeight+ 'px';
           this.$.map.style.minHeight = mapHeight+ 'px';
@@ -1285,11 +1322,11 @@ var map;
           this._selectedPoiMarker = e.srcElement;
         },
         _onStopIconClick : function(e){
-          console.log('check stop click even');
-          console.log(e);;
+          //spcl_console.log ('check stop click even');
+          //spcl_console.log (e);;
           var sourceElement = e.srcElement;
           var sec = sourceElement.childNodes[1].innerText;
-          console.log('clicked station sec: '+sec);
+          //spcl_console.log ('clicked station sec: '+sec);
           if(sec){
               this.player.currentTime(sec);
           }
@@ -1311,7 +1348,7 @@ var map;
                 page(page.current + "/detail");
               }
             }).catch(function(error) {
-              console.log(error)
+              //spcl_console.log (error)
             });
 
             // Send the event to Google Analytics
@@ -1356,7 +1393,7 @@ var map;
         },
         reAlightElements: function(){
 
-          // console.log('Resizing fullscreen button');
+          // //spcl_console.log ('Resizing fullscreen button');
           // var fullSkinButton = document.querySelector('.video-js .vjs-fullscreen-control');
           // fullSkinButton.style.display = 'block';
           // var videoHeight = parseInt($('video').outerHeight() || $('video').height());
@@ -1428,35 +1465,35 @@ var map;
                   self._adjustMapSize();
                 });
                 self.player.on('play', function() {
-                  console.log('Video Played');
+                  //spcl_console.log ('Video Played');
                   self._playVideo();
                   self._adjustMapSize();
                   self.reAlightElements();
                 });
                 self.player.on('pause', function() {
-                  console.log('Video Paused');
+                  //spcl_console.log ('Video Paused');
                   self._pauseVideo();
                   self._adjustMapSize();
                 });
                 self.player.on('error', function(e) {
-                  console.log('Video error');
-                  console.log(e);
+                  //spcl_console.log ('Video error');
+                  //spcl_console.log (e);
                 });
                   self.player.on('fullscreenchange', function() {
                     //alert('resized')
-                    console.log('full screen event');
+                    //spcl_console.log ('full screen event');
                     self._adjustMapSize();
                     self.reAlightElements();
                   });
 
                 self.player.on('timeupdate', function () {
-                    //console.log(this.currentTime());
+                    ////spcl_console.log (this.currentTime());
                   self._videoCurrentTimeChange(parseInt(this.currentTime()));
                   self.reAlightElements();
                 });
               });
 
-          console.log('done')
+          //spcl_console.log ('done')
 
         },
         _assignSource : function(src){
@@ -1473,8 +1510,8 @@ var map;
           }
         },
         _videoViewChange:function(src){
-          // console.log('video direction change');
-          // console.log(this.$.videoViewSelection.value);
+          // //spcl_console.log ('video direction change');
+          // //spcl_console.log (this.$.videoViewSelection.value);
           // this._assignSource(this.$.videoViewSelection.value);
           // this._videoCurrentTimeChange(0);
           // this._pauseVideo();
@@ -1548,8 +1585,8 @@ var map;
           var self = this;
           directionsService.route(request, function(result, status) {
             if (status == 'OK') {
-              console.log('check experimental direction data below');
-              console.log(result);
+              //spcl_console.log ('check experimental direction data below');
+              //spcl_console.log (result);
               //directionsDisplay.setDirections(result);
               if(result){
                 if(result.routes && result.routes.length){
@@ -1581,8 +1618,8 @@ var map;
         }
       });
     }catch(err){
-      console.log('route navigation error');
-      console.log(err);
+      //spcl_console.log ('route navigation error');
+      //spcl_console.log (err);
     }
 
   })();

@@ -1,0 +1,263 @@
+<dom-module id="customPoi-list">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      .item-wrapper,
+      .header {
+        border-bottom: 1px solid #ccc;
+      }
+
+      .item-wrapper:hover {
+        background-color: var(--vta-light-gray);
+      }
+
+      .item-wrapper.active:hover {
+        background-color: var(--vta-white);
+      }
+
+      .item {
+        padding: 12px 5% 0;
+        @apply(--layout-horizontal);
+        font-size: 1.05em;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .item {
+        color: var(--primary-color);
+      }
+
+      .header {
+        padding: 20px 5% 18px;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+
+      .customPoi-code {
+        min-width: 10%;
+        padding: 0 20px;
+        font-weight: bold;
+      }
+
+      .item-wrapper.active .customPoi-name {
+        margin-bottom: 20px;
+      }
+
+      .customPoi-details {
+        @apply(--layout-flex);
+      }
+
+      .customPoi-operations {
+        padding: 0 20px;
+        margin-top: -12px;
+      }
+
+      paper-fab {
+        position: absolute;
+        right: 8%;
+        top: -28px;
+      }
+
+      paper-button {
+        top: 2px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+      }
+
+      paper-button iron-icon {
+        --iron-icon-height: 40px;
+        --iron-icon-width: 40px;
+      }
+
+      .customPoi-departure-destination {
+        margin-bottom: 20px;
+        display: none;
+        color: var(--secondary-text-color);
+      }
+
+      .customPoi-map{
+        display: none;
+      }
+      .item-wrapper.active .customPoi-map {
+        display: block;
+      }
+
+      .customPoi-departure,
+      .customPoi-destination {
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+      }
+
+      .customPoi-detail-header {
+        font-weight: bold;
+        margin-right: 30px;
+      }
+
+      .edit-customPoi-operation {
+        display: none;
+        padding: 21px 5%;
+        font-size: 1.4em;
+        text-transform: capitalize;
+        text-align: right;
+      }
+
+      .item-wrapper.active paper-button iron-icon.expand,
+      .item-wrapper paper-button iron-icon.collapse,
+      .customPoi-map-template,
+      .item-wrapper customPoi-map {
+        display: none;
+      }
+
+      .item-wrapper customPoi-map {
+        display: none !important;
+      }
+
+      .item-wrapper paper-button iron-icon.expand,
+      .item-wrapper.active paper-button iron-icon.collapse,
+      .item-wrapper.active customPoi-map,
+      .item-wrapper.active .edit-customPoi-operation {
+        display: block;
+      }
+      google-map {
+        height: 300px;
+      }
+    </style>
+
+    <firebase-query
+      app-name="vta"
+      id="query"
+      path="/customPois"
+      data="{{_customPois}}">
+    </firebase-query>
+
+    <firebase-document
+      app-name="vta"
+      id="videoGeoPoints"
+      data="{{_videoGeoPointsOrigin}}">
+    </firebase-document>
+
+    <div class="inner-content">
+      <h2 class="page-title">CustomPois</h2>
+
+      <paper-material elevation="1">
+        <div class="item header">
+          <div class="customPoi-code">Code</div>
+          <div class="customPoi-details">CustomPoi name</div>
+          <div class="customPoi-operations">
+            <a href="{{baseUrl}}customPois/add" tabindex="-1">
+              <paper-fab title="Add customPoi" icon="icons:add"></paper-fab>
+            </a>
+          </div>
+        </div>
+
+        <template is="dom-repeat" items="[[_customPois]]" as="customPoi">
+          <div class="item-wrapper" data-customPoi-index$="[[index]]" data-customPoi-code$="[[customPoi.code]]">
+            <div class="item customPoi">
+              <div class="customPoi-code">[[customPoi.code]]</div>
+              <div class="customPoi-details">
+                <div class="customPoi-name">[[customPoi.name]]</div>
+                <div class="customPoi-departure-destination">
+                  <div class="customPoi-departure">
+                    <div class="customPoi-detail-header">Latitude</div>
+                    <div class="customPoi-detail-value">[[customPoi.latitude]]</div>
+                  </div>
+                  <div class="customPoi-destination">
+                    <div class="customPoi-detail-header">Longitude</div>
+                    <div class="customPoi-detail-value">[[customPoi.longitude]]</div>
+                  </div>
+                </div>
+              </div>
+              <div class="customPoi-operations">
+                <paper-button on-click="_toggleCustomPoi" data-customPoi-index$="[[index]]">
+                  <iron-icon class="expand" icon="icons:expand-more"></iron-icon>
+                  <iron-icon class="collapse" icon="icons:expand-less"></iron-icon>
+                </paper-button>
+              </div>
+            </div>
+            <div class="customPoi-map">
+              <google-map
+               id="map"
+                api-key="AIzaSyALqCogus7yIJJ0OE48RwBtmteqybWvZ6g"
+                additional-map-options='{"zoomControl":"true"}'
+                latitude="[[customPoi.latitude]]"
+                longitude="[[customPoi.longitude]]"
+                mapType="satellite"
+                zoom="15"
+                >
+                <google-map-marker
+                  latitude="[[customPoi.latitude]]"
+                  longitude="[[customPoi.longitude]]"
+                  icon="/images/poi-pointer.png">
+                    <h2>{{customPoi.name}}</h2>
+                </google-map-marker>
+
+              </google-map>
+            </div>
+            <div class="edit-customPoi-operation">
+              <a href="{{baseUrl}}customPois/{{_activeCustomPoiCode}}/edit" tabindex="-1">
+                <paper-button>Edit</paper-button>
+              </a>
+            </div>
+          </div>
+        </template>
+      </paper-material>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'customPoi-list',
+
+      properties: {
+        _customPois: {
+          type: Array
+        },
+        _activeCustomPoiCode: {
+          type: String,
+          value: ''
+        }
+      },
+
+      _toggleCustomPoi: function(e) {
+        var oldActiveCustomPoi = Polymer.dom(this.root).querySelector('.item-wrapper.active');
+        var paperButton;
+        var customPoiIndex;
+        var activeCustomPoi;
+
+        if (e.srcElement.localName === 'iron-icon') {
+          paperButton = e.srcElement.parentNode;
+        } else {
+          paperButton = e.srcElement;
+        }
+
+        // Get the info of the selected customPoi
+        customPoiIndex = paperButton.getAttribute('data-customPoi-index');
+        this._selectedCustomPoi = this._customPois[customPoiIndex];
+        console.log('selected custom api');
+        console.log(this._selectedCustomPoi);
+        activeCustomPoi = Polymer.dom(this.root).querySelector('.item-wrapper[data-customPoi-index="' + customPoiIndex + '"]');
+
+
+        // Remove the active class
+        if (oldActiveCustomPoi) {
+          oldActiveCustomPoi.classList.remove('active');
+        }
+
+        // Check if the same customPoi was collapsed
+        if (oldActiveCustomPoi !== activeCustomPoi) {
+          var customPoiMap = Polymer.dom(this.root).querySelector('#customPoiMap');
+
+          activeCustomPoi.classList.add('active');
+
+          // Append the map element
+          // Polymer.dom(activeCustomPoi.querySelector('.customPoi-map')).appendChild(customPoiMap);
+          this._activeCustomPoiCode = activeCustomPoi.getAttribute('data-customPoi-code');
+        }
+      }
+    });
+  })();
+  </script>
+</dom-module>
