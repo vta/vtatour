@@ -383,6 +383,13 @@
                 <span>{{poi.formatted_address}}</span>
               </google-map-marker>
             </template>
+            <template is="dom-repeat" items="{{_meetUps}}" as="meetUpObject">
+              <google-map-marker latitude="{{meetUpObject.lat}}" longitude="{{meetUpObject.lon}}"
+                click-events on-google-map-marker-click="_onPoiClick" icon="/images/meetup.png">
+                <h2>{{meetUpObject.name}}</h2>
+                <span>{{meetUpObject.address_1}}</span>
+              </google-map-marker>
+            </template>
             <template is="dom-repeat" items="{{_customPois}}" as="_customPoi">
                 <template is="dom-if" if="[[_isValidCords(_customPoi.lat,_customPoi.lng)]]">
                     <google-map-marker latitude="{{_customPoi.latitude}}" longitude="{{_customPoi.longitude}}"
@@ -561,6 +568,9 @@ var map;
           _map : {
             type: Object
           },
+          _meetUps: {
+            type: Array
+          },
           _customPois: {
             type: Array
           },
@@ -650,6 +660,8 @@ var map;
           this.$.routeDetails.path = null;
           this.$.routeInfo.path = null;
           this._pois = [];
+          this._customPois = [];
+          this._meetUps=[];
           this._direction = false;
           this.reFocused = false;
           this._isValidZoom = false;
@@ -1004,6 +1016,9 @@ var map;
           if(this._customPois){
               this._customPois = null;
           }
+          if(this._meetUps){
+            this._meetUps = null;
+          }
 
           $('#direction-display').html('');
 
@@ -1027,6 +1042,9 @@ var map;
           if(this._customPois){
               this._customPois = null;
           }
+          if(this._meetUps){
+              this._meetUps = null;
+          }
           // Send the event to Google Analytics
           ga('send', 'event', 'Tour', 'play', this._routeInfo.name);
         },
@@ -1041,7 +1059,11 @@ var map;
             this._customPois = this._customPoisOrigin;
             console.log('Custom Pois');
             console.log(this._customPois);
+            console.log('going to call meetp up apis')
+            this._getNearByMeetUps(this._currentLat, this._currentLng);
           }
+          console.log('check pois');
+          console.log(this._pois);
           // Send the event to Google Analytics
           if(this._routeInfo){
             ga('send', 'event', 'Tour', 'pause', this._routeInfo.name);
@@ -1055,6 +1077,7 @@ var map;
           if(this.$.mapsUtils && this._mapsApiLoaded && this._map){
             this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
             this._customPois = this._customPoisOrigin;
+            this._getNearByMeetUps(this._currentLat, this._currentLng);
           }
 
           // Send the event to Google Analytics
@@ -1065,7 +1088,11 @@ var map;
 
           this.player.pause();
           //this.$.routeVideo.pause();
-          this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+          if(this.$.mapsUtils && this._mapsApiLoaded && this._map){
+            this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
+            this._customPois = this._customPoisOrigin;
+            this._getNearByMeetUps(this._currentLat, this._currentLng);
+          }
 
           // Send the event to Google Analytics
           ga('send', 'event', 'Tour', 'stop', this._routeInfo.name);
@@ -1311,6 +1338,8 @@ var map;
         },
 
         _poisLoaded: function(event) {
+          console.log('check pois below');
+          console.log(event.detail);
           this._pois = event.detail;
         },
 
@@ -1615,6 +1644,28 @@ var map;
         },
         _toggleDirectionNavigation:function(){
           this._direction = this._direction ? false:true;
+        },
+        _getNearByMeetUps:function(lat,lon){
+            var self = this;
+            var settings = {
+              "async": true,
+              "crossDomain": true,
+              "url": "http://localhost:5000/api/meetups/"+lat+"/"+lon+"",
+              "method": "GET",
+              "headers": {
+                "cache-control": "no-cache",
+              }
+            }
+            $.ajax(settings).done(function (response) {
+              console.log('check meetups data below');
+              console.log(response);
+              if(response.results){
+                self._meetUps = response.results;
+
+                console.log('check actual meetUp Data');
+                console.log(self._meetUps);
+              }
+            });
         }
       });
     }catch(err){
