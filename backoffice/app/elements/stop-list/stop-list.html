@@ -19,7 +19,7 @@
       <div role="listbox">
         <template is="dom-repeat" items="{{stops}}" as="stop">
           <paper-item>
-            <paper-item-body>[[stop.name]]
+            <paper-item-body>[[stop.code]] - [[stop.name]]
               <template is="dom-if" if="{{stop.route_list}}">
                 <br/>
                 (Connect route: [[stop.route_list]])
