@@ -1080,6 +1080,9 @@ var map;
             console.log(this._customPois);
             console.log('going to call meetp up apis')
             this._getNearByMeetUps(this._currentLat, this._currentLng);
+            this._getNearByCoords(this._currentLat, this._currentLng);
+
+
           }
           console.log('check pois');
           console.log(this._pois);
@@ -1097,6 +1100,7 @@ var map;
             this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
             this._customPois = this._customPoisOrigin;
             this._getNearByMeetUps(this._currentLat, this._currentLng);
+            this._getNearByCoords(this._currentLat, this._currentLng);
           }
 
           // Send the event to Google Analytics
@@ -1111,6 +1115,7 @@ var map;
             this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
             this._customPois = this._customPoisOrigin;
             this._getNearByMeetUps(this._currentLat, this._currentLng);
+            this._getNearByCoords(this._currentLat, this._currentLng);
           }
 
           // Send the event to Google Analytics
