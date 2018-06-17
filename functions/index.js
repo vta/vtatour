@@ -43,6 +43,32 @@ app.get('/api/meetups/:lat/:lon', (req, res) => {
     return res.json(JSON.parse(body))
   });
 });
+app.get('/api/coords/:lat/:lon', (req, res) => {
+  const lat = req.params.lat;
+  const lon = req.params.lon;
+
+  var options = {
+    method: 'GET',
+    url: 'https://api.coord.co/v1/bike/location',
+    qs: {
+      access_key: config.coordApiKey,
+      latitude: lat,
+      longitude: lon,
+      radius_km: 1,
+    },
+    headers: {
+      'cache-control': 'no-cache'
+    }
+  };
+
+  request(options, (error, response, body) => {
+    if (error)
+      throw new Error(error);
+
+    console.log(body);
+    return res.json(JSON.parse(body))
+  });
+});
 // app.get('/api/2',(request,response) => {
 //  response.send("Hello 2 from Firebase!");
 // });

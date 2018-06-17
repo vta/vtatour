@@ -390,6 +390,13 @@
                 <span>{{meetUpObject.address_1}}</span>
               </google-map-marker>
             </template>
+            <template is="dom-repeat" items="{{_coords}}" as="cordObject">
+              <google-map-marker latitude="{{cordObject.properties.lat}}" longitude="{{cordObject.properties.lon}}"
+                click-events on-google-map-marker-click="_onPoiClick" icon="/images/bike.png">
+                <h2>{{cordObject.properties.name}}</h2>
+                <span>Bikes Available: {{cordObject.properties.num_bikes_available}}, Docks Available: {{cordObject.properties.num_docks_available}}</span>
+              </google-map-marker>
+            </template>
             <template is="dom-repeat" items="{{_customPois}}" as="_customPoi">
                 <template is="dom-if" if="[[_isValidCords(_customPoi.lat,_customPoi.lng)]]">
                     <google-map-marker latitude="{{_customPoi.latitude}}" longitude="{{_customPoi.longitude}}"
@@ -571,6 +578,9 @@ var map;
           _meetUps: {
             type: Array
           },
+          _coords: {
+            type: Array
+          },
           _customPois: {
             type: Array
           },
@@ -662,6 +672,7 @@ var map;
           this._pois = [];
           this._customPois = [];
           this._meetUps=[];
+          this._coords = [];
           this._direction = false;
           this.reFocused = false;
           this._isValidZoom = false;
@@ -1019,6 +1030,9 @@ var map;
           if(this._meetUps){
             this._meetUps = null;
           }
+          if(this._coords){
+            this._coords= null;
+          }
 
           $('#direction-display').html('');
 
@@ -1045,6 +1059,11 @@ var map;
           if(this._meetUps){
               this._meetUps = null;
           }
+          if(this._coords){
+              this._coords = null;
+          }
+
+
           // Send the event to Google Analytics
           ga('send', 'event', 'Tour', 'play', this._routeInfo.name);
         },
@@ -1650,7 +1669,7 @@ var map;
             var settings = {
               "async": true,
               "crossDomain": true,
-              "url": "http://localhost:5000/api/meetups/"+lat+"/"+lon+"",
+              "url": "/api/meetups/"+lat+"/"+lon+"",
               "method": "GET",
               "headers": {
                 "cache-control": "no-cache",
@@ -1666,7 +1685,30 @@ var map;
                 console.log(self._meetUps);
               }
             });
-        }
+        },
+        _getNearByCoords:function(lat,lon){
+            var self = this;
+            var settings = {
+              "async": true,
+              "crossDomain": true,
+              "url": "/api/coords/"+lat+"/"+lon+"",
+              "method": "GET",
+              "headers": {
+                "cache-control": "no-cache",
+              }
+            }
+            $.ajax(settings).done(function (response) {
+              console.log('check meetups data below');
+              console.log(response);
+              if(response.features){
+                self._coords = response.features;
+
+                console.log('check actual coords Data');
+                console.log(self._coords);
+              }
+            });
+        },
+
       });
     }catch(err){
       //spcl_console.log ('route navigation error');
