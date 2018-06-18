@@ -349,7 +349,7 @@
                             <div role="listbox">
                               <template is="dom-repeat" items="{{route.routeDetails.a.stops}}" as="stop">
                                 <paper-item>
-                                  <paper-item-body>[[stop.name]]
+                                  <paper-item-body>[[stop.code]] - [[stop.name]]
                                       <template is="dom-if" if="{{stop.route_list}}">
                                         (Connect route: [[stop.route_list]])
                                       </template>
@@ -1021,7 +1021,7 @@
       },
       _batchImportRoutesListData:function(e) {
 
-        if(!confirm('Are you sure? This action will update new routes in database, but will not overwrite existing routes.')){
+        if(!confirm('Are you sure? This action will update new routes in database, Notice: It will overwrite existing routes.')){
           return false;
         }
 
@@ -1049,39 +1049,43 @@
             var alreadyHadRouteInfoData = false;
             var alreadyHadRouteDetailsData = false;
             var code = fullRouteDetails.code.trim();
-            self.$.routeInfo.getStoredValue('/routes/' + code)
-              .then(function(data) {
-                // console.log('check route root data');
-                // console.log(data);
-                if(data && data.code){
-                  alreadyHadRouteInfoData = true;
+            self._saveRoute(fullRouteDetails,function(err,success){
+                if(err){
+                  console.log('There is a error to check')
+                  console.log(err);
                 }
-                return self.$.routeDetails.getStoredValue('/route-details/' + code);
-              }).then(function(data) {
-                // console.log('check route detailed data');
-                // console.log(data);
-                if(data && data.a && data.a.stops.length && data.a.videoUrl){
-                  alreadyHadRouteDetailsData = true;
-                }
-                if(alreadyHadRouteDetailsData){
-                  startUpdate(index+1);
-                }else{
-                  //alert('safe to proceed to final store');
-                  self._saveRoute(fullRouteDetails,function(err,success){
-                      if(err){
-                        console.log('There is a error to check')
-                        console.log(err);
-                      }
-                      console.log('Success: '+success);
-                      startUpdate(index+1);
-                  })
-                }
-
-              }).catch(function(error) {
-                console.log(error);
-              });
+                console.log('Success: '+success);
+                startUpdate(index+1);
+            });
+            // self.$.routeInfo.getStoredValue('/routes/' + code)
+            //   .then(function(data) {
+            //
+            //     if(data && data.code){
+            //       alreadyHadRouteInfoData = true;
+            //     }
+            //     return self.$.routeDetails.getStoredValue('/route-details/' + code);
+            //   }).then(function(data) {
+            //     if(data && data.a && data.a.stops.length && data.a.videoUrl){
+            //       alreadyHadRouteDetailsData = true;
+            //     }
+            //     if(alreadyHadRouteDetailsData){
+            //       startUpdate(index+1);
+            //     }else{
+            //       self._saveRoute(fullRouteDetails,function(err,success){
+            //           if(err){
+            //             console.log('There is a error to check')
+            //             console.log(err);
+            //           }
+            //           console.log('Success: '+success);
+            //           startUpdate(index+1);
+            //       })
+            //     }
+            //
+            //   }).catch(function(error) {
+            //     console.log(error);
+            //   });
           }else{
-            self._showOperationResultModal(true,"All new routes updated in firebase db");
+            self._showOperationResultModal(true,"All routes updated in firebase db");
             setTimeout(function(){
                self.$.saveOperationResultModal.close();
             }, 2000);
