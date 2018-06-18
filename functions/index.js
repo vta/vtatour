@@ -14,6 +14,10 @@ getConfig().then((mainConfigs) => {
   console.log('check below configs');
   console.log(mainConfigs);
   config = mainConfigs;
+  return true;
+}).catch((err) => {
+  console.log('errors below');
+  console.log(err);
 });
 app.get('/api/meetups/:lat/:lon', (req, res) => {
   const lat = req.params.lat;
