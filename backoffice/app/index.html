@@ -156,6 +156,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <iron-icon icon="av:subscriptions"></iron-icon>
                         <span>Video</span>
                       </a>
+                      <a data-route="integrations" href="{{baseUrl}}integrations">
+                        <iron-icon icon="vta-icons:routes"></iron-icon>
+                        <span>Integrations</span>
+                      </a>
+                      <a data-route="customPois" href="{{baseUrl}}customPois">
+                        <iron-icon icon="vta-icons:routes"></iron-icon>
+                        <span>Custom POIs</span>
+                      </a>
                       <a data-route="logout" href="{{baseUrl}}logout/1">
                         <span>Logout</span>
                         <iron-icon icon="icons:exit-to-app"></iron-icon>
@@ -185,6 +193,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </section>
             <section data-route="video-kml" tabindex="-1">
               <video-kml></video-kml>
+            </section>
+            <section data-route="integrations" tabindex="-1">
+              <integration-list></integration-list>
+            </section>
+            <section data-route="customPois" tabindex="-1">
+              <customPoi-list></customPoi-list>
+            </section>
+            <section data-route="customPoi-edition" tabindex="-1">
+              <customPoi-edition code="{{params.code}}"></customPoi-edition>
             </section>
             <section data-route="vta-logout" tabindex="-1">
               <vta-logout action="{{params.action}}"></vta-logout>

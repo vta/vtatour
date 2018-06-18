@@ -1,0 +1,431 @@
+<dom-module id="customPoi-edition">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      hr {
+        margin: 0 5%;
+        border-color: var(--primary-color);
+      }
+
+      .container {
+        margin-bottom: 40px;
+      }
+
+      .item {
+        padding: 12px 5% 0;
+        @apply(--layout-horizontal);
+        font-size: 1.05em;
+        color: var(--secondary-text-color);
+      }
+
+      .item.no-padding {
+        padding: 0;
+      }
+
+      .header {
+        padding: 20px 5% 18px;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+
+      .customPoi-code {
+        width: 15%;
+        padding: 0 20px 0 0;
+        font-weight: bold;
+      }
+
+      .customPoi-details,
+      .column2 {
+        @apply(--layout-flex);
+      }
+
+      .column1 {
+        width: 35%;
+        padding: 0 20px 0 0;
+      }
+
+      .column-container {
+        width: 35%;
+      }
+
+      .operations {
+        text-transform: capitalize;
+        text-align: right;
+      }
+
+      .edit-customPoi-operation {
+        padding: 21px 5%;
+        font-size: 1.4em;
+      }
+
+      .delete-customPoi{
+        font-size: 0.5em;
+        text-align: left;
+        float:left;
+        color: var(--secondary-color);
+        top: 5px;
+      }
+
+      paper-button {
+        top: 2px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+      }
+
+      paper-button.primary {
+        color: var(--primary-color);
+      }
+
+      .direction-wrapper {
+        margin-bottom: 20px;
+      }
+
+      stop-list {
+        margin-bottom: 10px;
+      }
+
+      .add-stop-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+      }
+
+      .add-stop-wrapper paper-button {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.5em 1em;
+      }
+
+      google-map {
+        height: 300px;
+      }
+
+      #stopsModal {
+        width: 50%;
+      }
+
+      .buttons paper-button {
+        padding: 10px 15px;
+      }
+
+      #saveOperationResultModal {
+        width: auto;
+        background-color: transparent;
+        color: var(--vta-white);
+        box-shadow: none;
+      }
+
+      #saveOperationResultModal .icon {
+        text-align: center;
+      }
+
+      #saveOperationResultModal iron-icon {
+        width: 140px;
+        height: 140px;
+        padding: 20px;
+        text-align: center;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+      }
+
+      #saveOperationResultModal .message-wrapper.success iron-icon {
+        background-color: var(--primary-color);
+      }
+
+      #saveOperationResultModal .message-wrapper.error iron-icon {
+        background-color: var(--secondary-color);
+      }
+
+      #saveOperationResultModal .message {
+        text-align: center;
+        font-size: 2.5em;
+        line-height: 1;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .customPoiInfo{
+        padding-left: 0px;
+        margin-left: 5%;
+      }
+    </style>
+
+    <firebase-query
+      app-name="vta"
+      id="stops"
+      path="/stops"
+      data="{{_stopsOrigin}}">
+    </firebase-query>
+    <firebase-document
+      app-name="vta"
+      id="customPoiInfo"
+      data="{{_customPoiInfoOrigin}}">
+    </firebase-document>
+    <firebase-document
+      app-name="vta"
+      id="customPoiDetails"
+      data="{{_customPoiDetailsOrigin}}">
+    </firebase-document>
+
+    <div class="inner-content">
+      <template is="dom-if" if="{{_isNewCustomPoi}}">
+        <h2 class="page-title">New customPoi</h2>
+      </template>
+      <template is="dom-if" if="{{!_isNewCustomPoi}}">
+        <h2 class="page-title">Edit customPoi</h2>
+      </template>
+
+      <paper-material elevation="1">
+        <div class="item header">
+          <div class="column1">
+            <div class="item no-padding">
+              <div class="customPoi-code">Code</div>
+              <div class="customPoi-details">CustomPoi name</div>
+            </div>
+          </div>
+          <div class="column2">
+            <div class="operations">
+              <a href="{{baseUrl}}customPois" tabindex="-1">
+                <paper-button>Cancel</paper-button>
+              </a>
+              <paper-button class="primary" on-click="_captureCustomPoiData">Save</paper-button>
+            </div>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="item">
+          <div class="column1">
+            <div class="item no-padding">
+              <div class="customPoi-code">
+                <paper-input id="code" value="{{_code}}" placeholder="Number" required></paper-input>
+              </div>
+              <div class="customPoi-details">
+                <paper-input id="name" value="{{_customPoiInfo.name}}" placeholder="Text" required></paper-input>
+              </div>
+            </div>
+            <paper-input id="vicinity" value="{{_customPoiInfo.address}}" label="Address" placeholder="Text" required></paper-input>
+            <paper-input id="icon" value="{{_customPoiInfo.icon}}" label="Icon" placeholder="Url" required></paper-input>
+            <paper-input id="latitude" value="{{_customPoiInfo.latitude}}" label="Latitude" placeholder="Text" required></paper-input>
+            <paper-input id="longitude" value="{{_customPoiInfo.longitude}}" label="Longitude" placeholder="Text" required></paper-input>
+            <paper-input id="description" value="{{_customPoiInfo.description}}" label="Description" placeholder="Text" required></paper-input>
+            <paper-input id="web_link" value="{{_customPoiInfo.web_link}}" label="Web Link" placeholder="Url" required></paper-input>
+          </div>
+        </div>
+
+
+
+        <hr/>
+
+        <div class="operations edit-customPoi-operation">
+          <paper-button class="delete-customPoi" on-click="_openDeleteCustomPoiModal">Delete This CustomPoi</paper-button>
+          <a href="{{baseUrl}}customPois" tabindex="-1">
+            <paper-button>Cancel</paper-button>
+          </a>
+          <paper-button class="primary" on-click="_captureCustomPoiData">Save</paper-button>
+        </div>
+      </paper-material>
+    </div>
+
+    <paper-dialog id="saveOperationResultModal" modal>
+      <template is="dom-if" if="{{_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:check"></iron-icon>
+          </div>
+          <div class="message">Saved</div>
+        </div>
+      </template>
+      <template is="dom-if" if="{{!_operationSuccess}}">
+        <div class="message-wrapper error">
+          <div class="icon">
+            <iron-icon icon="icons:clear"></iron-icon>
+          </div>
+          <div class="message">Error</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+    </paper-dialog>
+
+    <paper-dialog id="deleteCustomPoiModal" modal>
+      <h2>Delete this customPoi</h2>
+      <div class="message">Do you want to delete customPoi {{_code}} {{_customPoiInfo.name}}?</div>
+
+      <div class="buttons">
+        <paper-button dialog-dismiss>No</paper-button>
+        <paper-button dialog-confirm autofocus class="primary" on-click="_deleteCustomPoi">Yes, delete customPoi</paper-button>
+      </div>
+    </paper-dialog>
+
+    <maps-utils id="mapsUtils"></maps-utils>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'customPoi-edition',
+
+      properties: {
+        _stops: {
+          type: Array
+        },
+        _isNewCustomPoi: {
+          type: Boolean,
+          value: true
+        },
+        code: {
+          type: String,
+          value: null,
+          observer: '_codeChange'
+        },
+        _customPoiInfoOrigin: {
+          type: Object,
+          observer: '_customPoiInfoOriginChange'
+        },
+        _customPoiInfo: {
+          type: Object,
+          value: {}
+        },
+        _map : {
+          type: Object
+        },
+      },
+
+      clear: function() {
+        this._code = null;
+        this.$.customPoiInfo.reset();
+        this._customPoiInfo = {};
+        this._isNewCustomPoi = true;
+      },
+
+      _codeChange: function(newCode) {
+        if (newCode) { // A customPoi will be edited
+          var self = this;
+          this._code = newCode;
+          this._isNewCustomPoi = false;
+
+          this.$.customPoiInfo.getStoredValue('/customPois/' + newCode)
+            .then(function(data) {
+              self._customPoiInfoOrigin = data;
+            }).catch(function(error) {
+              console.log(error);
+            });
+        } else {
+          this.clear();
+        }
+      },
+
+      _customPoiInfoOriginChange: function(newCustomPoiInfo) {
+        if (this._jsonHasKeys(newCustomPoiInfo)) {
+          this._customPoiInfo = newCustomPoiInfo;
+        }
+      },
+
+      _captureCustomPoiData: function() {
+        // Check if the values are well included
+        if (!this._validateForm()) {
+          return;
+        }
+
+        this._customPoiInfo.code = this._code;
+
+        this._saveCustomPoi();
+      },
+
+      _validateForm: function() {
+        var fields = [
+          this.$.code,
+          this.$.name,
+          this.$.latitude,
+          this.$.longitude
+        ];
+
+        var isFormValid = true;
+        var actualValidation;
+
+        // This allows the validation of all the fields at once
+        for (var indexField = 0; indexField < fields.length; indexField++) {
+          actualValidation = fields[indexField].validate();
+          isFormValid = isFormValid && actualValidation;
+        }
+        return isFormValid;
+      },
+
+      _saveCustomPoi: function() {
+        var self = this;
+        console.log(this._customPoiInfo);
+        this._customPoiInfoOrigin = this._customPoiInfo;
+        var code = this._customPoiInfo.code;
+        if(!code){
+            alert('Please enter code');
+            return false;
+          }
+        var update = {};
+        update['customPois/'+code] = this._customPoiInfo;
+        console.log('check below update deep path data');
+        console.log(update);
+        var firebaseDb = this.$.customPoiInfo.db;
+        var firebaseDbRef = firebaseDb.ref();
+        firebaseDbRef.update(update, function(error) {
+          if (error) {
+            console.log("Error updating data:", error);
+            self._showOperationResultModal(false, error);
+          }else{
+            console.log('Write Success');
+              self._showOperationResultModal(true);
+              if(self._isNewCustomPoi){
+                setTimeout(function(){
+                   return page('/customPois');
+                }, 1000);
+              }
+          }
+        });
+      },
+
+      _showOperationResultModal: function(isSuccess, operationDetailMessage) {
+        var self = this;
+        this._operationSuccess = isSuccess;
+        this.$.saveOperationResultModal.open();
+        this._operationMessageDetail = operationDetailMessage;
+
+        setTimeout(function() {
+          self.$.saveOperationResultModal.close();
+        }, 2500)
+      },
+
+      _jsonHasKeys: function(json) {
+        if (json) {
+          for (var key in json) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+
+      _openDeleteCustomPoiModal : function(){
+        this.$.deleteCustomPoiModal.open();
+      },
+
+      _deleteCustomPoi : function(){
+        var self = this;
+        this._customPoiInfo = null;
+        this._customPoiDetails = null;
+        this._customPoiInfoOrigin = this._customPoiInfo;
+
+        // Delete the customPoi using document save method
+        this.$.customPoiInfo.save('/customPois', this._code)
+          .then(function() {
+             return page('/customPois');
+          }).catch(function(error) {
+            self._showOperationResultModal(false, error);
+            console.log(error);
+          });
+      }
+    });
+  })();
+  </script>
+</dom-module>
