@@ -24,7 +24,7 @@
 
 ## How to setup? ##
 
-1. Run the install.sh file
+1. Run the requirements.txtfile
 2. Replace file in /usr/local/lib/python2.7/dist-packages/google_streetview/api.py with google_api/api.py
-3. Open terminal run FLASK_APP=google.pyflaskrun
-4. Open index.html in browser,enter start and end points,click on Generate button.
+3. Open terminal run python manage.py runserver from project folder
+4. Open http://localhost:5000/ in browser,select Route, Direction and Camera angle and press Generate button.

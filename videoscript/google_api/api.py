@@ -7,7 +7,10 @@ try:
   from urllib.parse import urlencode
 except ImportError:
   from urllib import urlencode
-
+import hashlib
+import hmac
+import base64
+import urlparse
 import json
 import requests
 
@@ -43,7 +46,7 @@ class results:
       
       # Define parameters for street view api
       params = [{
-        'size': '600x300', # max 640x640 pixels
+        'size': '2048x2048', # max 640x640 pixels
         'location': '46.414382,10.013988',
         'heading': '151.78',
         'pitch': '-0.76',
@@ -73,7 +76,7 @@ class results:
     
     # (params) Set default params
     defaults = {
-      'size': '640x640'
+      'size': '2048x2048'
     }
     for i in range(len(params)):
       for k in defaults:
@@ -88,7 +91,7 @@ class results:
     self.metadata_links = [site_metadata + '?' + urlencode(p) for p in params]
     self.metadata = [requests.get(url, stream=True).json() for url in self.metadata_links]
       
-  def download_links(self, dir_path,filename, metadata_file='metadata.json', metadata_status='status', status_ok='OK'):
+  def download_links(self, dir_path,file_name, metadata_file='metadata.json', metadata_status='status', status_ok='OK'):
     """Download Google Street View images from parameter queries if they are available.
     
     Args:
@@ -102,20 +105,55 @@ class results:
         Value from the metadata API response status indicating that an image is available.
     """
     metadata = self.metadata
-    #if not path.isdir(dir_path):
-     # makedirs(dir_path)
+    if not path.isdir(dir_path):
+      makedirs(dir_path)
     
     # (download) Download images if status from metadata is ok
+    
     for i, url in enumerate(self.links):
       if metadata[i][metadata_status] == status_ok:
-        file_path = path.join(dir_path,filename+'.jpg')
+        file_path = path.join(dir_path, file_name  + '.jpg')
         metadata[i]['_file'] = path.basename(file_path) # add file reference
-        helpers.download(url, file_path)
+        print "-------------------------------api is working------------------------------"
+        input_url = url
+        secret = "2FALXF438hYwtyVfzy0fc8Zel7o="
+        signurl =self.sign_url(input_url, secret)
+        helpers.download(signurl, file_path)
     
     # (metadata) Save metadata with file reference
     metadata_path = path.join(dir_path, metadata_file)
     with open(metadata_path, 'w') as out_file:
       json.dump(metadata, out_file)
+
+  def sign_url(self, input_url=None, secret=None):
+      #print "1234"
+      try:
+          if not input_url or not secret:
+              raise Exception("Both input_url and secret are required")
+
+          url = urlparse.urlparse(input_url)
+      
+          # We only need to sign the path+query part of the string
+          url_to_sign = url.path + "?" + url.query
+
+          # Decode the private key into its binary format
+          # We need to decode the URL-encoded private key
+          decoded_key = base64.urlsafe_b64decode(secret)
+
+          # Create a signature using the private key and the URL-encoded
+          # string using HMAC SHA1. This signature will be binary.
+          signature = hmac.new(decoded_key, url_to_sign, hashlib.sha1)
+
+          # Encode the binary signature into base64 for use within a URL
+          encoded_signature = base64.urlsafe_b64encode(signature.digest())
+
+          original_url = url.scheme + "://" + url.netloc + url.path + "?" + url.query
+      
+          # Return signed URL
+          return original_url + "&signature=" + encoded_signature
+          # return encoded_signature
+      except:
+          print "sign url error"
   
   def preview(self, n=10, k=['date', 'location', 'pano_id', 'status'], kheader='pano_id'):
     """Print a preview of the request results.
@@ -146,23 +184,23 @@ class results:
           else:
             print(ki + ': ' + str(kv[ki]))
       
-  def save_links(self, file_path):
+  def save_links(self):#self, file_path):
     """Saves a text file of the search result links.
     
     Saves a text file of the search result links, where each link 
     is saved in a new line. An example is provided below::
       
-      https://maps.googleapis.com/maps/api/streetview?size=600x300&location=46.414382,10.013988&heading=151.78&pitch=-0.76&key=yourdevkey
-      https://maps.googleapis.com/maps/api/streetview?size=600x300&location=41.403609,2.174448&heading=100&pitch=28&scale=2&key=yourdevkey
+      https://maps.googleapis.com/maps/api/streetview?size=2048x2048&location=46.414382,10.013988&heading=151.78&pitch=-0.76&key=yourdevkey
+      https://maps.googleapis.com/maps/api/streetview?size=2048x2048&location=41.403609,2.174448&heading=100&pitch=28&scale=2&key=yourdevkey
     
     Args:
       file_path (str):
         Path to the text file to save links to.
     """
-    data = '\n'.join(self.links)
-    with open(file_path, 'w+') as out_file:
-      out_file.write(data)
-  
+    # data = '\n'.join(self.links)
+    # with open(file_path, 'w+') as out_file:
+    #   out_file.write(data)
+    return str(self.links)  
   def save_metadata(self, file_path):
     """Save Google Street View metadata from parameter queries.
     

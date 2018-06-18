@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="" name="description">
+  <meta content="Mosaddek" name="author">
+  <link href="img/favicon.png" rel="shortcut icon">
+  <title>Home</title><!-- js placed at the end of the document so the pages load faster -->
+  <!-- jQuery library -->
+  <!-- Latest compiled and minified CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"><!-- jQuery library -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+  </script><!-- Latest compiled JavaScript -->
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+  </script><!-- Bootstrap core CSS -->
+  <link href="/static/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/theme.css" rel="stylesheet">
+  <link href="/static/bootstrap-reset.css" rel="stylesheet"><!--external css-->
+  <link href="/static/font-awesome.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js">
+  </script><!-- Custom styles for this template -->
+  <link href="/static/font-awesome.css" rel="stylesheet">
+  <link href="/static/le-responsive.css.css" rel="stylesheet">
+  <link href="/static/style.css" rel="stylesheet">
+  <style>
+        .top-header {
+  background-color: #02528a;
+  border-bottom: 1px solid #DDDDDD;
+  padding: 6px 0;
+  height: 38px !important;
+  /* padding-left: 15px; */
+  padding-right: 15px;
+}
+@media (min-width: 992px) {
+  .container {
+    max-width: 670px !important;
+  }
+  @media (max-width: 768px) {
+    .top-header .header-item {
+      display: inline-block;
+      margin-left: 19px !important;
+      margin-right: 20px;
+      font-size: 14px;
+      color: #FFF;
+      /* padding-top: 4px; */
+    }
+  }
+  </style>
+  <script>
+        /*--------------------------------newly added code to get all the routes and dirid from firebase--------------*/
+      var routeslist = [];
+      var config = {
+        apiKey: "AIzaSyCDtI3bfIhVlYdG9zrYzKtqCOqQWldRI7c",
+        authDomain: "vtavirtualtransit-7c904.firebaseapp.com",
+        databaseURL: "https://vtavirtualtransit-7c904.firebaseio.com",
+        projectId: "vtavirtualtransit-7c904",
+        storageBucket: "vtavirtualtransit-7c904.appspot.com",
+        messagingSenderId: "141415834682"
+      };
+      firebase.initializeApp(config)
+      routeslist = [];
+      console.log("here")
+      firebase.database().ref('/').once('value').then(function(snapshot) {
+        snapshot.forEach(function(userSnapshot) {
+          var rdata = userSnapshot.val();
+          this.routeslist.push(rdata);
+        });
+        console.log(routeslist[2])
+        this.select = document.getElementById('routeid');
+        select.add(new Option("Select the route"));
+        for (i in routeslist[3]) {
+          select.add(new Option(routeslist[3][i]['name']));
+        };
+        $('#routeid').prop('disabled', false);
+        $('#directionid').prop('disabled', false);
+        $('#camangle').prop('disabled', false);
+        $("#progress").html("Please select a route.");
+      });
+
+      function chkdir(period) {
+        console.log(routeslist)
+        $("#progress").html("");
+        $("#urls").html("");
+        var interval = 100; // seconds
+        refreshIntervalId = setInterval(ajax_call, interval);
+        angsel();
+        for (i in routeslist[3]) {
+          if (period.replace(/\s/g, "").localeCompare(routeslist[3][i]['name'].replace(/\s/g, "")) == 0) {
+            this.select = document.getElementById('directionid');
+            select.options.length = 0;
+            a = routeslist[3][i]['directionAName']
+            a1 = a.charAt(0).toUpperCase() + a.slice(1);
+            b = routeslist[3][i]['directionBName']
+            b1 = b.charAt(0).toUpperCase() + b.slice(1);
+            select.add(new Option("Select the direction"));
+            select.add(new Option(a1));
+            select.add(new Option(b1));
+          }
+        };
+        if (period == "") {
+          alert("No data!")
+        }
+      }
+
+      function angsel() {
+        $("#progress").html("");
+        $("#urls").html("");
+        this.sel = document.getElementById('camangle');
+        sel.options.length = 0;
+        sel.add(new Option("Select the view"));
+        sel.add(new Option("Forward"));
+        sel.add(new Option("Backward"));
+        sel.add(new Option("Left"));
+        sel.add(new Option("Right"));
+        sel.add(new Option("All"));
+        var interval = 100; // seconds
+        refreshIntervalId = setInterval(ajax_call, interval);
+      }
+
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        console.log("ret cookie");
+        return cookieValue;
+      }
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          console.log(settings.url)
+          //if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+          // Only send the token to relative URLs i.e. locally.
+          xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          //}
+        }
+      });
+      var refreshIntervalId;
+      $(document).ready(function() {
+        $("#progress").html("Loading.. please wait");
+        $('#routeid').prop('disabled', 'disabled');
+        $('#directionid').prop('disabled', 'disabled');
+        $('#camangle').prop('disabled', 'disabled');
+        var obj, len, progress, routeid, direction, urllen, forward, backward, left, right, pstatus;
+        pstatus = 0;
+        $.ajaxSetup({
+          cache: false
+        });
+        var interval = 1000; // seconds
+        console.log("pstatus1:" + pstatus);
+        var interval = 1000; // seconds
+        refreshIntervalId = setInterval(ajax_call, interval);
+      });
+      var ajax_call = function() {
+        var e = document.getElementById("directionid");
+        console.log(e.options.selectedIndex);
+        if (e.options.selectedIndex != -1) {
+          dir_1 = e.options[e.selectedIndex].value;
+        }
+        var route = undefined
+        var cam = undefined
+        var f = document.getElementById("routeid");
+        if (f.options.selectedIndex != -1) {
+          route = f.options[f.selectedIndex].value;
+          r1 = route.split("-")
+          r2 = r1[0].replace(" ", "")
+          console.log(r2 + "----------")
+        }
+        var g = document.getElementById("camangle");
+        if (g.options.selectedIndex != -1) {
+          cam = g.options[g.selectedIndex].value;
+          if (dir_1 == 'West') {
+            dir = 'a'
+          }
+          if (dir_1 == 'East') {
+            dir = 'b'
+          }
+        }
+        console.log(route + dir + cam)
+        if (dir != "Select the direction") {
+          if (cam != "Select the view") {
+            if (route != undefined) {
+              if (cam != undefined) {
+                $.ajax({
+                  url: "/static/" + r2 + "_" + dir + "_" + cam + ".txt",
+                  dataType: "json",
+                  contentType: "json",
+                  success: function(data) {
+                    $("#urls").html("");
+                    if (data == '100') {
+                      $("#progress").html("Route : " + r2 + " , Direction : " + dir_1 + " , View : " + cam + " , Generating video");
+                    } else {
+                      if (data != '405') $("#progress").html("Route : " + r2 + " , Direction : " + dir_1 + " , View : " + cam + " , Progress : " + data + "% Completed.");
+                    }
+                    if (data == '201') {
+                      $("#progress").html("Route : " + r2 + " , Direction : " + dir_1 + " , View : " + cam + " , Fetching coordinates,please wait");
+                    }
+                    if (data == '405') {
+                      //$("#progress").html("Please select Forward or All for Route : "+r2+" , Direction : "+dir+" , Camera view : "+cam);
+                    }
+                    if (data == '101') {
+                      $("#urls").append('<a target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '_forward.mp4">Forward<\/a><br>');
+                      $("#urls").append('<a  target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '_backward.mp4">Backward<\/a><br>');
+                      $("#urls").append('<a target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '_right.mp4">Right<\/a><br>');
+                      $("#urls").append('<a target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '_left.mp4">Left<\/a><br>');
+                      $("#urls").append('<a target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '.kml">KML<\/a><br>');
+                      $("#progress").html("100% Completed.");
+                      clearInterval(refreshIntervalId);
+                    }
+                  },
+                  error: function(data, errorThrown) {
+                    $("#progress").html("");
+                    $("#urls").html("");
+                    $("#progress").html("No video generation in progress for Route : " + r2 + " , Direction : " + dir_1 + " , View : " + cam);
+                    if (data == '101') {
+                      clearInterval(refreshIntervalId);
+                    }
+                    //alert('this is else condition no file found, pass your ajax request here');
+                    // clearInterval(refreshIntervalId); //to s??/*/top the auto refresh
+                  }
+                });
+              } else {
+                $("#progress").html("");
+                $("#urls").html("");
+              }
+            }
+          }
+        }
+      };
+      var dir;
+      var routedirid = [];
+
+      function getrouteinfo() {
+        var interval = 1000;
+        refreshIntervalId = setInterval(ajax_call, interval);
+        var d = document.getElementById("directionid");
+        dir = d.options[d.selectedIndex].value;
+        var r = document.getElementById("routeid");
+        routename = r.options[r.selectedIndex].value;
+        camview = document.getElementById("camangle").value;
+        if (dir == "West - East") {
+          dir = 'a';
+        }
+        if (dir == "North - South") {
+          dir = 'b';
+        }
+        routedirid[0] = "rid";
+        routedirid[1] = routename;
+        routedirid[2] = dir;
+        routedirid[3] = camview;
+        console.log(routedirid)
+        var stationJson = JSON.stringify(routedirid);
+        console.log(stationJson)
+        var pythonUrl = "/"; //python url to post data 
+        var sendCordinates = $.ajax({
+          type: 'POST',
+          url: pythonUrl,
+          dataType: "json",
+          data: stationJson,
+          contentType: 'application/json',
+          "beforeSend": function(xhr, settings) {
+            console.log("Before Send");
+            $.ajaxSettings.beforeSend(xhr, settings);
+          },
+          success: function(resultData) {
+            console.log("done");
+          }
+        });
+      }
+  </script>
+</head>
+<body>
+  <!--header start-->
+  <header class="header-frontend">
+    <div class="navbar navbar-default navbar-static-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#"><img alt="" src="/static/vtavirtualtransit-logo.jpg" style="margin-top:4px; height:48px"></a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="top-header hidden-sm">
+    <div class="container-fluid header-area">
+      <div class="pull-left">
+        <div class="header-item" style="height:30px;">
+          Choose your route
+        </div>
+      </div>
+      <div class="pull-right"></div><!-- #top-social end -->
+    </div>
+  </div><!--header end-->
+  <section class="home-services">
+    <div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
+    <div id="controls">
+      <div class="container">
+        <div class="row">
+          <form class="form-horizontal tasi-form" id="map_form" name="map_form">
+            <input name='csrfmiddlewaretoken' type='hidden' value='Rha8XnTVJye745oyJhcNn4CEtYxkZOCDBaI5Y92hHfwCt3LAwuJEXiiXq0kT0ygC'>
+            <div class="form-group">
+              <div class="col-lg-12">
+                <div class="panel-body">
+                  <label class="col-lg-2 control-label">Routes</label> 
+                   <select class="form-control input-sm m-bot15" id="routeid" onchange="chkdir(this.value)">
+                  </select>
+                </div>
+                <div class="panel-body">
+                  <label class="col-lg-2 control-label">Direction</label> <select class="form-control input-sm m-bot15" id="directionid" onchange="angsel()">
+                  </select>
+                </div>
+                <div class="panel-body">
+                  <label class="col-lg-2 control-label">View</label> <select class="form-control input-sm m-bot15" id="camangle">
+                  </select>
+                </div>
+                <div style="margin-left:auto; margin-right:auto; width:130px; padding-top:10px;">
+                  <button class="btn btn-kool-default" id="searchButton" onclick="getrouteinfo()" type="button">Generate</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-12">
+        <div class="panel-body2">
+          <div id="progress"></div>
+          <div id="urls"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

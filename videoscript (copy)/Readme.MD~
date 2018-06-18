@@ -1,0 +1,3 @@
+1. Run the install.sh file
+2. Open terminal run FLASK_APP=google.py flask run
+3. 
