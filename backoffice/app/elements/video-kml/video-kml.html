@@ -843,7 +843,7 @@
           var tempRoute = routes[routeKey]
               if(tempRoute){
                 //console.log(tempRoute.code);
-                if(routeDetailses && routeDetailses[routeKey] && routeDetailses[routeKey].a && routeDetailses[routeKey].a.stops && routeDetailses[routeKey].b && routeDetailses[routeKey].b.stops){
+                if(routeDetailses && routeDetailses[routeKey] && routeDetailses[routeKey].a && routeDetailses[routeKey].a.stops){
                   tempRoute.routeDetails = routeDetailses[routeKey];
                   finalRoutes.push(tempRoute);
                 }
