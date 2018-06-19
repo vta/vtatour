@@ -181,7 +181,7 @@
           <div class="column1">
             <div class="item no-padding">
               <div class="customPoi-code">Code</div>
-              <div class="customPoi-details">CustomPoi name</div>
+              <div class="customPoi-details">Custom POI name</div>
             </div>
           </div>
           <div class="column2">
@@ -207,7 +207,9 @@
               </div>
             </div>
             <paper-input id="vicinity" value="{{_customPoiInfo.address}}" label="Address" placeholder="Text" required></paper-input>
-            <paper-input id="icon" value="{{_customPoiInfo.icon}}" label="Icon" placeholder="Url" required></paper-input>
+            <!-- <paper-input id="icon" value="{{_customPoiInfo.icon}}" label="Icon" placeholder="Url" required></paper-input> -->
+            <paper-input id="icon" label="Icon PNG file" type="file" placeholder="PNG ICON file upload" on-change="_onIconFileAChange"></paper-input>
+            <img id="imagePreview" src="{{_customPoiInfo.icon}}" style="height:100px;width:100px;" lt="Image Preview">
             <paper-input id="latitude" value="{{_customPoiInfo.latitude}}" label="Latitude" placeholder="Text" required></paper-input>
             <paper-input id="longitude" value="{{_customPoiInfo.longitude}}" label="Longitude" placeholder="Text" required></paper-input>
             <paper-input id="description" value="{{_customPoiInfo.description}}" label="Description" placeholder="Text" required></paper-input>
@@ -220,7 +222,7 @@
         <hr/>
 
         <div class="operations edit-customPoi-operation">
-          <paper-button class="delete-customPoi" on-click="_openDeleteCustomPoiModal">Delete This CustomPoi</paper-button>
+          <paper-button class="delete-customPoi" on-click="_openDeleteCustomPoiModal">Delete This Custom POI</paper-button>
           <a href="{{baseUrl}}customPois" tabindex="-1">
             <paper-button>Cancel</paper-button>
           </a>
@@ -250,12 +252,12 @@
     </paper-dialog>
 
     <paper-dialog id="deleteCustomPoiModal" modal>
-      <h2>Delete this customPoi</h2>
-      <div class="message">Do you want to delete customPoi {{_code}} {{_customPoiInfo.name}}?</div>
+      <h2>Delete this Custom POI</h2>
+      <div class="message">Do you want to delete Custom POI {{_code}} {{_customPoiInfo.name}}?</div>
 
       <div class="buttons">
         <paper-button dialog-dismiss>No</paper-button>
-        <paper-button dialog-confirm autofocus class="primary" on-click="_deleteCustomPoi">Yes, delete customPoi</paper-button>
+        <paper-button dialog-confirm autofocus class="primary" on-click="_deleteCustomPoi">Yes, delete Custom POI</paper-button>
       </div>
     </paper-dialog>
 
@@ -424,7 +426,32 @@
             self._showOperationResultModal(false, error);
             console.log(error);
           });
-      }
+      },
+      _onIconFileAChange: function(event) {
+         var file = event.target.files[0];
+         var preview = document.querySelector('#imagePreview');
+          console.log(file);
+          // var reader = new FileReader();
+          // reader.readAsBinaryString(file);
+          //
+          // reader.onload = function() {
+          //     console.log(btoa(reader.result));
+          // };
+          // reader.onerror = function() {
+          //     console.log('there are some problems');
+          // };
+          var reader  = new FileReader();
+          var self = this;
+          reader.addEventListener("load", function () {
+            console.log(reader.result);
+            preview.src = reader.result;
+            self._customPoiInfo.icon = reader.result;
+          }, false);
+
+          if (file) {
+            reader.readAsDataURL(file);
+          }
+      },
     });
   })();
   </script>

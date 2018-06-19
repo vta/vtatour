@@ -107,12 +107,12 @@
       @media all and (min-width: 600px) and (orientation: landscape) {
         .poi-wrapper{
           position: absolute;
-          top: -20px;
+          top: 30px;
           left: 0;
           width: 100%;
           @apply(--layout-horizontal);
           background-color: var(--vta-light-gray);
-          z-index: 100;
+          z-index: 10000002 !important;
         }
 
         poi-list,
@@ -371,6 +371,8 @@
                         >
                         <span style="display:none">[[stopObj.sec]]</span>
                         <h2>[[stopObj.name]]</h2>
+                        <span>Connections: [[stopObj.route_list]]</span><br/>
+                        <span>Amenities: N/A</span>
                       </google-map-marker>
                   </template>
                 </template>
@@ -378,7 +380,7 @@
 
             <template is="dom-repeat" items="{{_pois}}" as="poi">
               <google-map-marker latitude="{{poi.latitude}}" longitude="{{poi.longitude}}"
-                click-events on-google-map-marker-click="_onPoiClick" icon="/images/poi-pointer.png">
+                click-events on-google-map-marker-click="_onPoiClick" icon="{{_getPoiIcon()}}">
                 <h2>{{poi.name}}</h2>
                 <span>{{poi.formatted_address}}</span>
               </google-map-marker>
@@ -398,11 +400,11 @@
               </google-map-marker>
             </template>
             <template is="dom-repeat" items="{{_customPois}}" as="_customPoi">
-                <template is="dom-if" if="[[_isValidCords(_customPoi.lat,_customPoi.lng)]]">
+                <template is="dom-if" if="[[_isValidCords(_customPoi.latitude,_customPoi.longitude)]]">
                     <google-map-marker latitude="{{_customPoi.latitude}}" longitude="{{_customPoi.longitude}}"
-                      click-events on-google-map-marker-click="_onPoiClick" icon="/images/poi-pointer.png">
-                      <h2>{{poi.name}}</h2>
-                      <!-- <span>{{poi.formatted_address}}</span> -->
+                      click-events on-google-map-marker-click="_onPoiClick" icon="{{_getCustomPoiIcon(_customPoi.icon)}}">
+                      <h2>{{_customPoi.name}}</h2>
+                      <span>{{_customPoi.address}}</span>
                     </google-map-marker>
                 </template>
             </template>
@@ -1375,17 +1377,12 @@ var map;
           this._selectedPoiMarker = e.srcElement;
         },
         _onStopIconClick : function(e){
-          //spcl_console.log ('check stop click even');
-          //spcl_console.log (e);;
-          var sourceElement = e.srcElement;
-          var sec = sourceElement.childNodes[1].innerText;
-          //spcl_console.log ('clicked station sec: '+sec);
-          if(sec){
-              this.player.currentTime(sec);
-          }
-          this._onPoiClick(e);
-
-          //this._selectedPoiMarker = e.srcElement;
+          // var sourceElement = e.srcElement;
+          // var sec = sourceElement.childNodes[1].innerText;
+          // if(sec){
+          //     this.player.currentTime(sec);
+          // }
+          // this._onPoiClick(e);
         },
 
         _selectedPoiChange: function(newSelectedPoi) {
@@ -1618,6 +1615,32 @@ var map;
            null, //anchor
            new google.maps.Size(20, 20)
           );
+        },
+        _getPoiIcon:function(url){
+          if(!url){
+            url = '/images/custom_poi.png';
+          }
+          return new google.maps.MarkerImage(
+           url, //url
+           null, //size
+           null, //origin
+           null, //anchor
+           new google.maps.Size(18, 18)
+          );
+        },
+        _getCustomPoiIcon:function(url){
+          if(!url){
+            url = '/images/custom_poi.png';
+            return url;
+          }
+          return url;
+          // return new google.maps.MarkerImage(
+          //  url, //url
+          //  null, //size
+          //  null, //origin
+          //  null, //anchor
+          //  new google.maps.Size(18, 18)
+          // );
         },
         _calculateValidZooomStatus:function(){
           if(this._map.getZoom() >= 14){
