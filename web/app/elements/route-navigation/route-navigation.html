@@ -1631,16 +1631,15 @@ var map;
         _getCustomPoiIcon:function(url){
           if(!url){
             url = '/images/custom_poi.png';
-            return url;
+            //return url;
           }
-          return url;
-          // return new google.maps.MarkerImage(
-          //  url, //url
-          //  null, //size
-          //  null, //origin
-          //  null, //anchor
-          //  new google.maps.Size(18, 18)
-          // );
+          return new google.maps.MarkerImage(
+           url, //url
+           null, //size
+           null, //origin
+           null, //anchor
+           new google.maps.Size(18, 18)
+          );
         },
         _calculateValidZooomStatus:function(){
           if(this._map.getZoom() >= 14){
