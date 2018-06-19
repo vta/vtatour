@@ -1089,23 +1089,65 @@
         var routeDetails = routeInfo.routeDetails;
         delete routeInfo.routeDetails;
         var update = {};
-
-        update['routes/'+code] = routeInfo;
-        update['route-details/'+code] = routeDetails;
-        console.log('check below update deep path');
-        console.log(update)
         //return callback(null,true);
         //firebase.database().ref().update(update);
         var firebaseDb = this.$.routeInfo.db;
         var firebaseDbRef = firebaseDb.ref();
-        firebaseDbRef.update(update, function(error) {
-          if (error) {
-            console.log("Error updating data:", error);
-          }else{
-            console.log('Write Success');
-          }
-          return callback(null,true);
-        });
+        self.$.routeDetails.getStoredValue('/route-details/' + code)
+          .then(function(data) {
+            if(data && data.a){
+              if(data.a.videoGeoPoints && data.a.videoGeoPoints.length){
+                  routeDetails.a.videoGeoPoints = data.a.videoGeoPoints;
+              }
+              routeDetails.a.videoUrl = data.a.videoUrl || "";
+              routeDetails.a.videoLeftUrl = data.a.videoLeftUrl || "";
+              routeDetails.a.videoRightUrl = data.a.videoRightUrl || "";
+              routeDetails.a.videoBackUrl = data.a.videoBackUrl || "";
+              routeDetails.a.videoNightUrl = data.a.videoNightUrl || "";
+              if(routeDetails.a && routeDetails.a.stops && routeDetails.a.stops.length){
+                for(var a=0;a<routeDetails.a.stops.length;a++){
+                  var tempStopObject = routeDetails.a.stops[a];
+                    var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.a.videoGeoPoints);
+                    routeDetails.a.stops[a].sec =  parseInt(point.key);
+                }
+              }
+             }
+            if(data && data.b){
+              if(data.b.videoGeoPoints && data.b.videoGeoPoints.length){
+                  routeDetails.b.videoGeoPoints = data.b.videoGeoPoints;
+              }
+              routeDetails.b.videoUrl = data.b.videoUrl || "";
+              routeDetails.b.videoLeftUrl = data.b.videoLeftUrl || "";
+              routeDetails.b.videoRightUrl = data.b.videoRightUrl || "";
+              routeDetails.b.videoBackUrl = data.b.videoBackUrl || "";
+              routeDetails.b.videoNightUrl = data.b.videoNightUrl || "";
+              if(routeDetails.b && routeDetails.b.stops && routeDetails.b.stops.length ){
+                for(var b=0;b<routeDetails.b.stops.length;b++){
+                  var tempStopObject = routeDetails.b.stops[b];
+                  var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.b.videoGeoPoints);
+                  routeDetails.b.stops[b].sec =  parseInt(point.key);
+                }
+              }
+            }
+            update['routes/'+code] = routeInfo;
+            update['route-details/'+code] = routeDetails;
+            console.log('check below update deep path');
+            console.log(update)
+            firebaseDbRef.update(update, function(error) {
+              if (error) {
+                console.log("Error updating data:", error);
+              }else{
+                console.log('Write Success');
+              }
+              return callback(null,true);
+            });
+
+          }).catch(function(error) {
+            console.log(error);
+            return callback(null,true);
+          });
+
+
         // self._routeInfoOrigin = routeInfo;
         // self._routeDetailsOrigin = routeDetails;
         // console.log(self.$.routeInfo);
