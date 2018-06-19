@@ -387,9 +387,9 @@
             </template>
             <template is="dom-repeat" items="{{_meetUps}}" as="meetUpObject">
               <google-map-marker latitude="{{meetUpObject.lat}}" longitude="{{meetUpObject.lon}}"
-                click-events on-google-map-marker-click="_onPoiClick" icon="/images/meetup.png">
-                <h2>{{meetUpObject.name}}</h2>
-                <span>{{meetUpObject.address_1}}</span>
+                click-events on-google-map-marker-click="_onMeetUpClick" icon="/images/meetup.png">
+                <h2><a href="{{meetUpObject.link}}" target="_blank">{{meetUpObject.name}}</a></h2>
+                <span>Members: {{meetUpObject.members}}</span>
               </google-map-marker>
             </template>
             <template is="dom-repeat" items="{{_coords}}" as="cordObject">
@@ -1375,6 +1375,16 @@ var map;
           }
 
           this._selectedPoiMarker = e.srcElement;
+        },
+        _onMeetUpClick : function(e){
+          if(this._selectedPoiMarker){
+            this._selectedPoiMarker.open = false;
+          }
+          this._selectedPoiMarker = e.srcElement;
+          // console.log(e.srcElement);
+          // var element = $(e.srcElement);
+          // var link = element.find('a').attr('href');
+          // window.open(link, '_blank');
         },
         _onStopIconClick : function(e){
           // var sourceElement = e.srcElement;

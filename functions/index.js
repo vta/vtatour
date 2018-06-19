@@ -25,14 +25,15 @@ app.get('/api/meetups/:lat/:lon', (req, res) => {
 
   var options = {
     method: 'GET',
-    url: 'https://api.meetup.com/2/open_venues',
+    url: 'https://api.meetup.com/2/groups/',
     qs: {
       key: config.meetUpApiKey,
-      sign: 'true',
+      // sign: 'true',
       lat: lat,
       lon: lon,
-      'photo-host': 'public',
-      page: '20'
+      radius: '5'
+      // 'photo-host': 'public',
+      // page: '20'
     },
     headers: {
       'cache-control': 'no-cache'
