@@ -760,10 +760,14 @@
              for(var i=0;i<rawRoutesData.length;i++){
                var rawRouteObject = rawRoutesData[i];
                var rawRouteObjectOtherDirection = null;
+               var rawRouteObjectPreviousDirection = null;
                if(rawRoutesData[i+1] && rawRoutesData[i+1].route_id==rawRouteObject.route_id && rawRoutesData[i+1].direction_id==1){
                  rawRouteObjectOtherDirection = rawRoutesData[i+1];
                }
-               if(rawRouteObject.direction_id==0){
+               if(rawRoutesData[i-1] && rawRoutesData[i-1].route_id==rawRouteObject.route_id && rawRoutesData[i-1].direction_id==0){
+                 rawRouteObjectPreviousDirection = rawRoutesData[i-1];
+               }
+               if(rawRouteObject.direction_id==0 || (rawRouteObject.direction_id==0 && rawRouteObjectOtherDirection)){
                  var departure,destination;
                  var sourcedestinationArray = rawRouteObject.route_long_name.split('-');
                  if(sourcedestinationArray.length>1){
@@ -875,6 +879,110 @@
                  if(routeObject.code){
                     routeListArray.push(routeObject);
                  }
+               }else if(rawRouteObject.direction_id==1 && !rawRouteObjectPreviousDirection){
+                 var departure,destination;
+                 var sourcedestinationArray = rawRouteObject.route_long_name.split('-');
+                 if(sourcedestinationArray.length>1){
+                   departure = sourcedestinationArray[0].trim();
+                   destination = sourcedestinationArray[1].trim();
+                 }else{
+                   departure = rawRouteObject.route_long_name.trim();
+                   destination = '';
+                 }
+
+                 var routeObject = {
+                   code:rawRouteObject.route_id,
+                   name:rawRouteObject.route_id+' - '+toTitleCase(rawRouteObject.route_long_name).replace('-',' to '),
+                   departure:toTitleCase(departure),
+                   destination:toTitleCase(destination),
+                   directionAName:'west',
+                   directionBName:'east',
+                   routeDetails: {
+                       a: {
+                         stops: [],
+                         videoGeoPoints: {},
+                         originalVideoGeoPoints: {},
+                         videoId: null,
+                         videoUrl: null
+                       },
+                       b: {
+                         stops: [],
+                         videoGeoPoints: {},
+                         originalVideoGeoPoints: {},
+                         videoId: null,
+                         videoUrl: null
+                       }
+                   }
+                 }
+
+                 var routesStopsArray = [];
+                 if(rawRouteObject.lst_stop_ids){
+                   var parsed1StStopIds = rawRouteObject.lst_stop_ids.split(',')
+                   if(parsed1StStopIds.length){
+                      for(var paredStopIdCount = 0;paredStopIdCount<parsed1StStopIds.length;paredStopIdCount++){
+                        var pasedProcesedStopObject = getStopObject(parsed1StStopIds[paredStopIdCount]);
+                        if(pasedProcesedStopObject){
+                          routesStopsArray.push({
+                            lat:parseFloat(pasedProcesedStopObject.lat),
+                            lng:parseFloat(pasedProcesedStopObject.lng),
+                            name:pasedProcesedStopObject.name,
+                            code:pasedProcesedStopObject.id,
+                            route_list:pasedProcesedStopObject.route_list,
+                            sec:null
+                          })
+                        }
+                      }
+                   }
+                 }
+                 var routesStopsOtherDirectionArray = [];
+                 if(rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.lst_stop_ids){
+                   var parsed1StStopIds = rawRouteObjectOtherDirection.lst_stop_ids.split(',')
+                   if(parsed1StStopIds.length){
+                      for(var paredStopIdCount = 0;paredStopIdCount<parsed1StStopIds.length;paredStopIdCount++){
+                        var pasedProcesedStopObject = getStopObject(parsed1StStopIds[paredStopIdCount]);
+                        if(pasedProcesedStopObject){
+                          routesStopsOtherDirectionArray.push({
+                            lat:parseFloat(pasedProcesedStopObject.lat),
+                            lng:parseFloat(pasedProcesedStopObject.lng),
+                            name:pasedProcesedStopObject.name,
+                            code:pasedProcesedStopObject.id,
+                            route_list:pasedProcesedStopObject.route_list,
+                            sec:null
+                          })
+                        }
+                      }
+                   }
+                 }
+
+                 routeObject.routeDetails.b.stops = routesStopsArray;
+                 var videoCode = routeObject.code;
+                 routeObject.routeDetails.a.videoUrl = "";
+                 routeObject.routeDetails.a.videoLeftUrl = "";
+                 routeObject.routeDetails.a.videoRightUrl = "";
+                 routeObject.routeDetails.a.videoBackUrl = "";
+                 routeObject.routeDetails.a.videoNightUrl = "";
+
+                 routeObject.routeDetails.b.videoUrl = "";
+                 routeObject.routeDetails.b.videoLeftUrl = "";
+                 routeObject.routeDetails.b.videoRightUrl = "";
+                 routeObject.routeDetails.b.videoBackUrl = "";
+                 routeObject.routeDetails.b.videoNightUrl = "";
+
+                 if(rawRouteObject.routeshape){
+                   var geoPointsArrayString = "["+rawRouteObject.routeshape+"]";
+                   var geoPointsArray = eval(geoPointsArrayString);
+                   routeObject.routeDetails.b.videoGeoPoints = objectifyLatLon(geoPointsArray);
+                   routeObject.routeDetails.b.originalVideoGeoPoints = objectifyLatLon(geoPointsArray);
+                   if(geoPointsArray && geoPointsArray.length){
+                     //console.log('check important below');
+                     console.log(geoPointsArray[0]);
+                     routeObject.latitude = geoPointsArray[0].lat;
+                     routeObject.longitude = geoPointsArray[0].lon;
+                   }
+                 }
+                 if(routeObject.code){
+                    routeListArray.push(routeObject);
+                 }
                }
              }
              console.log('check final routes array');
@@ -932,6 +1040,9 @@
           Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
           this._activeRouteCode = activeRoute.getAttribute('data-route-code');
           this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.a.videoGeoPoints;
+          if(!this._videoGeoPointsOrigin.length){
+            this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.b.videoGeoPoints;
+          }
 
         }
       },
