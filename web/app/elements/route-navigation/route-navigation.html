@@ -52,7 +52,7 @@
 
       poi-list,
       poi-detail {
-        background-color: var(--vta-light-gray);
+        background-color: white;
         display: none;
         position: absolute;
         top: -29px;
@@ -65,6 +65,7 @@
       poi-list.active,
       poi-detail.active {
         display: block;
+        background-color: white;
       }
       #route-list-display{
         width:100%;
@@ -129,8 +130,8 @@
         }
         poi-detail {
           @apply(--layout-flex);
-          margin-left: 16px;
-          min-height: 500px;
+          /* margin-left: 16px; */
+          min-height: 600px;
         }
       }
 
@@ -403,8 +404,9 @@
                 <template is="dom-if" if="[[_isValidCords(_customPoi.latitude,_customPoi.longitude)]]">
                     <google-map-marker latitude="{{_customPoi.latitude}}" longitude="{{_customPoi.longitude}}"
                       click-events on-google-map-marker-click="_onPoiClick" icon="{{_getCustomPoiIcon(_customPoi.icon)}}">
-                      <h2>{{_customPoi.name}}</h2>
-                      <span>{{_customPoi.address}}</span>
+                      <h2><a href="{{_getCustomPoiLink(_customPoi.web_link)}}">{{_customPoi.name}}</a></h2><br/>
+                      <span>{{_customPoi.address}}</span><br/>
+                      <span>{{_customPoi.description}}</span><br/>
                     </google-map-marker>
                 </template>
             </template>
@@ -1375,12 +1377,14 @@ var map;
           }
 
           this._selectedPoiMarker = e.srcElement;
+          this._selectedPoiMarker.open = true;
         },
         _onMeetUpClick : function(e){
           if(this._selectedPoiMarker){
             this._selectedPoiMarker.open = false;
           }
           this._selectedPoiMarker = e.srcElement;
+          this._selectedPoiMarker.open = true;
           // console.log(e.srcElement);
           // var element = $(e.srcElement);
           // var link = element.find('a').attr('href');
@@ -1650,6 +1654,14 @@ var map;
            null, //anchor
            new google.maps.Size(18, 18)
           );
+        },
+        _getCustomPoiLink:function(url){
+          if(url && url!=null && url != undefined){
+            return url;
+          }else{
+            return 'javasctipt:void(0)';
+          }
+
         },
         _calculateValidZooomStatus:function(){
           if(this._map.getZoom() >= 14){
