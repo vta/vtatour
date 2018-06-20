@@ -212,6 +212,7 @@
 
       _googleMapResponse: function(event, responseWrapper) {
         console.log('received response from google');
+        console.log(responseWrapper.response);
         if (responseWrapper.response && responseWrapper.response.routes && responseWrapper.response.routes.length > 0) {
           var route = responseWrapper.response.routes[0];
 
