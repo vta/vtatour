@@ -82,7 +82,7 @@
       <div class="header-wrapper">
         <iron-image class="poi-image" src="{{_placeDetailsInfo.imageUrl}}" sizing="cover"></iron-image>
 
-        <a href="{{_directionsUrl}}" tabindex="-1" target="_blank">
+      <a href="{{_directionsUrl}}" tabindex="-1" target="_blank">
           <paper-fab id="getDirections" icon="maps:directions-walk" raised></paper-fab>
         </a>
       </div>
@@ -204,6 +204,7 @@
           };
 
           this.$.mapDirections.startAddress = this.$.mapsUtils.getLatLngObj(this.latOrigin, this.lngOrigin);
+          this._get_direction_url();
         } else{
           this._placeDetailsInfo = null;
           this.$.mapDirections.startAddress = null;
@@ -228,6 +229,48 @@
               '/data=!4m2!4m1!3e2';
           }
         }
+      },
+      _get_direction_url:function(){
+        console.log(this._placeDetailsInfo);
+        var directionsService = new google.maps.DirectionsService();
+        var start = this.$.mapsUtils.getLatLngObj(currentLatForPoi, currentLngForPoi);
+        var end = this._placeDetailsInfo.formatedAddress.replace(/ /g, '+');
+        var request = {
+          origin: start,
+          destination: end,
+          travelMode: 'WALKING'
+        };
+        var self = this;
+        directionsService.route(request, function(result, status) {
+          console.log(result);
+          if (status == 'OK') {
+            console.log('check experimental direction data below');
+            console.log(result);
+            //directionsDisplay.setDirections(result);
+            if(result){
+              var responseWrapper ={
+                response:result
+              }
+              if (responseWrapper.response && responseWrapper.response.routes && responseWrapper.response.routes.length > 0) {
+                var route = responseWrapper.response.routes[0];
+
+                if (route.legs && route.legs.length > 0) {
+                  var leg = route.legs[0];
+
+                  self._walkingDistance = leg.distance.text;
+                  self._walkingTime = leg.duration.text;
+                  self._directionsUrl = 'https://www.google.com/maps/dir/' +
+                    currentLatForPoi + ',' +
+                    currentLngForPoi + '/' +
+                    self._placeDetailsInfo.formatedAddress.replace(/ /g, '+') +
+                    '/data=!4m2!4m1!3e2';
+
+                    //window.open(self._directionsUrl, '_blank');
+                }
+              }
+            }
+          }
+        });
       },
 
       _computeRating : function(rating) {

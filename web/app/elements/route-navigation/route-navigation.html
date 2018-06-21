@@ -521,6 +521,8 @@
 
 <script>
 var map;
+var currentLatForPoi = null;
+var currentLngForPoi = null;
 	(function() {
     'use strict';
     try{
@@ -1114,6 +1116,16 @@ var map;
           var self = this;
 
           this.player.pause();
+          //alert();
+          if(!this._currentLat && !this._currentLng){
+              var point = this._routeDetails.videoGeoPoints[0];
+              this._currentLat = parseFloat(point.lat);
+              this._currentLng = parseFloat(point.lng);
+               currentLatForPoi = this._currentLat;
+               currentLngForPoi = this._currentLng;
+          }
+           currentLatForPoi = this._currentLat;
+           currentLngForPoi = this._currentLng;
           //this.$.routeVideo.pause();
           if(this.$.mapsUtils && this._mapsApiLoaded && this._map){
             this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);

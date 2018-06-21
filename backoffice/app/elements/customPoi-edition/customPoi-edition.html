@@ -366,7 +366,8 @@
             return false;
           }
         var update = {};
-        update['customPois/'+code] = this._customPoiInfo;
+        update['customPois/'+code] = null;
+        update['customPois/'+this._customPoiInfo.code] = this._customPoiInfo;
         console.log('check below update deep path data');
         console.log(update);
         var firebaseDb = this.$.customPoiInfo.db;
