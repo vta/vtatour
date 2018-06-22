@@ -7,7 +7,7 @@
     </style>
 
     <google-map
-      api-key="AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0"
+      api-key="[[_google_api_key]]"
       id="map"
       map="{{_map}}"
       additional-map-options='{"zoomControl":"true"}'
@@ -59,6 +59,10 @@
           },
           _zoomLevel:{
             type: Number
+          },
+          _google_api_key: {
+            type: String,
+            value:window.env.keys.google_map_api_key
           },
         },
 

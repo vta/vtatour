@@ -312,7 +312,7 @@
           <google-map-search
             id="search"
             map="[[_map]]"
-            api-key="AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0"
+            api-key="[[_google_api_key]]"
             radius="3000"
             results="{{_pois}}"
             mapType="satellite"
@@ -321,7 +321,7 @@
 
           <google-map id="map"
             map="{{_map}}"
-            api-key="AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0"
+            api-key="[[_google_api_key]]"
             additional-map-options='{"zoomControl":"true"}'
             mapType="satellite"
             disable-zoom>
@@ -392,7 +392,7 @@
             </template>
           </google-map>
         </div>
-        <google-maps-api api-key="AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0" library-loaded="{{_mapsApiLoaded}}" on-api-load="_onMapsApiLoad"></google-maps-api>
+        <google-maps-api api-key="[[_google_api_key]]" library-loaded="{{_mapsApiLoaded}}" on-api-load="_onMapsApiLoad"></google-maps-api>
       </div>
 
       <div class="poi-wrapper">
@@ -623,7 +623,11 @@ var map;
           _directions:{
             type: Array,
             value: []
-          }
+          },
+          _google_api_key: {
+            type: String,
+            value:window.env.keys.google_map_api_key
+          },
         },
 
         SECONDS_INTERVAL_FOR_STOPS : 10,

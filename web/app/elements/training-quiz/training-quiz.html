@@ -342,18 +342,7 @@
           <div class="container quiz-area">
           	<div class="panel-body style-scope training-quiz">
             <div class="col-md-6 col-xs-12 map_wrapper">
-              <!-- <template is="dom-if" if="[[_currentQA.lat]]"> -->
               <route-map id="routeMap" geo-points="{{_currentQA.geoPoints}}"></route-map>
-              <!-- <google-map
-                api-key="AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0"
-                additional-map-options='{"zoomControl":"true"}'
-                latitude="[[_currentQA.lat]]"
-                longitude="[[_currentQA.lng]]"
-                mapType="satellite"
-                zoom="15"
-                >
-              </google-map> -->
-              <!-- </template> -->
             </div>
             <div class="col-md-6 col-xs-12 question_wrapper">
                     <div class="style-scope training-quiz">
@@ -362,9 +351,6 @@
                         <template is="dom-repeat" items="[[_currentQA.options]]" as="optionItem" >
                           <span class="style-scope training-quiz quiz2">
                               <input id="answer_option_[[index]]" name="optionAnswer" type="radio" value="[[index]]" class="optionAnswer clearAbleCheck"/> [[optionItem.name]]
-                          <!-- <template is="dom-if" if="[[optionItem.isCorrect]]">
-                               <span> -- Right Answer</span>
-                          </template> -->
                           <template is="dom-if" class="style-scope training-quiz"></template>
                           </span>
                           <br class="style-scope training-quiz">
@@ -425,37 +411,7 @@
 
         </div>
 
-    <!-- <template is="dom-if" if="[[_qa.length]]">
-      <template is="dom-repeat" items="[[_qa]]" as="qaItem" >
-        <div class="panel-body">
-            <div>
-              <h3>Q[[_getQuestionNumber(index)]]: [[qaItem.questionText]]</h3>
-              <div>
-              <template is="dom-repeat" items="[[qaItem.options]]" as="optionItem" >
-                  <span>[[_getQuestionNumber(index)]]) [[optionItem.name]]
-                  <template is="dom-if" if="[[optionItem.isCorrect]]">
-                       <span> -- Right Answer</span>
-                  </template>
-                  </span>
-                    <br/>
-              </template>
-
-              </div>
-            </div>
-
-        </div>
-      </template>
-    </template> -->
-
-
-        <!-- <template is="dom-if" if="{{_sameStops}}">
-          <div class="route-selection-message">
-            Please select different departure and destination stops to start the tour.
-          </div>
-        </template> -->
       </div>
-
-      <!-- <paper-fab id="viewRide" label="View Route" raised disabled on-click="_onGoClick"></paper-fab> -->
 
       <paper-dialog id="saveOperationResultModal" modal>
         <template is="dom-if" if="{{_operationSuccess}}">
