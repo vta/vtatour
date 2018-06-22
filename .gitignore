@@ -10,4 +10,4 @@ ehthumbs.db
 # Deploy
 dist
 .firebaserc
-./web/app/elements/config-store/*
+/web/app/elements/config-store/
