@@ -58,9 +58,9 @@
         top: -29px;
         left: 0;
         width: 100%;
-        min-height: 110%;
+        min-height: 100%;
         /* margin-bottom: 56px; */
-        z-index: 999;
+        z-index: 99999999;
       }
 
       poi-list.active,
@@ -223,6 +223,10 @@
           margin-top: 4px !important;
           margin-left: -25px !important;
         }
+        poi-list,
+        poi-detail {
+            top:1px;
+          }
 
       }
       .fullscreen-button{
@@ -249,6 +253,10 @@
           margin-top: 9px !important;
           margin-left: -25px !important;
         }
+        poi-list,
+        poi-detail {
+            top:1px;
+          }
 
 
       }
@@ -273,6 +281,7 @@
         path="/customPois"
         data="{{_customPoisOrigin}}">
       </firebase-query>
+
       <template is="dom-if" if="[[_routeInfo]]" >
       <div class="top-header">
               <div class="container-fluid header-area">
@@ -308,7 +317,7 @@
           <google-map-search
             id="search"
             map="[[_map]]"
-            api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"
+            api-key="[[_google_api_key]]"
             radius="3000"
             results="{{_pois}}"
             mapType="satellite"
@@ -317,7 +326,7 @@
 
           <google-map id="map"
             map="{{_map}}"
-            api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4"
+            api-key="[[_google_api_key]]"
             additional-map-options='{"zoomControl":"true"}'
             mapType="satellite"
             disable-zoom>
@@ -414,7 +423,7 @@
             </template>
           </google-map>
         </div>
-        <google-maps-api api-key="AIzaSyCRa-TDLoCJRQmekLjUiU5tI9HXnWijLu4" library-loaded="{{_mapsApiLoaded}}" on-api-load="_onMapsApiLoad"></google-maps-api>
+        <google-maps-api api-key="[[_google_api_key]]" library-loaded="{{_mapsApiLoaded}}" on-api-load="_onMapsApiLoad"></google-maps-api>
       </div>
 
       <div class="poi-wrapper">
@@ -522,6 +531,7 @@
 </dom-module>
 
 <script>
+var key = "AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0";
 var map;
 var currentLatForPoi = null;
 var currentLngForPoi = null;
@@ -663,6 +673,10 @@ var currentLngForPoi = null;
           },
           _direction: {
             type: Boolean
+          },
+          _google_api_key: {
+            type: String,
+            value:window.env.keys.google_map_api_key
           },
         },
 
@@ -1601,9 +1615,10 @@ var currentLngForPoi = null;
           $('#backBtn').click();
         },
         ready: function() {
+
           var self = this;
           setTimeout(function(){
-            self._bingVideo()
+            self._bingVideo();
           }, 1000);
 
           $(document).ready(function(e){
@@ -1617,8 +1632,24 @@ var currentLngForPoi = null;
             //   'background':'#44B5E3',
             //   'height':'20px'
             // })
+            $(window).resize(function(e){
+                // console.log(e);
+                // console.log('width below');
+                // console.log($(window).width());
+                var screenWidth = $(window).width();
+                if(screenWidth>600){
+                  self.isDesktop = true;
+                  if($('#pois').hasClass('active')){
+                    self.$.poiDetails.classList.add('active');
+                  }
+                }else{
+                  self.isDesktop = false;
+                    //self.$.poiDetails.classList.remove('active');
+                }
+            });
 
-          })
+          });
+
         },
         _isValidCords:function(lat,lng){
           if(isNaN(parseFloat(lat))){

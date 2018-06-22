@@ -1,0 +1,28 @@
+<dom-module id="config-store">
+  <template>
+  </template>
+  <script>
+  var keys = {
+    dev:{
+        google_map_api_key:"",
+    },
+    prod:{
+        google_map_api_key:"",
+    }
+  };
+  window.env = {
+    keys:{}
+  }
+  var host = window.location.hostname;
+  if(host=='localhost'){
+    window.env.keys = keys.dev;
+  }else{
+    window.env.keys = keys.prod;
+  }
+  Polymer({
+      is: 'config-store',
+      properties : {
+      },
+    });
+  </script>
+</dom-module>
