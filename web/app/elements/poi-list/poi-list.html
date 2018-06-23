@@ -98,7 +98,10 @@
         this.$.poisFilter.clearFilter();
         setTimeout(function(){
           if($('.paperListItem').length){
-            $('.paperListItem').eq(0).click()
+            var screenWidth = $(window).width();
+            if(screenWidth>600){
+              $('.paperListItem').eq(0).click();
+            }
           }
         }, 1000);
       },
