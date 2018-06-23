@@ -52,14 +52,14 @@
         --iron-icon-height: 40px;
         --iron-icon-width: 40px;
       }
-    
+
     </style>
     <div class="poi-filter-wrapper">
       <poi-filter id="poisFilter" label="Category" pois="{{pois}}" selected-filter="{{_selectedPoiFilter}}"></poi-filter>
     </div>
 
     <template id="poisList" is="dom-repeat" items="{{pois}}" as="poi" filter="_filterPois">
-      <paper-item on-click="_onPoiClick">
+      <paper-item on-click="_onPoiClick" class="paperListItem">
         <iron-image src="{{poi.imageUrl}}" preload sizing="cover" item-icon placeholder="data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5b3V0cyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgOTYgNzIiPjxkZWZzPjxzdHlsZT4uY2xzLTF7b3BhY2l0eTowLjU0O30uY2xzLTJ7ZmlsbDojZGJkYmRkO30uY2xzLTN7ZmlsbDojZmZmO308L3N0eWxlPjwvZGVmcz48dGl0bGU+aW1hZ2VuX2RlZmF1bHRfc21hbGw8L3RpdGxlPjxyZWN0IGNsYXNzPSJjbHMtMiIgd2lkdGg9Ijk2IiBoZWlnaHQ9IjcyIi8+PHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjEwLjkzIDQ5LjUxIDg0LjM2IDQ5LjUxIDc4Ljc2IDI4LjM3IDcyLjk2IDMzLjczIDY2LjExIDIyLjAyIDMzLjUgNDEuNzYgMjAuNzkgMzcuMDQgMTAuOTMgNDkuNTEiLz48ZWxsaXBzZSBjbGFzcz0iY2xzLTMiIGN4PSIzMy41MSIgY3k9IjI3LjQxIiByeD0iNS4yIiByeT0iNS4xNCIvPjwvc3ZnPg=="></iron-image>
         <paper-item-body two-line>
           <div class="name">{{poi.name}}</div>
@@ -96,6 +96,11 @@
       _poisChange: function(newPois) {
         this._selectedPoiFilter = '';
         this.$.poisFilter.clearFilter();
+        setTimeout(function(){
+          if($('.paperListItem').length){
+            $('.paperListItem').eq(0).click()
+          }
+        }, 1000);
       },
 
       _computeRating : function(rating) {
