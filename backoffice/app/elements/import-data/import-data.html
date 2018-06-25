@@ -680,6 +680,7 @@
                    type:rawStopObject.stop_type,
                    id:rawStopObject.stop_id,
                    code:rawStopObject.stop_code,
+                   stop_code:rawStopObject.stop_code,
                    route_list:route_list
                  }
                  if(stopObject.id){
@@ -815,6 +816,7 @@
                             lng:parseFloat(pasedProcesedStopObject.lng),
                             name:pasedProcesedStopObject.name,
                             code:pasedProcesedStopObject.id,
+                            stop_code:pasedProcesedStopObject.stop_code,
                             route_list:pasedProcesedStopObject.route_list,
                             sec:null
                           })
@@ -834,6 +836,7 @@
                             lng:parseFloat(pasedProcesedStopObject.lng),
                             name:pasedProcesedStopObject.name,
                             code:pasedProcesedStopObject.id,
+                            stop_code:pasedProcesedStopObject.stop_code,
                             route_list:pasedProcesedStopObject.route_list,
                             sec:null
                           })
@@ -927,6 +930,7 @@
                             lng:parseFloat(pasedProcesedStopObject.lng),
                             name:pasedProcesedStopObject.name,
                             code:pasedProcesedStopObject.id,
+                            stop_code:pasedProcesedStopObject.stop_code,
                             route_list:pasedProcesedStopObject.route_list,
                             sec:null
                           })
@@ -946,6 +950,7 @@
                             lng:parseFloat(pasedProcesedStopObject.lng),
                             name:pasedProcesedStopObject.name,
                             code:pasedProcesedStopObject.id,
+                            stop_code:pasedProcesedStopObject.stop_code,
                             route_list:pasedProcesedStopObject.route_list,
                             sec:null
                           })
@@ -1096,7 +1101,7 @@
         self.$.routeDetails.getStoredValue('/route-details/' + code)
           .then(function(data) {
             if(data && data.a){
-              if(data.a.videoGeoPoints && data.a.videoGeoPoints.length){
+              if(data.a.videoGeoPoints){
                   routeDetails.a.videoGeoPoints = data.a.videoGeoPoints;
               }
               routeDetails.a.videoUrl = data.a.videoUrl || "";
@@ -1113,7 +1118,7 @@
               }
              }
             if(data && data.b){
-              if(data.b.videoGeoPoints && data.b.videoGeoPoints.length){
+              if(data.b.videoGeoPoints){
                   routeDetails.b.videoGeoPoints = data.b.videoGeoPoints;
               }
               routeDetails.b.videoUrl = data.b.videoUrl || "";

@@ -275,6 +275,10 @@
         id="routeInfo"
         data="{{_routeInfoOrigin}}">
       </firebase-document>
+      <firebase-document
+        app-name="vta"
+        id="customQueryObject">
+      </firebase-document>
       <firebase-query
         app-name="vta"
         id="query"
@@ -377,14 +381,16 @@
             <template is="dom-repeat" items="[[_routeDetails.stops]]" as="stopObj">
                 <template is="dom-if" if="[[_isValidCords(stopObj.lat,stopObj.lng)]]">
                   <template is="dom-if" if="[[_isInValidRange(stopObj.sec)]]">
-                      <google-map-marker latitude="[[stopObj.lat]]" longitude="[[stopObj.lng]]" data-sec="[[stopObj.sec]]"
+                      <google-map-marker latitude="[[stopObj.lat]]" longitude="[[stopObj.lng]]" data-sec="[[stopObj.sec]]" data-code="[[stopObj.code]]"
                         click-events on-google-map-marker-click="_onStopIconClick" icon="{{_getStopIcon()}}"
                         hidden$="{{!_isValidZoom}}"
                         >
                         <span style="display:none">[[stopObj.sec]]</span>
                         <h2>[[stopObj.name]]</h2>
                         <span>Connections: [[stopObj.route_list]]</span><br/>
-                        <span>Amenities: N/A</span>
+                        <div style="height:50px;">Amenities:
+                          <span id="stop_amenities_[[stopObj.stop_code]]" class="amenities_list" data-code="[[stopObj.stop_code]]">N/A</span>
+                        </div>
                       </google-map-marker>
                   </template>
                 </template>
@@ -1418,6 +1424,54 @@ var currentLngForPoi = null;
           // window.open(link, '_blank');
         },
         _onStopIconClick : function(e){
+          var sourceElement = e.srcElement;
+          var element = $(e.srcElement);
+          var toTitleCase = function(str) {
+              return str.replace(
+                  /\w\S*/g,
+                  function(txt) {
+                      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                  }
+              );
+          }
+          console.log(element);
+          console.log('check below stop code');
+          console.log(element.find('.amenities_list'));
+          if(element.find('.amenities_list').length){
+            var code = parseInt(element.find('.amenities_list')[0].dataCode);
+            console.log(code);
+            // return false;
+            //code = 60001;
+            this.$.customQueryObject.getStoredValue('/amenities/' + code)
+              .then(function(data) {
+                console.log('Got aminities data')
+                console.log(data)
+                if(data && data.list){
+                  var amenities_list = data.list;
+                  var amenities_list_string  = "";
+                  for(var i=0;i<amenities_list.length;i++){
+                    var aminity_key_value_pair = "";
+                    if(amenities_list[i].value && amenities_list[i].enabled){
+                      var key = amenities_list[i].key;
+                      if(key){
+                        key = toTitleCase(key.split('_').join(' '));
+                      }
+                      var value = amenities_list[i].value;
+                      aminity_key_value_pair = key+": "+value+", ";
+                    }
+                    // if(amenities_list[i].enabled){
+                    //   aminity_key_value_pair = '<span style="color:green">'+aminity_key_value_pair+"</span>";
+                    // }
+                    amenities_list_string+=aminity_key_value_pair;
+                  }
+                  $("#stop_amenities_"+code).html(amenities_list_string);
+                }
+              }).catch(function(error) {
+                console.log(error);
+              });
+          }
+
+
           // var sourceElement = e.srcElement;
           // var sec = sourceElement.childNodes[1].innerText;
           // if(sec){

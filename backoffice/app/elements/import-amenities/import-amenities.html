@@ -1,0 +1,705 @@
+<dom-module id="import-amenities">
+  <template>
+    <style is="custom-style" include="shared-styles"></style>
+    <style>
+      .item-wrapper,
+      .header {
+        border-bottom: 1px solid #ccc;
+      }
+      hr {
+
+        border-color: var(--primary-color);
+      }
+
+      .item-wrapper:hover {
+        background-color: var(--vta-light-gray);
+      }
+
+      .item-wrapper.active:hover {
+        background-color: var(--vta-white);
+      }
+
+      .item {
+        padding: 12px 5% 0;
+        @apply(--layout-horizontal);
+        font-size: 1.05em;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .item {
+        color: var(--primary-color);
+      }
+
+      .header {
+        padding: 20px 5% 18px;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+
+      .route-code,.stop-code {
+        min-width: 10%;
+        padding: 0 20px;
+        font-weight: bold;
+      }
+
+      .item-wrapper.active .route-name,.item-wrapper.active .stop-name {
+        margin-bottom: 20px;
+      }
+
+      .route-details,.stop-details {
+        @apply(--layout-flex);
+      }
+
+      .route-operations,.stop-operations {
+        padding: 0 20px;
+        margin-top: -12px;
+      }
+
+      paper-fab {
+        position: absolute;
+        right: 8%;
+        top: -28px;
+      }
+
+      paper-button {
+        top: 2px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--secondary-text-color);
+      }
+
+      paper-button iron-icon {
+        --iron-icon-height: 40px;
+        --iron-icon-width: 40px;
+      }
+
+      .route-departure-destination, .stop-departure-destination,.stop-list-listing {
+        margin-bottom: 20px;
+        display: none;
+        color: var(--secondary-text-color);
+      }
+
+      .item-wrapper.active .route-departure-destination, .item-wrapper.active .stop-departure-destination, .item-wrapper.active .stop-list-listing {
+        @apply(--layout-horizontal);
+      }
+
+      .route-departure,
+      .route-destination,.stop-lat,
+      .stop-lng {
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+      }
+
+      .route-detail-header,.stop-lat-header {
+        font-weight: bold;
+        margin-right: 30px;
+      }
+
+      .edit-route-operation,.stop-route-operation {
+        display: none;
+        padding: 21px 5%;
+        font-size: 1.4em;
+        text-transform: capitalize;
+        text-align: right;
+      }
+
+      .item-wrapper.active paper-button iron-icon.expand,
+      .item-wrapper paper-button iron-icon.collapse,
+      .route-map-template,
+      .stop-map-template,
+      .item-wrapper route-map {
+        display: none;
+      }
+
+      .item-wrapper paper-button iron-icon.expand,
+      .item-wrapper.active paper-button iron-icon.collapse,
+      .item-wrapper.active route-map,
+      .item-wrapper.active .edit-route-operation {
+        display: block;
+      }
+      #byte_content {
+        margin: 5px 0;
+        max-height: 100px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      #byte_range { margin-top: 5px; }
+      .loadButtons{
+            width: 12%;
+            background: gainsboro;
+      }
+      .add-stop-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+        float: left;
+      }
+
+      .add-stop-wrapper paper-button {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.2em .6em;
+        width: 167px;
+
+      }
+      .clear-break{
+        clear:both;
+      }
+
+      paper-toolbar {
+        --paper-toolbar-background: var(--paper-blue-900);
+      }
+      paper-button.primary {
+        color: var(--primary-color);
+        font-size: 22px;
+      }
+      .column1 {
+        width: 50%;
+        padding: 0 20px 0 0;
+        margin-right: 16%;
+      }
+
+      .column-container {
+        width: 35%;
+      }
+      .stop-list-listing{
+        margin-left: 0px;
+        padding-left: 0px;
+        width: 100%;
+      }
+      .download-icon{
+        height: 20px;
+      }
+
+      #saveOperationResultModal {
+        width: auto;
+        background-color: transparent;
+        color: var(--vta-white);
+        box-shadow: none;
+      }
+
+      #saveOperationResultModal .icon {
+        text-align: center;
+      }
+
+      #saveOperationResultModal iron-icon {
+        width: 140px;
+        height: 140px;
+        padding: 20px;
+        text-align: center;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+      }
+
+      #saveOperationResultModal .message-wrapper.success iron-icon {
+        background-color: var(--primary-color);
+      }
+
+      #saveOperationResultModal .message-wrapper.error iron-icon {
+        background-color: var(--secondary-color);
+      }
+
+      #saveOperationResultModal .message {
+        text-align: center;
+        font-size: 2.5em;
+        line-height: 1;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+    </style>
+
+    <firebase-document
+      app-name="vta"
+      id="amenities">
+    </firebase-document>
+
+
+    <div class="inner-content">
+      <h2 class="page-title">Amenities</h2>
+
+      <div>
+        &nbsp;Select Amenities List File:  <input type="file" id="amenities_list" name="amenities_list" />
+        <br/>
+
+        <div class="add-stop-wrapper">
+        <paper-button on-click="_readAmenities" >
+          <iron-icon icon="file-download" class="download-icon"></iron-icon>Load Amenities
+        </paper-button>
+       </div>
+      </div>
+      <br/><br/>
+
+      <br/><br/>
+      <div class="clear-break" id="main_amenities_updater">
+        <paper-button  on-click="_batchImportRoutesListData" class="primary">Batch Import / Save</paper-button>
+      </div>
+      <paper-material elevation="1">
+        <paper-tabs scrollable fit-container>
+          <paper-tab>Amenities</paper-tab>
+        </paper-tabs>
+        <template is="dom-if" if="{{_amenitiesFields.length}}">
+          <template is="dom-repeat" items="{{_amenitiesFields}}" as="item">
+            <span style="border-style: solid;margin-right: 0px;">
+              <input id="[[item.key]]" type="checkbox" name="item.enabled" value="{{item.enabled}}" data-index="[[index]]" checked="[[item.enabled]]" on-change="_changeFieldValue"> [[item.key]]
+            </span>
+          </template>
+          <br/>  <br/>
+          <div class="add-stop-wrapper">
+          <paper-button on-click="_setAmenitiesFields" >
+            Apply Field Changes
+          </paper-button>
+          </div>
+          <br/><br/><br/>
+        </template>
+          <div class="item header">
+            <div class="route-code">Stop Code</div>
+            <div class="route-details">Amenities</div>
+            <div class="route-operations">
+            </div>
+          </div>
+
+          <template is="dom-repeat" items="[[_amenities]]" as="amenitiyObject" >
+            <div class="item-wrapper" data-stop-index$="[[index]]" data-stop-code$="[[amenitiyObject.stop_code]]">
+              <div class="item stop">
+                <div class="stop-code">[[amenitiyObject.stop_code]]</div>
+                <div class="stop-details">
+                  <div class="stop-name">Click on Down Arrow to See All Amenities for this Stop </div>
+                  <div class="stop-departure-destination">
+                    <div class="stop-departure-destination">
+                      <div class="stop-lng">
+                        <div class="stops-wrapper">
+                          <h3>Amenities List</h3>
+                          <div class="stop-list">
+                            <div role="listbox">
+                              <span id="amenities_list_[[index]]"> </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="stop-operations">
+                  <paper-button on-click="_toggleStop" data-stop-index$="[[index]]">
+                    <iron-icon class="expand" icon="icons:expand-more"></iron-icon>
+                    <iron-icon class="collapse" icon="icons:expand-less"></iron-icon>
+                  </paper-button>
+                </div>
+              </div>
+              <div class="stop-map"></div>
+            </div>
+          </template>
+      </paper-material>
+    </div>
+    <paper-dialog id="saveOperationResultModal" modal>
+      <template is="dom-if" if="{{_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:check"></iron-icon>
+          </div>
+          <div class="message">Done</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+      <template is="dom-if" if="{{!_operationSuccess}}">
+        <div class="message-wrapper success">
+          <div class="icon">
+            <iron-icon icon="icons:cached"></iron-icon>
+          </div>
+          <div class="message">Processing...</div>
+          <div class="">{{_operationMessageDetail}}</div>
+        </div>
+      </template>
+    </paper-dialog>
+    <maps-utils id="mapsUtils"></maps-utils>
+    <kml-parser id="tempKmlParser"></kml-parser>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'import-amenities',
+
+      properties: {
+
+        _imported_amenities: {
+          type: Array,
+          value: []
+        },
+        _amenities: {
+          type: Array,
+          value: []
+        },
+        _amenitiesOrigin : {
+          type: Array,
+          observer: '_amenitiesOriginChange'
+        },
+        _amenitiesFields: {
+          type: Array,
+          value: []
+        },
+        _amenitiesFieldsOrigin : {
+          type: Array,
+          observer: '_amenitiesFieldsOriginChange'
+        },
+        _activeStopCode: {
+          type: String,
+          value: ''
+        },
+      },
+      _amenitiesOriginChange: function(newAmenitiesOrigin, oldData) {
+        console.log('check below main data')
+        console.log(newAmenitiesOrigin);
+        console.log(oldData)
+        if (newAmenitiesOrigin ) {
+          this._amenities = newAmenitiesOrigin;
+        }
+      },
+      _amenitiesFieldsOriginChange: function(newAmenitiesFieldsOrigin, oldData) {
+        console.log('check below heads')
+        console.log(newAmenitiesFieldsOrigin);
+        if (newAmenitiesFieldsOrigin ) {
+          this._amenitiesFieldsOrigin = newAmenitiesFieldsOrigin;
+        }
+      },
+      _showOperationResultModal: function(isSuccess, operationDetailMessage) {
+
+        if($('#main_amenities_updater').is(":visible") != true){
+          return false;
+        }
+        this.$.saveOperationResultModal.open();
+        var self = this;
+        this._operationSuccess = isSuccess;
+        this._operationMessageDetail = operationDetailMessage;
+      },
+      _closeOperationResultModal: function() {
+        this.$.saveOperationResultModal.close();
+      },
+
+      _setAmenities : function(amenitiesArray){
+        this._imported_amenities = amenitiesArray;
+        this._amenities = this._imported_amenities;
+        this.selectedTab = 0;
+        this.$.saveOperationResultModal.close();
+        this._showOperationResultModal(true,"Amenities list data loaded, You can now select fields that will be shown in route navigation page");
+        var self = this;
+        setTimeout(function(){
+           self.$.saveOperationResultModal.close();
+        }, 1000);
+      },
+      _setFields : function(headings){
+        var procesedHeadings = [];
+        for(var c=0;c<headings.length;c++){
+          var fieldObject = {
+            key:headings[c],
+            enabled:true
+          };
+          procesedHeadings.push(fieldObject);
+        }
+        this._amenitiesFields = procesedHeadings;
+      },
+      _readAmenities:function(opt_startByte,opt_stopByte){
+        var files = document.getElementById('amenities_list').files;
+         if (!files.length) {
+           this.$.saveOperationResultModal.close();
+           alert('Please select a csv file!');
+           return;
+         }
+         this._showOperationResultModal(false,"Amenities list data gettnig loaded, it will take a while...");
+
+         var file = files[0];
+         var start = 0;
+         var stop = file.size - 1;
+         var reader = new FileReader();
+         var thisPolyMerObject = this;
+         // If we use onloadend, we need to check the readyState.
+         reader.onloadend = function(evt) {
+           if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+             //document.getElementById('byte_content').textContent = evt.target.result;
+             //this._imported_routes = JSON.parse(evt.target.result);
+             if(!evt.target.result){
+               this.$.saveOperationResultModal.close();
+               alert('please select valid amenities list csv file');
+               return false;
+             }
+             var rawCsvAmenitiesArray = thisPolyMerObject.CSVtoArray(evt.target.result)
+             console.log('Check amenities Data');
+             console.log(rawCsvAmenitiesArray);
+             var processedAminities = [];
+             if(rawCsvAmenitiesArray.length && rawCsvAmenitiesArray.length>1){
+                var heading = rawCsvAmenitiesArray[0];
+                thisPolyMerObject._setFields(heading);
+                // console.log('check heading');
+                // console.log(heading);
+                rawCsvAmenitiesArray.shift();
+               for(var i=0;i<rawCsvAmenitiesArray.length;i++){
+                 // console.log('check raw object');
+                 // console.log(rawCsvAmenitiesArray[i]);
+                 if(rawCsvAmenitiesArray[i] && rawCsvAmenitiesArray[i].length==heading.length){
+                   var aminityObject = {
+                      list:[]
+                   };
+                   for(var h=0;h<heading.length;h++){
+                     var keyValuePair = {
+                      key:heading[h],
+                      value:rawCsvAmenitiesArray[i][h],
+                      enabled:true
+                     }
+                     if(keyValuePair.key=='rtiid'){
+                       aminityObject.stop_code = keyValuePair.value;
+                     }
+                     aminityObject.list.push(keyValuePair);
+                     //aminityObject[heading[h]] = rawCsvAmenitiesArray[i][h];
+                   }
+                   if(aminityObject.stop_code){
+                     processedAminities.push(aminityObject);
+                   }
+
+                 }
+               }
+             }
+             console.log('Check Processed amenities Data');
+             console.log(processedAminities);
+             thisPolyMerObject._setAmenities(processedAminities);
+             if(processedAminities.length==0){
+               this.$.saveOperationResultModal.close();
+               alert('please select valid stop list json file');
+             }
+           }
+         };
+
+         var blob = file.slice(start, stop + 1);
+         reader.readAsBinaryString(blob);
+      },
+      _changeFieldValue:function(e){
+        console.log(e);
+        var targetObject = $('#'+e.target.id);
+        console.log('check key and value');
+        console.log('id: '+targetObject.attr('id'));
+        console.log('id: '+targetObject.attr('value'));
+        console.log('is Checked: '+targetObject.is(":checked"));
+        for(var h=0;h<this._amenitiesFields.length;h++){
+          if(this._amenitiesFields[h].key==targetObject.attr('id')){
+            this._amenitiesFields[h].enabled= targetObject.is(":checked");
+          }
+        }
+      },
+      _setAmenitiesFields:function(){
+         this._showOperationResultModal(false,"Amenities list data gettnig updated for preview after field set change, it will take a while...");
+         var fields = this._amenitiesFields;
+         console.log('check updated fields');
+         console.log(fields);
+         for(var i=0;i<this._amenities.length;i++){
+           for(var j=0;j<this._amenities[i].list.length;j++){
+             for(var h=0;h<fields.length;h++){
+                if(this._amenities[i].list[j].key == fields[h].key){
+                  this._amenities[i].list[j].enabled = fields[h].enabled
+                }
+             }
+           }
+         }
+         this.$.saveOperationResultModal.close();
+         this._showOperationResultModal(true,"Amenities list data view updated, if data seems ok, please click on Batch Import/Save Button");
+         var self = this;
+         setTimeout(function(){
+            self.$.saveOperationResultModal.close();
+         }, 1000);
+      },
+
+      _toggleStop: function(e) {
+        var oldActiveStop = Polymer.dom(this.root).querySelector('.item-wrapper.active');
+        var paperButton;
+        var stopIndex;
+        var activeStop;
+
+        if (e.srcElement.localName === 'iron-icon') {
+          paperButton = e.srcElement.parentNode;
+        } else {
+          paperButton = e.srcElement;
+        }
+
+        // Get the info of the selected route
+        stopIndex = paperButton.getAttribute('data-stop-index');
+        activeStop = Polymer.dom(this.root).querySelector('.item-wrapper[data-stop-index="' + stopIndex + '"]');
+
+        // Remove the active class
+        if (oldActiveStop) {
+          oldActiveStop.classList.remove('active');
+        }
+
+        // Check if the same route was collapsed
+        if (oldActiveStop !== activeStop) {
+          activeStop.classList.add('active');
+          this._activeStopCode = activeStop.getAttribute('data-stop-code');
+        }
+        var amenities_list = this._amenities[stopIndex].list;
+        var amenities_list_string  = "";
+        for(var i=0;i<amenities_list.length;i++){
+          var aminity_key_value_pair = amenities_list[i].key+": "+amenities_list[i].value+", ";
+          if(amenities_list[i].enabled){
+            aminity_key_value_pair = '<span style="color:green">'+aminity_key_value_pair+"</span>";
+          }else{
+              aminity_key_value_pair = '<span style="color:red">'+aminity_key_value_pair+"</span>";
+          }
+          amenities_list_string+=aminity_key_value_pair;
+        }
+        $("#amenities_list_"+stopIndex).html(amenities_list_string);
+      },
+      _saveAmenity: function(fullAmenityData,callback) {
+        var self = this;
+        if(!fullAmenityData){
+            return callback({message:'data missing'},false);
+        }
+        if(!fullAmenityData.stop_code){
+            return callback({message:'data missing - before trim'},false);
+        }
+        var code = fullAmenityData.stop_code.trim();
+        if(!code){
+            return callback({message:'Code missing - after trim'},false)
+        }
+        var amenityInfo = fullAmenityData;
+        var update = {};
+        //return callback(null,true);
+        //firebase.database().ref().update(update);
+        var firebaseDb = this.$.amenities.db;
+        var firebaseDbRef = firebaseDb.ref();
+        update['amenities/'+code] = amenityInfo;
+        console.log('check below update deep path');
+        console.log(update)
+        firebaseDbRef.update(update, function(error) {
+          if (error) {
+            console.log("Error updating data:", error);
+          }else{
+            console.log('Write Success');
+          }
+          return callback(null,true);
+        });
+      },
+      _batchImportRoutesListData:function(e) {
+
+        if(!confirm('Are you sure? This action will update new routes in database, Notice: It will overwrite existing routes.')){
+          return false;
+        }
+
+
+        var self = this;
+
+        if(!this._amenities.length){
+          this.$.saveOperationResultModal.close();
+          alert('Please load a stop amenities list first!');
+          return;
+        }
+        this._showOperationResultModal(false,"Amenities data getting updated in firebase db, it will take a while, please wait...");
+        var self = this;
+        var updateAble = 0;
+        var update = {};
+        var firebaseDb = this.$.amenities.db;
+        var firebaseDbRef = firebaseDb.ref();
+        update['amenitiesFields'] = this._amenitiesFields;
+        // for(var i=0;i<this._amenities.length;i++){
+        //   update['amenities/'+this._amenities[i].stop_code] = this._amenities[i];
+        // }
+        console.log('check below update deep path');
+        console.log(update)
+        //return false;
+        firebaseDbRef.update(update, function(error) {
+          if (error) {
+            console.log("field write Error updating data:", error);
+            //self._showOperationResultModal(false,"Err!!! data not updated in firebase db, please import proper csv file");
+          }else{
+            console.log('fields Write Success');
+            //self._showOperationResultModal(true,"All amenities data updated in firebase db");
+          }
+
+          var startUpdate =  function(index){
+            console.log('Index: '+index);
+            if(index<self._amenities.length){
+              var fullAminityDetails = {};
+              fullAminityDetails = self._amenities[index];
+              self._saveAmenity(fullAminityDetails,function(err,success){
+                  if(err){
+                    console.log('There is a error to check')
+                    console.log(err);
+                  }
+
+                  console.log('Success: '+success);
+
+                  startUpdate(index+1);
+              });
+            }else{
+              self._showOperationResultModal(true,"All Aminities data updated in firebase db");
+              setTimeout(function(){
+                 self.$.saveOperationResultModal.close();
+              }, 2000);
+              return;
+            }
+          }
+          startUpdate(0);
+
+          // setTimeout(function(){
+          //    self.$.saveOperationResultModal.close();
+          // }, 2000);
+        });
+      },
+      CSVtoArray: function(text) {
+        let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
+        for (l in text) {
+          l = text[l];
+          if ('"' === l) {
+            if (s && l === p) row[i] += l;
+            s = !s;
+          } else if (',' === l && s) l = row[++i] = '';
+          else if ('\n' === l && s) {
+            if ('\r' === p) row[i] = row[i].slice(0, -1);
+            row = ret[++r] = [l = '']; i = 0;
+          } else row[i] += l;
+          p = l;
+        }
+        return ret;
+      },
+      ready: function() {
+        var self = this;
+        var serialize = function(objectArray){
+          var newArray = [];
+          for (var o in objectArray) {
+              newArray.push(objectArray[o]);
+          }
+          return newArray;
+        }
+        self._showOperationResultModal(false,"Loading existing fieldset data");
+        this.$.amenities.getStoredValue('/amenitiesFields/')
+          .then(function(data) {
+            self._amenitiesFields = serialize(data);
+            self._showOperationResultModal(true,"Field set data loaded, now going to load exising amenities data ");
+            self.$.saveOperationResultModal.close();
+            self._showOperationResultModal(false,"Exising Amenities data getting loaded, please wait, it will take a while");
+            setTimeout(function(){
+              self.$.amenities.getStoredValue('/amenities/')
+                .then(function(data) {
+                  if(data){
+                    console.log('Total Amenities: '+data.length);
+
+                    self._setAmenities(serialize(data));
+                  }else{
+                    self._showOperationResultModal(true,"No existing Aminities data available");
+                    setTimeout(function(){
+                       self.$.saveOperationResultModal.close();
+                    }, 2000);
+                  }
+                }).catch(function(error) {
+                  console.log(error);
+                });
+            }, 5000);
+
+          }).catch(function(error) {
+            console.log(error);
+          });
+      }
+
+    });
+  })();
+  </script>
+</dom-module>
