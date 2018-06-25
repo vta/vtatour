@@ -1459,6 +1459,10 @@ var currentLngForPoi = null;
                       var value = amenities_list[i].value;
                       aminity_key_value_pair = key+": "+value+", ";
                     }
+
+                    if(amenities_list[i].value =='0' || amenities_list[i].value == 0 || amenities_list[i].key =='rtiid'){
+                      aminity_key_value_pair = "";
+                    }
                     // if(amenities_list[i].enabled){
                     //   aminity_key_value_pair = '<span style="color:green">'+aminity_key_value_pair+"</span>";
                     // }

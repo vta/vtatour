@@ -238,7 +238,7 @@
         <paper-tabs scrollable fit-container>
           <paper-tab>Amenities</paper-tab>
         </paper-tabs>
-        <template is="dom-if" if="{{_amenitiesFields.length}}">
+        <!-- <template is="dom-if" if="{{_amenitiesFields.length}}">
           <template is="dom-repeat" items="{{_amenitiesFields}}" as="item">
             <span style="border-style: solid;margin-right: 0px;">
               <input id="[[item.key]]" type="checkbox" name="item.enabled" value="{{item.enabled}}" data-index="[[index]]" checked="[[item.enabled]]" on-change="_changeFieldValue"> [[item.key]]
@@ -251,7 +251,7 @@
           </paper-button>
           </div>
           <br/><br/><br/>
-        </template>
+        </template> -->
           <div class="item header">
             <div class="route-code">Stop Code</div>
             <div class="route-details">Amenities</div>
@@ -539,10 +539,8 @@
         var amenities_list_string  = "";
         for(var i=0;i<amenities_list.length;i++){
           var aminity_key_value_pair = amenities_list[i].key+": "+amenities_list[i].value+", ";
-          if(amenities_list[i].enabled){
-            aminity_key_value_pair = '<span style="color:green">'+aminity_key_value_pair+"</span>";
-          }else{
-              aminity_key_value_pair = '<span style="color:red">'+aminity_key_value_pair+"</span>";
+          if(amenities_list[i].value =='0' || amenities_list[i].value == 0 || amenities_list[i].key =='rtiid'){
+            aminity_key_value_pair = "";
           }
           amenities_list_string+=aminity_key_value_pair;
         }
