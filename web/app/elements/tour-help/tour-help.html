@@ -49,6 +49,7 @@
         height: 245px;
         max-width: 100%;
       }
+    
 
       .pagination {
         @apply(--layout-horizontal);
@@ -147,7 +148,7 @@
             <div class="slider-wrapper">
               <h3>Where do you want to go?</h3>
               <p>Take the virtual tour of Valley Transportation Authority</p>
-              <iron-image src="/images/walkthrough_1.svg" ></iron-image>
+              <iron-image src="/images/walkthrough_1.svg" class="walkthoughimage"></iron-image>
             </div>
             <paper-button class="chevron right" on-click="_openItem">
               <iron-icon data-item="1" icon="icons:chevron-right"></iron-icon>
@@ -157,7 +158,7 @@
             <div class="slider-wrapper">
               <h3>What is interesting there?</h3>
               <p>Pause the navigation any moment to know more about the intersting places around</p>
-              <iron-image src="/images/walkthrough_2.svg" ></iron-image>
+              <iron-image src="/images/walkthrough_2.svg" class="walkthoughimage" ></iron-image>
             </div>
             <paper-button class="chevron left" on-click="_openItem">
               <iron-icon data-item="0" icon="icons:chevron-left"></iron-icon>
@@ -170,10 +171,10 @@
             <div class="slider-wrapper">
               <h3>Do you want to get off the tour?</h3>
               <p>When you are getting closer to a Stop, you can get off the tour and see the places nearby</p>
-              <iron-image src="/images/walkthrough_3.svg" ></iron-image>
+              <iron-image src="/images/walkthrough_3.svg" class="walkthoughimage"></iron-image>
             </div>
             <paper-button class="chevron left" on-click="_openItem">
-              <iron-icon data-item="1" icon="icons:chevron-left"></iron-icon>
+              <iron-icon data-item="1" icon="icons:chevron-left" ></iron-icon>
             </paper-button>
           </div>
         </div>

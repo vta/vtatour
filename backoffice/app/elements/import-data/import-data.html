@@ -224,28 +224,33 @@
 
       <div>
         &nbsp; Step 1: Select Stop List File:  <input type="file" id="stop_list" name="stop_list" />
-        <br/>
-
         <div class="add-stop-wrapper">
         <paper-button on-click="_loadStopeData" >
           <iron-icon icon="file-download" class="download-icon"></iron-icon>Load Stops
         </paper-button>
        </div>
       </div>
-      <br/><br/>
+      <br/><br/><br/>
       <div class="clear-break">
         &nbsp; Step 2: Select Route List File:  <input type="file" id="route_list" name="route_list" />
-        <br/>
         <div class="add-stop-wrapper">
         <paper-button on-click="_loadRoutesData" >
           <iron-icon icon="file-download" class="download-icon"></iron-icon>Load Routes
         </paper-button>
        </div>
       </div>
-
       <br/><br/>
       <div class="clear-break">
-        <paper-button  on-click="_batchImportRoutesListData" class="primary">Batch Import</paper-button>
+        <br/>
+      &nbsp; Step 3: Click on "Batch Import" to upload data in firebase database:
+      <br/>
+      <div class="add-stop-wrapper">
+        <paper-button  on-click="_batchImportRoutesListData" >
+          <iron-icon icon="file-upload" class="download-icon"></iron-icon>Batch Import
+        </paper-button>
+      </div>
+      <br/>
+      <br/>
       </div>
       <paper-material elevation="1">
         <paper-tabs scrollable selected="{{selectedTab}}" fit-container>

@@ -2462,3 +2462,8 @@ ul#filters > .active > span {
 .routeDirectionSteps div{
   font-size: 13px !important;
 }
+.walkthoughimage img{
+  width: 100% !important;
+  height: 90% !important;
+  margin-top: 10% !important;
+}
