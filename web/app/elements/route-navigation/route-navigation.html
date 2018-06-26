@@ -1424,6 +1424,11 @@ var currentLngForPoi = null;
           // window.open(link, '_blank');
         },
         _onStopIconClick : function(e){
+          if(this._selectedPoiMarker){
+            this._selectedPoiMarker.open = false;
+          }
+          this._selectedPoiMarker = e.srcElement;
+          this._selectedPoiMarker.open = true;
           var sourceElement = e.srcElement;
           var element = $(e.srcElement);
           var toTitleCase = function(str) {
@@ -1471,7 +1476,7 @@ var currentLngForPoi = null;
 
                     amenities_list_string+=amenity_key_value_pair;
                   }
-                  $("#stop_amenities_"+code).html(amenities_list_string);
+                  $("#stop_amenities_"+code).html(amenities_list_string.replace(/,\s*$/, ""));
                 }
               }).catch(function(error) {
                 console.log(error);

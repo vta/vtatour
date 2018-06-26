@@ -228,7 +228,7 @@
 
       <div>
         <br/>
-      &nbsp; Step 1: Click on "Video URL + KML Data Update" to prepare Video and KML data :
+      &nbsp;Step 1: Click on "Video URL + KML Data Update" to prepare Video and KML data :
       <br/>
         <div class="add-stop-wrapper">
         <a href="http://52.9.113.34/" target="_blank">
@@ -236,6 +236,13 @@
           <iron-icon icon="file-download" class="download-icon"></iron-icon>Video Generation
         </paper-button>
       </a>
+       </div>
+      </div>
+      <div>
+        <br/><br/><br/>
+      &nbsp;Step 2: Click on "Video URL + KML Data Update" to prepare Video and KML data :
+      <br/>
+        <div class="add-stop-wrapper">
         <paper-button on-click="_startVideoUrlsAndStartKmlPrepareDataAndStartProcessing" >
           <iron-icon icon="file-download" class="download-icon"></iron-icon>Video URL + KML Data Update
         </paper-button>
@@ -250,17 +257,18 @@
 
        </div>
       </div>
-
       <br/>
-      <br/>
-      &nbsp; Step 2: Click on "Batch Update" to upload data in firebase database:
+      &nbsp;Step 3: Click on "Batch Update" to update data in firebase database:
       <br/>
       <div class="clear-break">
-        <paper-button  on-click="_batchImportRoutesListData" class="primary">Batch Update</paper-button>
+        <div class="add-stop-wrapper">
+        <paper-button  on-click="_batchImportRoutesListData" >Batch Update</paper-button>
+          </div>
       </div>
       <div>
-
       </div>
+      <br/>
+      <br/>
       <paper-material elevation="1">
         <paper-tabs scrollable selected="0" fit-container>
           <paper-tab>Routes</paper-tab>

@@ -219,9 +219,10 @@
       <h2 class="page-title">Amenities</h2>
 
       <div>
-        &nbsp;Select Amenities List File:  <input type="file" id="amenities_list" name="amenities_list" />
+        &nbsp;Step 1: Select Amenities List File:  <input type="file" id="amenities_list" name="amenities_list" />
         <br/>
 
+        &nbsp;Step 2: Load Aminites data from selected file:<br/>
         <div class="add-stop-wrapper">
         <paper-button on-click="_readAmenities" >
           <iron-icon icon="file-download" class="download-icon"></iron-icon>Load Amenities
@@ -229,11 +230,14 @@
        </div>
       </div>
       <br/><br/>
-
-      <br/><br/>
+      <br/>
+      &nbsp;Step 3: Click on "Batch Import / Save"  to update Amenities data in firebase database:<br/>
       <div class="clear-break" id="main_amenities_updater">
-        <paper-button  on-click="_batchImportRoutesListData" class="primary">Batch Import / Save</paper-button>
+            <div class="add-stop-wrapper">
+                <paper-button  on-click="_batchImportRoutesListData" >Batch Import / Save</paper-button>
+           </div>
       </div>
+      <br/><br/>
       <paper-material elevation="1">
         <paper-tabs scrollable fit-container>
           <paper-tab>Amenities</paper-tab>
@@ -565,7 +569,7 @@
           }
           amenities_list_string+=amenity_key_value_pair;
         }
-        $("#amenities_list_"+stopIndex).html(amenities_list_string);
+        $("#amenities_list_"+stopIndex).html(amenities_list_string.replace(/,\s*$/, ""));
       },
       _saveAmenity: function(fullAmenityData,callback) {
         var self = this;
