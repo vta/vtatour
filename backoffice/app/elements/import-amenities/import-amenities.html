@@ -439,7 +439,7 @@
                  // console.log('check raw object');
                  // console.log(rawCsvAmenitiesArray[i]);
                  if(rawCsvAmenitiesArray[i] && rawCsvAmenitiesArray[i].length==heading.length){
-                   var aminityObject = {
+                   var amenityObject = {
                       list:[]
                    };
                    for(var h=0;h<heading.length;h++){
@@ -448,14 +448,14 @@
                       value:rawCsvAmenitiesArray[i][h],
                       enabled:true
                      }
-                     if(keyValuePair.key=='rtiid'){
-                       aminityObject.stop_code = keyValuePair.value;
+                     if(keyValuePair.key=='stop_id'){
+                       amenityObject.stop_code = keyValuePair.value;
                      }
-                     aminityObject.list.push(keyValuePair);
-                     //aminityObject[heading[h]] = rawCsvAmenitiesArray[i][h];
+                     amenityObject.list.push(keyValuePair);
+                     //amenityObject[heading[h]] = rawCsvAmenitiesArray[i][h];
                    }
-                   if(aminityObject.stop_code){
-                     processedAminities.push(aminityObject);
+                   if(amenityObject.stop_code){
+                     processedAminities.push(amenityObject);
                    }
 
                  }
@@ -537,12 +537,33 @@
         }
         var amenities_list = this._amenities[stopIndex].list;
         var amenities_list_string  = "";
+        var toTitleCase = function(str) {
+            return str.replace(
+                /\w\S*/g,
+                function(txt) {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                }
+            );
+        }
         for(var i=0;i<amenities_list.length;i++){
-          var aminity_key_value_pair = amenities_list[i].key+": "+amenities_list[i].value+", ";
-          if(amenities_list[i].value =='0' || amenities_list[i].value == 0 || amenities_list[i].key =='rtiid'){
-            aminity_key_value_pair = "";
+          var amenity_key_value_pair = "";
+          if(amenities_list[i].value){
+            var key = amenities_list[i].key;
+            if(key){
+              key = toTitleCase(key.split('_').join(' '));
+            }
+            amenity_key_value_pair = key;
+            var value = amenities_list[i].value;
+            var numericValue = parseInt(value);
+            if(numericValue != 0 && numericValue != 1 ){
+              amenity_key_value_pair = amenity_key_value_pair+": "+value;
+            }
+            amenity_key_value_pair = amenity_key_value_pair+', '; //key+": "+value+", ";
           }
-          amenities_list_string+=aminity_key_value_pair;
+          if(amenities_list[i].value =='0' || amenities_list[i].value == 0 || amenities_list[i].key =='stop_id'){
+            amenity_key_value_pair = "";
+          }
+          amenities_list_string+=amenity_key_value_pair;
         }
         $("#amenities_list_"+stopIndex).html(amenities_list_string);
       },
@@ -596,6 +617,8 @@
         var update = {};
         var firebaseDb = this.$.amenities.db;
         var firebaseDbRef = firebaseDb.ref();
+
+        update['amenities'] = null;
         update['amenitiesFields'] = this._amenitiesFields;
         // for(var i=0;i<this._amenities.length;i++){
         //   update['amenities/'+this._amenities[i].stop_code] = this._amenities[i];
@@ -615,9 +638,9 @@
           var startUpdate =  function(index){
             console.log('Index: '+index);
             if(index<self._amenities.length){
-              var fullAminityDetails = {};
-              fullAminityDetails = self._amenities[index];
-              self._saveAmenity(fullAminityDetails,function(err,success){
+              var fullamenityDetails = {};
+              fullamenityDetails = self._amenities[index];
+              self._saveAmenity(fullamenityDetails,function(err,success){
                   if(err){
                     console.log('There is a error to check')
                     console.log(err);

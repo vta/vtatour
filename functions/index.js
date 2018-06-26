@@ -74,6 +74,13 @@ app.get('/api/coords/:lat/:lon', (req, res) => {
     return res.json(JSON.parse(body))
   });
 });
+
+app.post('/api/route-details/:route_id', (req, res) => {
+    return res.status(ok).json({
+      status:'ok',
+      message:'success'
+    });
+});
 // app.get('/api/2',(request,response) => {
 //  response.send("Hello 2 from Firebase!");
 // });

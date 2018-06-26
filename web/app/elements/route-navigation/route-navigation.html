@@ -388,8 +388,8 @@
                         <span style="display:none">[[stopObj.sec]]</span>
                         <h2>[[stopObj.name]]</h2>
                         <span>Connections: [[stopObj.route_list]]</span><br/>
-                        <div style="height:50px;">Amenities:
-                          <span id="stop_amenities_[[stopObj.stop_code]]" class="amenities_list" data-code="[[stopObj.stop_code]]">N/A</span>
+                        <div style="max-height:50px;max-width:200px;">Amenities:
+                          <span id="stop_amenities_[[stopObj.code]]" class="amenities_list" data-code="[[stopObj.code]]">N/A</span>
                         </div>
                       </google-map-marker>
                   </template>
@@ -1450,23 +1450,26 @@ var currentLngForPoi = null;
                   var amenities_list = data.list;
                   var amenities_list_string  = "";
                   for(var i=0;i<amenities_list.length;i++){
-                    var aminity_key_value_pair = "";
-                    if(amenities_list[i].value && amenities_list[i].enabled){
+                    var amenity_key_value_pair = "";
+                    if(amenities_list[i].value){
                       var key = amenities_list[i].key;
                       if(key){
                         key = toTitleCase(key.split('_').join(' '));
                       }
+                      amenity_key_value_pair = key;
                       var value = amenities_list[i].value;
-                      aminity_key_value_pair = key+": "+value+", ";
+                      var numericValue = parseInt(value);
+                      if(numericValue != 0 && numericValue != 1 ){
+                        amenity_key_value_pair = amenity_key_value_pair+": "+value;
+                      }
+                      amenity_key_value_pair = amenity_key_value_pair+', '; //key+": "+value+", ";
                     }
 
-                    if(amenities_list[i].value =='0' || amenities_list[i].value == 0 || amenities_list[i].key =='rtiid'){
-                      aminity_key_value_pair = "";
+                    if(amenities_list[i].value =='0' || amenities_list[i].value == 0 || amenities_list[i].key =='stop_id'){
+                      amenity_key_value_pair = "";
                     }
-                    // if(amenities_list[i].enabled){
-                    //   aminity_key_value_pair = '<span style="color:green">'+aminity_key_value_pair+"</span>";
-                    // }
-                    amenities_list_string+=aminity_key_value_pair;
+
+                    amenities_list_string+=amenity_key_value_pair;
                   }
                   $("#stop_amenities_"+code).html(amenities_list_string);
                 }
