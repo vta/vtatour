@@ -2495,3 +2495,7 @@ ul#filters > .active > span {
   border-bottom: 2px solid white;
   padding-bottom: 10px;
 }
+
+#selectionBar{
+      border-bottom: 2px solid #0B5388 !important;
+}

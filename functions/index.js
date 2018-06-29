@@ -60,7 +60,7 @@ app.get('/api/coords/:lat/:lon', (req, res) => {
       access_key: config.coordApiKey,
       latitude: lat,
       longitude: lon,
-      radius_km: 5,
+      radius_km: 100,
     },
     headers: {
       'cache-control': 'no-cache'

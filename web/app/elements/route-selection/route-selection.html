@@ -4,6 +4,7 @@
       <style>
         paper-dropdown-menu {
           width: 100%;
+          text-transform: capitalize;
         }
 
         .route-selection-message {
@@ -25,7 +26,7 @@
           cursor: pointer;
           font-weight: 600;
           text-align: center;
-          height: 45px;
+          height: 50px;
           -webkit-user-select: none;
           -moz-user-select: none;
           -ms-user-select: none;
@@ -49,6 +50,7 @@
           padding: 1px 32px;
           font-size: 11px;
           border-radius: 60px!important;
+          text-transform: capitalize !important;
         }
         paper-material{
           width:88%;
@@ -119,6 +121,48 @@
               min-height: 52px !important;
         }
 
+        .capitalize, #input-2{
+          text-transform: capitalize;
+        }
+        #saveOperationResultModal {
+          width: auto;
+          background-color: transparent;
+          color: var(--vta-white);
+          box-shadow: none;
+        }
+
+        #saveOperationResultModal .icon {
+          text-align: center;
+        }
+
+        #saveOperationResultModal iron-icon {
+          width: 140px;
+          height: 140px;
+          padding: 20px;
+          text-align: center;
+          -webkit-border-radius: 50%;
+          border-radius: 50%;
+        }
+
+        #saveOperationResultModal .message-wrapper.success iron-icon {
+          background-color: var(--primary-color);
+        }
+
+        #saveOperationResultModal .message-wrapper.error iron-icon {
+          background-color: var(--secondary-color);
+        }
+
+        #saveOperationResultModal .message {
+          text-align: center;
+          font-size: 2.5em;
+          line-height: 1;
+          text-transform: uppercase;
+          font-weight: bold;
+          margin-top: 10px;
+        }
+        #saveOperationResultModal .dynamic-message{
+            text-align: center;
+        }
       </style>
       <firebase-query
           app-name="vta"
@@ -162,8 +206,8 @@
         <paper-dropdown-menu id="directionDropdown" label="Direction" placeholder="Choose direction of the route"
           disabled on-iron-select="_directionDropdownSelect">
           <paper-listbox id="directionDropdownListBox" class="dropdown-content">
-            <paper-item value="[[_directions.a]]">[[_selectedRoute.directionAName]]</paper-item>
-            <paper-item value="[[_directions.b]]">[[_selectedRoute.directionBName]]</paper-item>
+            <paper-item value="[[_directions.a]]"><span class="capitalize">[[_selectedRoute.directionAName]]</span></paper-item>
+            <paper-item value="[[_directions.b]]"><span><span class="capitalize">[[_selectedRoute.directionBName]]</span></paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
         </div>
@@ -195,9 +239,36 @@
             Please select different departure and destination stops to start the tour.
           </div>
         </template>
+        <template is="dom-if" if="{{_stopsNotAvilable}}">
+          <div class="route-selection-message">
+            For selected direction, departure and destination data not avilable. Please select different direction stops to start the tour.
+          </div>
+        </template>
       </div>
 
       <paper-fab id="viewRide" label="View Route" raised disabled on-click="_onGoClick"></paper-fab>
+
+
+      <paper-dialog id="saveOperationResultModal" modal>
+        <template is="dom-if" if="{{_operationSuccess}}">
+          <div class="message-wrapper success">
+            <div class="icon">
+              <iron-icon icon="icons:check"></iron-icon>
+            </div>
+            <div class="message">Done</div>
+            <div class="dynamic-message">{{_operationMessageDetail}}</div>
+          </div>
+        </template>
+        <template is="dom-if" if="{{!_operationSuccess}}">
+          <div class="message-wrapper success">
+            <div class="icon">
+              <iron-icon icon="icons:cached"></iron-icon>
+            </div>
+            <div class="message">Loadning...</div>
+            <div class="dynamic-message">{{_operationMessageDetail}}</div>
+          </div>
+        </template>
+      </paper-dialog>
     </template>
 </dom-module>
 
@@ -226,9 +297,22 @@
         _sameStops: {
           type: Boolean,
           value: false
-        }
-      },
+        },
+        _stopsNotAvilable: {
+          type: Boolean,
+          value: false
+        },
 
+      },
+      _showOperationResultModal: function(isSuccess, operationDetailMessage) {
+        this.$.saveOperationResultModal.open();
+        var self = this;
+        this._operationSuccess = isSuccess;
+        this._operationMessageDetail = operationDetailMessage;
+      },
+      _closeOperationResultModal: function() {
+        this.$.saveOperationResultModal.close();
+      },
       clearRoute: function() {
         this.$.routesAutocomplete.clear();
         this._clearStopsDropdowns();
@@ -242,6 +326,7 @@
         this.$.departureDropdownListBox.selected = -1;
         this.$.destinationDropdown._setSelectedItem();
         this.$.destinationDropdownListBox.selected = -1;
+        this._stopsNotAvilable = false;
       },
 
       _selectedRouteChange: function(newSelectedRoute) {
@@ -250,11 +335,15 @@
         this._selectedRouteDetails = null;
         this._departureStopId = null;
         this._destinationStopId = null;
+        this._stopsNotAvilable = false;
 
         // Check if the selected route is selected to enable the proper elements
         if (typeof newSelectedRoute === 'object') {
           this._selectedRouteCode = newSelectedRoute.$key;
           this.$.directionDropdown.disabled = false;
+          $('.paper-input').css({
+              'text-transform': 'capitalize'
+          })
         } else {
           this._selectedRouteCode = null;
           this.$.directionDropdown.disabled = true;
@@ -276,21 +365,35 @@
 
         if (this._direction) {
           var self = this;
-
+          this._showOperationResultModal(false,"Loadnig stop list");
           // Get the route details from the selected route
           this.$.routeDetailsDoc.getStoredValue('/route-details/' + this._selectedRouteCode + '/' + this._direction)
             .then(function(data) {
               self._selectedRouteDetails = data;
+              self._showOperationResultModal(true,"Stop list loaded");
+              setTimeout(function(){
+                 self.$.saveOperationResultModal.close();
+              }, 1000);
             }).catch(function(error) {
               console.log(error);
+               self.$.saveOperationResultModal.close();
             });
         }
       },
 
       _selectedRouteDetailsChange: function(newSelectedRouteDoc) {
+        console.log('debug log, check below: direction: '+this._direction);
+        console.log(newSelectedRouteDoc)
         if (typeof newSelectedRouteDoc === 'object') {
-          this.$.departureDropdown.disabled = false;
-          this.$.destinationDropdown.disabled = false;
+          if(this._direction && newSelectedRouteDoc && newSelectedRouteDoc.stops && newSelectedRouteDoc.stops.length){
+            this._stopsNotAvilable = false;
+            this.$.departureDropdown.disabled = false;
+            this.$.destinationDropdown.disabled = false;
+          }else if(this._direction){
+            this._stopsNotAvilable = true;
+            this.$.departureDropdown.disabled = true;
+            this.$.destinationDropdown.disabled = true;
+          }
         }
       },
 

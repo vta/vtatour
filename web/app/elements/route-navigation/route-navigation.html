@@ -347,7 +347,7 @@
                     longitude="[[_departureStop.lng]]"
                     icon="/images/fa-map-marker-origin.png"
                     click-events
-                    on-google-map-marker-click="_onPoiClick">
+                    on-google-map-marker-click="_onDepartureClick">
                     <h3>{{_departureStop.name}}</h3>
                   </google-map-marker>
               </template>
@@ -359,7 +359,7 @@
                   longitude="[[_destinationStop.lng]]"
                   icon="/images/fa-map-marker-destination.png"
                   click-events
-                  on-google-map-marker-click="_onPoiClick">
+                  on-google-map-marker-click="_onDestinationClick">
                   <h3>{{_destinationStop.name}}</h3>
                 </google-map-marker>
               </template>
@@ -388,8 +388,8 @@
                         <span style="display:none">[[stopObj.sec]]</span>
                         <h2>[[stopObj.name]]</h2>
                         <span>Connections: [[stopObj.route_list]]</span><br/>
-                        <div style="max-height:50px;max-width:200px;">Amenities:
-                          <span id="stop_amenities_[[stopObj.code]]" class="amenities_list" data-code="[[stopObj.code]]">N/A</span>
+                        <div style="max-width:250px;">
+                          <span id="stop_amenities_[[stopObj.code]]" class="amenities_list" data-code="[[stopObj.code]]"></span>
                         </div>
                       </google-map-marker>
                   </template>
@@ -421,7 +421,7 @@
                 <template is="dom-if" if="[[_isValidCords(_customPoi.latitude,_customPoi.longitude)]]">
                     <google-map-marker latitude="{{_customPoi.latitude}}" longitude="{{_customPoi.longitude}}"
                       click-events on-google-map-marker-click="_onPoiClick" icon="{{_getCustomPoiIcon(_customPoi.icon)}}">
-                      <h2><a href="{{_getCustomPoiLink(_customPoi.web_link)}}">{{_customPoi.name}}</a></h2><br/>
+                      <h2><a href="{{_getCustomPoiLink(_customPoi.web_link)}}" target="_blank">{{_customPoi.name}}</a></h2><br/>
                       <span>{{_customPoi.address}}</span><br/>
                       <span>{{_customPoi.description}}</span><br/>
                     </google-map-marker>
@@ -703,6 +703,8 @@ var currentLngForPoi = null;
           this._direction = false;
           this.reFocused = false;
           this._isValidZoom = false;
+          this._departureStop = null;
+          this._destinationStop = null;
 
           if (this._mapPolyline) {
             this._mapPolyline.setMap(null);
@@ -734,6 +736,10 @@ var currentLngForPoi = null;
           //spcl_console.log (newRouteDetails)
 
           this._assignSource(newRouteDetails.videoUrl);
+
+          if(!newRouteDetails.videoGeoPoints){
+            newRouteDetails.videoGeoPoints = newRouteDetails.originalVideoGeoPoints
+          }
 
           if(newRouteDetails.videoUrl){
             $('#frontView').show().attr('data-video',newRouteDetails.videoUrl);
@@ -779,23 +785,23 @@ var currentLngForPoi = null;
           //spcl_console.log (newRouteDetails.stops[this.departureStopId]);
 
           this._departureStop = newRouteDetails.stops[this.departureStopId];
-          // if(this._departureStop){
-          //   this._currentLat = parseFloat(this._departureStop.lat);
-          //   this._currentLng = parseFloat(this._departureStop.lng);
-          //   this._map.panTo({
-          //     lat:this._currentLat,
-          //     lng:this._currentLng,
-          //   })
-          //   this._map.setZoom(16);
-          // }
+          if(this._departureStop){
+            this._currentLat = parseFloat(this._departureStop.lat);
+            this._currentLng = parseFloat(this._departureStop.lng);
+            this._map.panTo({
+              lat:this._currentLat,
+              lng:this._currentLng,
+            });
+            //this._map.setZoom(16);
+          }
           this._destinationStop = newRouteDetails.stops[this.destinationStopId];
-          if(this.$.departureMarker){
-            this.$.departureMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._departureStop.name + '</h3>');
-          }
-
-          if(this.$.destinationMarker){
-            this.$.destinationMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._destinationStop.name + '</h3>');
-          }
+          // if(this.$.departureMarker){
+          //   this.$.departureMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._departureStop.name + '</h3>');
+          // }
+          //
+          // if(this.$.destinationMarker){
+          //   this.$.destinationMarker.info = this.$.mapsUtils.getMarkerObj('<h3>' + this._destinationStop.name + '</h3>');
+          // }
 
 
           // Set the start and end times of the video based on the departure and destination stops
@@ -991,6 +997,9 @@ var currentLngForPoi = null;
           }else{
               this._nextStop = this._calculateNextStop(this._stopsSlot, newVideoCurrentTime);
           }
+          if(this._meetUps){
+              this._meetUps = null;
+          }
         },
 
         _calculateVideoProgress: function(start, end, actual) {
@@ -1045,6 +1054,15 @@ var currentLngForPoi = null;
 
         _restartVideo: function() {
           this.player.currentTime(0);
+          if(this._departureStop){
+            this._currentLat = parseFloat(this._departureStop.lat);
+            this._currentLng = parseFloat(this._departureStop.lng);
+            this._map.panTo({
+              lat:this._currentLat,
+              lng:this._currentLng,
+            });
+            //this._map.setZoom(16);
+          }
           this.player.play();
           // this.player.currentTime(this._videoStartTime);
           this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
@@ -1412,6 +1430,29 @@ var currentLngForPoi = null;
           this._selectedPoiMarker = e.srcElement;
           this._selectedPoiMarker.open = true;
         },
+        _onDepartureClick : function(e){
+          var element = $(e.srcElement);
+          element.find('h3').html(this._departureStop.name);
+          if(this._selectedPoiMarker){
+            this._selectedPoiMarker.open = false;
+          }
+
+          this._selectedPoiMarker = e.srcElement;
+          this._selectedPoiMarker.open = true;
+        },
+        _onDestinationClick : function(e){
+          //alert(this._destinationStop.name);
+          var element = $(e.srcElement);
+          element.find('h3').html(this._destinationStop.name);
+
+          if(this._selectedPoiMarker){
+            this._selectedPoiMarker.open = false;
+          }
+
+          this._selectedPoiMarker = e.srcElement;
+          this._selectedPoiMarker.open = true;
+        },
+
         _onMeetUpClick : function(e){
           if(this._selectedPoiMarker){
             this._selectedPoiMarker.open = false;
@@ -1476,7 +1517,14 @@ var currentLngForPoi = null;
 
                     amenities_list_string+=amenity_key_value_pair;
                   }
-                  $("#stop_amenities_"+code).html(amenities_list_string.replace(/,\s*$/, ""));
+
+                  amenities_list_string = amenities_list_string.replace(/,\s*$/, "");
+                  if(amenities_list_string){
+                    amenities_list_string =   "Amenities: "+amenities_list_string;
+                  }
+
+
+                  $("#stop_amenities_"+code).html(amenities_list_string);
                 }
               }).catch(function(error) {
                 console.log(error);

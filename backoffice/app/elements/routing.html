@@ -127,6 +127,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           setFocus(app.route);
           selectRouteLink(app.route);
     });
+    page('/settings', function() {
+          app.route = 'settings';
+          setFocus(app.route);
+          selectRouteLink(app.route);
+    });
 
     page('/customPois', function() {
       app.route = 'customPois';

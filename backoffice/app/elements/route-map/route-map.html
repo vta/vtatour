@@ -10,8 +10,8 @@
       api-key="AIzaSyALqCogus7yIJJ0OE48RwBtmteqybWvZ6g"
       id="map"
       map="{{_map}}"
-      disable-default-ui="true"
-      disable-zoom="true">
+      additional-map-options='{"zoomControl":"true"}'
+      >
       <template is="dom-if" if="[[_isValidCords(_departure.lat,_departure.lng)]]">
         <google-map-marker
           latitude="[[_departure.lat]]"

@@ -1,4 +1,4 @@
-<dom-module id="integration-list">
+<dom-module id="settings-list">
   <template>
     <style is="custom-style" include="shared-styles"></style>
     <style>
@@ -161,17 +161,17 @@
     </style>
     <firebase-document
       app-name="vta"
-      id="integration"
-      data="{{_integrationsOrigin}}">
+      id="settings"
+      data="{{_settingsOrigin}}">
     </firebase-document>
 
     <div class="inner-content">
-    <h2 class="page-title">Integrations</h2>
+    <h2 class="page-title">Settingss</h2>
       <paper-material elevation="1">
         <div class="item header">
           <div class="column2">
             <div class="operations">
-              <!-- <paper-button class="primary" on-click="_saveIntegration">Save</paper-button> -->
+              <!-- <paper-button class="primary" on-click="_savesettings">Save</paper-button> -->
             </div>
           </div>
         </div>
@@ -180,19 +180,19 @@
 
         <div class="container item routeInfo">
           <div class="full-width">
-            <h3 class="field-heading">Meet Up Api Key</h3>
-            <paper-input id="meetUpApiKey" class="input-keys"  value="{{_integrations.meetUpApiKey}}" placeholder="Enter MeetUp Api Key" required></paper-input>
+            <h3 class="field-heading">API Key</h3>
+            <paper-input id="s3BucketName" class="input-keys"  value="{{_settings.apiKey}}" placeholder="Enter strong API Key and it should be hard to guess" required></paper-input>
           </div>
-          <div class="full-width">
-            <h3 class="field-heading">Coord Api Key</h3>
-            <paper-input id="coordApiKey" class="input-keys" value="{{_integrations.coordApiKey}}" placeholder="Enter Coord Api Key" required></paper-input>
-          </div>
+          <!-- <div class="full-width">
+            <h3 class="field-heading">Environment</h3>
+            <paper-input id="environment" class="input-keys" value="{{_settings.environment}}" placeholder="Enter Environment name" required></paper-input>
+          </div> -->
         </div>
 
         <hr/>
 
         <div class="operations edit-route-operation">
-          <paper-button class="primary" on-click="_saveIntegration">Save</paper-button>
+          <paper-button class="primary" on-click="_savesettings">Save</paper-button>
         </div>
       </paper-material>
     </div>
@@ -227,39 +227,40 @@
     'use strict';
 
     Polymer({
-      is: 'integration-list',
+      is: 'settings-list',
       properties: {
-        _integrationsOrigin: {
+        _settingsOrigin: {
           type: Object,
-          observer: '_integrationsOriginChange'
+          observer: '_settingsOriginChange'
         },
-        _integrations: {
+        _settings: {
           type: Object,
           value: {
-            meetUpApiKey: "",
+            s3BucketName: "",
+            environment:""
           }
         },
       },
 
 
-      _integrationsOriginChange: function(newIntegrationsOriginChange) {
-        if (this._jsonHasKeys(newIntegrationsOriginChange)) {
-          this._integrations = newIntegrationsOriginChange;
+      _settingsOriginChange: function(newsettingssOriginChange) {
+        if (this._jsonHasKeys(newsettingssOriginChange)) {
+          this._settings = newsettingssOriginChange;
         }
       },
-      _saveIntegration: function() {
+      _savesettings: function() {
         var self = this;
         console.log(this._routeDetails);
         //return false;
 
 
-        this._integrationsOrigin = this._integrations;
+        this._settingsOrigin = this._settings;
         var update = {};
-        update['integrations/'] = this._integrations;
+        update['settingss/'] = this._settings;
         console.log('check below update deep path data');
         console.log(update);
         //return false;
-        var firebaseDb = this.$.integration.db;
+        var firebaseDb = this.$.settings.db;
         var firebaseDbRef = firebaseDb.ref();
         firebaseDbRef.update(update, function(error) {
           if (error) {
@@ -305,11 +306,11 @@
       },
       ready: function() {
         var self = this;
-        this.$.integration.getStoredValue('/integrations')
+        this.$.settings.getStoredValue('/settingss')
           .then(function(data) {
 
-            self._integrationsOrigin = data;
-            //console.log(self._integrationsOrigin);
+            self._settingsOrigin = data;
+            //console.log(self._settingsOrigin);
           });
 
       },
