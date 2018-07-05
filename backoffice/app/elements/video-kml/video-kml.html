@@ -321,6 +321,9 @@
                             <div>
                               <span>Right Video: </span><br/> <a target="_blank" href="[[route.routeDetails.a.videoRightUrl]]"><span>[[route.routeDetails.a.videoRightUrl]]</span></a>
                             </div>
+                            <div>
+                              <span>KML Url: </span> <br/><a target="_blank" href="[[route.routeDetails.a.KmlUrl]]"><span>[[route.routeDetails.a.KmlUrl]]</span></a>
+                            </div>
                       </div>
                         <div class="stops-wrapper">
                           <h3>Direction A - Stops</h3>
@@ -355,6 +358,10 @@
                             <div>
                               <span>Right Video: </span> <br/><a target="_blank" href="[[route.routeDetails.b.videoRightUrl]]"><span>[[route.routeDetails.b.videoRightUrl]]</span></a>
                             </div>
+                            <div>
+                              <span>KML Url: </span> <br/><a target="_blank" href="[[route.routeDetails.b.KmlUrl]]"><span>[[route.routeDetails.b.KmlUrl]]</span></a>
+                            </div>
+
                       </div>
                         <div class="stops-wrapper">
                           <h3>Direction B - Stops</h3>
@@ -584,7 +591,7 @@
                 fullRouteDetails.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+code+"/"+code+"_a_backward.mp4";
 
               }
-              if(!directionAKmlUrl){
+              if(!directionBKmlUrl){
                 directionBKmlUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+code+"/"+code+"_b.kml";
                 isDefaultKmlfileB = true;
                 fullRouteDetails.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+code+"/"+code+"_b_forward.mp4";
@@ -595,6 +602,7 @@
               processKmlUrl(directionAKmlUrl,function(parsedAData){
                 console.log('check parsed data');
                 console.log(parsedAData);
+                fullRouteDetails.routeDetails.a.KmlUrl = directionAKmlUrl;
                 if(parsedAData){
                     fullRouteDetails.routeDetails.a.videoGeoPoints = parsedAData;
                     if(fullRouteDetails.routeDetails.a && fullRouteDetails.routeDetails.a.stops && fullRouteDetails.routeDetails.a.stops.length ){
@@ -617,6 +625,7 @@
                   fullRouteDetails.routeDetails.a.videoBackUrl = "";
                 }
                 processKmlUrl(directionBKmlUrl,function(parsedBData){
+                fullRouteDetails.routeDetails.b.KmlUrl = directionBKmlUrl;
                 if(parsedBData){
                           fullRouteDetails.routeDetails.b.videoGeoPoints = parsedBData;
                           if(fullRouteDetails.routeDetails.b && fullRouteDetails.routeDetails.b.stops && fullRouteDetails.routeDetails.b.stops.length ){
@@ -705,66 +714,96 @@
              var videoBLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
              var videoBRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
              var videoBBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
+             var isLatestSerourceA = false;
+             var isLatestSerourceB = false;
+
+             if(fullRouteDetails.routeDetails.a.videoUrl){
+               videoAUrl = fullRouteDetails.routeDetails.a.videoUrl;
+             }
+             if(fullRouteDetails.routeDetails.a.videoLeftUrl){
+               videoALeftUrl = fullRouteDetails.routeDetails.a.videoLeftUrl;
+             }
+             if(fullRouteDetails.routeDetails.a.videoARightUrl){
+               videoARightUrl = fullRouteDetails.routeDetails.a.videoARightUrl;
+             }
+             if(fullRouteDetails.routeDetails.a.videoABackUrl){
+               videoABackUrl = fullRouteDetails.routeDetails.a.videoABackUrl;
+             }
+
+             if(fullRouteDetails.routeDetails.b.videoUrl){
+               videoBUrl = fullRouteDetails.routeDetails.b.videoUrl;
+             }
+             if(fullRouteDetails.routeDetails.b.videoLeftUrl){
+               videoBLeftUrl = fullRouteDetails.routeDetails.b.videoLeftUrl;
+             }
+             if(fullRouteDetails.routeDetails.b.videoARightUrl){
+               videoBRightUrl = fullRouteDetails.routeDetails.b.videoARightUrl;
+             }
+             if(fullRouteDetails.routeDetails.b.videoABackUrl){
+               videoBBackUrl = fullRouteDetails.routeDetails.b.videoABackUrl;
+             }
 
              if(fullRouteDetails.routeDetails.latestResources && fullRouteDetails.routeDetails.latestResources.a){
                   videoAUrl = fullRouteDetails.routeDetails.latestResources.a.videoUrl;
                   videoALeftUrl = fullRouteDetails.routeDetails.latestResources.a.videoLeftUrl;
                   videoARightUrl = fullRouteDetails.routeDetails.latestResources.a.videoRightUrl;
                   videoABackUrl = fullRouteDetails.routeDetails.latestResources.a.videoBackUrl;
+                  isLatestSerourceA = true;
               }
               if(fullRouteDetails.routeDetails.latestResources && fullRouteDetails.routeDetails.latestResources.b){
                   videoBUrl = fullRouteDetails.routeDetails.latestResources.b.videoUrl;
                   videoBLeftUrl = fullRouteDetails.routeDetails.latestResources.b.videoLeftUrl;
                   videoBRightUrl = fullRouteDetails.routeDetails.latestResources.b.videoRightUrl;
                   videoBBackUrl = fullRouteDetails.routeDetails.latestResources.b.videoBackUrl;
+                  isLatestSerourceB = true;
               }
              //   tempRouteList[i] = routeObject;
              processVideoUrl(videoAUrl,function(videoAUrlResult){
              if(videoAUrlResult){
                fullRouteDetails.routeDetails.a.videoUrl = videoAUrl;
-             }else{
+             }else if(!isLatestSerourceA){
                fullRouteDetails.routeDetails.a.videoUrl = "";
              }
                processVideoUrl(videoALeftUrl,function(videoALeftUrlResult){
                  if(videoALeftUrlResult){
                    fullRouteDetails.routeDetails.a.videoLeftUrl = videoALeftUrl;
-                 }else{
+                 }else if(!isLatestSerourceA){
                    fullRouteDetails.routeDetails.a.videoLeftUrl = "";
                  }
                  processVideoUrl(videoARightUrl,function(videoARightUrlResult){
                    if(videoARightUrlResult){
                      fullRouteDetails.routeDetails.a.videoRightUrl = videoARightUrl;
-                   }else{
+                   }else if(!isLatestSerourceA){
                      fullRouteDetails.routeDetails.a.videoRightUrl = ""
                    }
                    processVideoUrl(videoABackUrl,function(videoABackUrlResult){
                      if(videoABackUrlResult){
                        fullRouteDetails.routeDetails.a.videoBackUrl = videoABackUrl;
-                     }else{
+                     }else if(!isLatestSerourceA){
                          fullRouteDetails.routeDetails.a.videoBackUrl = ""
                      }
                      processVideoUrl(videoBUrl,function(videoBUrlResult){
                        if(videoBUrlResult){
                          fullRouteDetails.routeDetails.b.videoUrl = videoBUrl
-                       }else{
+                       }else if(!isLatestSerourceB){
                            fullRouteDetails.routeDetails.b.videoUrl = ""
                        }
                        processVideoUrl(videoBLeftUrl,function(videoBLeftUrlResult){
                          if(videoBLeftUrlResult){
                            fullRouteDetails.routeDetails.b.videoLeftUrl = videoBLeftUrl
-                         }else{
+                         }else if(!isLatestSerourceB){
                              fullRouteDetails.routeDetails.b.videoLeftUrl = ""
                          }
                          processVideoUrl(videoBRightUrl,function(videoBRightUrlResult){
                            if(videoBRightUrlResult){
                              fullRouteDetails.routeDetails.b.videoRightUrl = videoBRightUrl
-                           }else{
+                           }else if(!isLatestSerourceB){
                              fullRouteDetails.routeDetails.b.videoRightUrl = ""
                            }
                                processVideoUrl(videoBBackUrl,function(videoBBackUrlResult){
                                  if(videoBBackUrlResult){
                                    fullRouteDetails.routeDetails.b.videoBackUrl = videoBBackUrl
-                                 }else{
+                                 }else if(!isLatestSerourceB){
                                      fullRouteDetails.routeDetails.b.videoBackUrl = ""
                                  }
                                  if(!fullRouteDetails.routeDetails.a.videoNightUrl){
@@ -952,9 +991,17 @@
         if(!code){
             return callback({message:'Code missing - after trim'},false)
         }
-        var routeInfo = fullRouteData;
-        var routeDetails = routeInfo.routeDetails;
-        delete routeInfo.routeDetails;
+        var routeInfo = {
+          code: fullRouteData.code,
+          departure: fullRouteData.departure,
+          destination: fullRouteData.destination,
+          directionAName: fullRouteData.directionAName,
+          directionBName: fullRouteData.directionBName,
+          latitude: fullRouteData.latitude,
+          longitude: fullRouteData.longitude,
+          name: fullRouteData.name
+        };
+        var routeDetails = fullRouteData.routeDetails;
         var update = {};
 
         update['routes/'+code] = routeInfo;
@@ -962,7 +1009,6 @@
         console.log('check below update deep path');
         console.log(update)
         //return callback(null,true);
-        //firebase.database().ref().update(update);
         var firebaseDb = this.$.routeInfo.db;
         var firebaseDbRef = firebaseDb.ref();
         firebaseDbRef.update(update, function(error) {
@@ -971,7 +1017,6 @@
           }else{
             console.log('Write Success');
           }
-          fullRouteData.routeDetails = routeDetails;
           return callback(null,true);
         });
       },

@@ -166,7 +166,7 @@
     </firebase-document>
 
     <div class="inner-content">
-    <h2 class="page-title">Settingss</h2>
+    <h2 class="page-title">settings</h2>
       <paper-material elevation="1">
         <div class="item header">
           <div class="column2">
@@ -181,7 +181,7 @@
         <div class="container item routeInfo">
           <div class="full-width">
             <h3 class="field-heading">API Key</h3>
-            <paper-input id="s3BucketName" class="input-keys"  value="{{_settings.apiKey}}" placeholder="Enter strong API Key and it should be hard to guess" required></paper-input>
+            <paper-input id="apiKey" class="input-keys"  value="{{_settings.apiKey}}" placeholder="Enter strong API Key and it should be hard to guess" required></paper-input>
           </div>
           <!-- <div class="full-width">
             <h3 class="field-heading">Environment</h3>
@@ -243,9 +243,9 @@
       },
 
 
-      _settingsOriginChange: function(newsettingssOriginChange) {
-        if (this._jsonHasKeys(newsettingssOriginChange)) {
-          this._settings = newsettingssOriginChange;
+      _settingsOriginChange: function(newsettingsOriginChange) {
+        if (this._jsonHasKeys(newsettingsOriginChange)) {
+          this._settings = newsettingsOriginChange;
         }
       },
       _savesettings: function() {
@@ -256,7 +256,7 @@
 
         this._settingsOrigin = this._settings;
         var update = {};
-        update['settingss/'] = this._settings;
+        update['settings/'] = this._settings;
         console.log('check below update deep path data');
         console.log(update);
         //return false;
@@ -306,7 +306,7 @@
       },
       ready: function() {
         var self = this;
-        this.$.settings.getStoredValue('/settingss')
+        this.$.settings.getStoredValue('/settings')
           .then(function(data) {
 
             self._settingsOrigin = data;

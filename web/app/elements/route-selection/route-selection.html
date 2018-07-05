@@ -264,7 +264,7 @@
             <div class="icon">
               <iron-icon icon="icons:cached"></iron-icon>
             </div>
-            <div class="message">Loadning...</div>
+            <div class="message">Loading...</div>
             <div class="dynamic-message">{{_operationMessageDetail}}</div>
           </div>
         </template>
@@ -365,15 +365,12 @@
 
         if (this._direction) {
           var self = this;
-          this._showOperationResultModal(false,"Loadnig stop list");
+          this._showOperationResultModal(false,"Loading departure and destination");
           // Get the route details from the selected route
           this.$.routeDetailsDoc.getStoredValue('/route-details/' + this._selectedRouteCode + '/' + this._direction)
             .then(function(data) {
               self._selectedRouteDetails = data;
-              self._showOperationResultModal(true,"Stop list loaded");
-              setTimeout(function(){
-                 self.$.saveOperationResultModal.close();
-              }, 1000);
+              self.$.saveOperationResultModal.close();
             }).catch(function(error) {
               console.log(error);
                self.$.saveOperationResultModal.close();

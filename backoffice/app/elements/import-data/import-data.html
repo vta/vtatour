@@ -411,7 +411,7 @@
             </div>
           </template>
 
-          <div class="route-map-template">
+          <div class="route-map-template" style="display:none;">
             <route-map id="routeMap" geo-points="{{_videoGeoPointsOrigin}}"></route-map>
           </div>
         </template>
@@ -704,6 +704,7 @@
          reader.readAsBinaryString(blob);
       },
       _readRoutes:function(opt_startByte,opt_stopByte){
+        var self = this;
         if(!this._imported_stops.length){
           this.$.saveOperationResultModal.close();
           alert('Please load a stop list first!');
@@ -764,7 +765,20 @@
                 }
 
              for(var i=0;i<rawRoutesData.length;i++){
+
                var rawRouteObject = rawRoutesData[i];
+               console.log('processing: '+rawRouteObject.route_id);
+               if(!rawRouteObject.route_id){
+                 self.$.saveOperationResultModal.close();
+                 alert('Processing error alert: route_id field missing for record number: '+(i+1)+', please upload valid file again');
+                 throw new ReferenceError('route_id id missing for record number: '+(i+1), 'import-data.html', 771);
+               }
+
+               if(!rawRouteObject.route_long_name){
+                 self.$.saveOperationResultModal.close();
+                 alert('Processing error alert: route_long_name field missing for route code: '+rawRouteObject.route_id+', please upload valid file again');
+                 throw new ReferenceError('route_long_name field missing for route code: '+rawRouteObject.route_id+', please upload valid file again', 'import-data.html', 779);
+               }
                var rawRouteObjectOtherDirection = null;
                var rawRouteObjectPreviousDirection = null;
                if(rawRoutesData[i+1] && rawRoutesData[i+1].route_id==rawRouteObject.route_id && rawRoutesData[i+1].direction_id==1){
@@ -1042,12 +1056,12 @@
 
         // Check if the same route was collapsed
         if (oldActiveRoute !== activeRoute) {
-          var routeMap = Polymer.dom(this.root).querySelector('#routeMap');
+          //var routeMap = Polymer.dom(this.root).querySelector('#routeMap');
 
           activeRoute.classList.add('active');
 
           // Append the map element
-          Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
+          //Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
           this._activeRouteCode = activeRoute.getAttribute('data-route-code');
           this._videoGeoPointsOrigin = this._imported_routes[routeIndex].routeDetails.a.videoGeoPoints;
           if(!this._videoGeoPointsOrigin.length){
@@ -1105,6 +1119,12 @@
         var firebaseDbRef = firebaseDb.ref();
         self.$.routeDetails.getStoredValue('/route-details/' + code)
           .then(function(data) {
+            if(data && data.latestResources){
+              routeDetails.latestResources = data.latestResources;
+            }
+            if(data && data.latestResourcesLowResolution){
+              routeDetails.latestResourcesLowResolution = data.latestResourcesLowResolution;
+            }
             if(data && data.a){
               if(data.a.videoGeoPoints){
                   routeDetails.a.videoGeoPoints = data.a.videoGeoPoints;
@@ -1114,6 +1134,8 @@
               routeDetails.a.videoRightUrl = data.a.videoRightUrl || "";
               routeDetails.a.videoBackUrl = data.a.videoBackUrl || "";
               routeDetails.a.videoNightUrl = data.a.videoNightUrl || "";
+
+
               if(routeDetails.a && routeDetails.a.stops && routeDetails.a.stops.length){
                 for(var a=0;a<routeDetails.a.stops.length;a++){
                   var tempStopObject = routeDetails.a.stops[a];
