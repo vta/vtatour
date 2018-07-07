@@ -1129,11 +1129,37 @@
               if(data.a.videoGeoPoints){
                   routeDetails.a.videoGeoPoints = data.a.videoGeoPoints;
               }
+              if(data.a.videoGeoPointsLowRes){
+                  routeDetails.a.videoGeoPointsLowRes = data.a.videoGeoPointsLowRes;
+              }
+              if(data.a.videoGeoPointsLeft){
+                  routeDetails.a.videoGeoPointsLeft = data.a.videoGeoPointsLeft;
+              }
+              if(data.a.videoGeoPointsLeftLowRes){
+                  routeDetails.a.videoGeoPointsLeftLowRes = data.a.videoGeoPointsLeftLowRes;
+              }
+              if(data.a.videoGeoPointsRight){
+                  routeDetails.a.videoGeoPointsRight = data.a.videoGeoPointsRight;
+              }
+              if(data.a.videoGeoPointsRightLowRes){
+                  routeDetails.a.videoGeoPointsRightLowRes = data.a.videoGeoPointsRightLowRes;
+              }
+              if(data.a.videoGeoPointsBack){
+                  routeDetails.a.videoGeoPointsBack = data.a.videoGeoPointsBack;
+              }
+              if(data.a.videoGeoPointsBackLowRes){
+                  routeDetails.a.videoGeoPointsBackLowRes = data.a.videoGeoPointsBackLowRes;
+              }
               routeDetails.a.videoUrl = data.a.videoUrl || "";
               routeDetails.a.videoLeftUrl = data.a.videoLeftUrl || "";
               routeDetails.a.videoRightUrl = data.a.videoRightUrl || "";
               routeDetails.a.videoBackUrl = data.a.videoBackUrl || "";
               routeDetails.a.videoNightUrl = data.a.videoNightUrl || "";
+              routeDetails.a.videoUrlLowRes = data.a.videoUrlLowRes || "";
+              routeDetails.a.videoLeftUrlLowRes = data.a.videoLeftUrlLowRes || "";
+              routeDetails.a.videoRightUrlLowRes = data.a.videoRightUrlLowRes || "";
+              routeDetails.a.videoBackUrlLowRes = data.a.videoBackUrlLowRes || "";
+              routeDetails.a.videoNightUrlLowRes = data.a.videoNightUrlLowRes || "";
 
 
               if(routeDetails.a && routeDetails.a.stops && routeDetails.a.stops.length){
@@ -1148,11 +1174,39 @@
               if(data.b.videoGeoPoints){
                   routeDetails.b.videoGeoPoints = data.b.videoGeoPoints;
               }
+              if(data.b.videoGeoPointsLowRes){
+                  routeDetails.b.videoGeoPointsLowRes = data.b.videoGeoPointsLowRes;
+              }
+              if(data.b.videoGeoPointsLeft){
+                  routeDetails.b.videoGeoPointsLeft = data.b.videoGeoPointsLeft;
+              }
+              if(data.b.videoGeoPointsLeftLowRes){
+                  routeDetails.b.videoGeoPointsLeftLowRes = data.b.videoGeoPointsLeftLowRes;
+              }
+
+              if(data.b.videoGeoPointsRight){
+                  routeDetails.b.videoGeoPointsRight = data.b.videoGeoPointsRight;
+              }
+              if(data.b.videoGeoPointsRightLowRes){
+                  routeDetails.b.videoGeoPointsRightLowRes = data.b.videoGeoPointsRightLowRes;
+              }
+
+              if(data.b.videoGeoPointsBack){
+                  routeDetails.b.videoGeoPointsBack = data.b.videoGeoPointsBack;
+              }
+              if(data.b.videoGeoPointsBackLowRes){
+                  routeDetails.b.videoGeoPointsBackLowRes = data.b.videoGeoPointsBackLowRes;
+              }
               routeDetails.b.videoUrl = data.b.videoUrl || "";
               routeDetails.b.videoLeftUrl = data.b.videoLeftUrl || "";
               routeDetails.b.videoRightUrl = data.b.videoRightUrl || "";
               routeDetails.b.videoBackUrl = data.b.videoBackUrl || "";
               routeDetails.b.videoNightUrl = data.b.videoNightUrl || "";
+              routeDetails.b.videoUrlLowRes = data.b.videoUrlLowRes || "";
+              routeDetails.b.videoLeftUrlLowRes = data.b.videoLeftUrlLowRes || "";
+              routeDetails.b.videoRightUrlLowRes = data.b.videoRightUrlLowRes || "";
+              routeDetails.b.videoBackUrlLowRes = data.b.videoBackUrlLowRes || "";
+              routeDetails.b.videoNightUrlLowRes = data.b.videoNightUrlLowRes || "";
               if(routeDetails.b && routeDetails.b.stops && routeDetails.b.stops.length ){
                 for(var b=0;b<routeDetails.b.stops.length;b++){
                   var tempStopObject = routeDetails.b.stops[b];
