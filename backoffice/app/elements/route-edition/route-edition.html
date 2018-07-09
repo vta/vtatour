@@ -1037,6 +1037,11 @@
         if(this._routeDetails.a && this._routeDetails.a.stops && this._routeDetails.a.stops.length ){
           for(var a=0;a<this._routeDetails.a.stops.length;a++){
             var tempStopObject = this._routeDetails.a.stops[a];
+            if (tempStopObject.isNotificationEnabled === true) {
+              this._routeDetails.a.stops[a].isNotificationEnabled = true;
+            } else {
+              this._routeDetails.a.stops[a].isNotificationEnabled = false;
+            }
               var point = this.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, this._routeDetails.a.videoGeoPoints);
               this._routeDetails.a.stops[a].sec =  parseInt(point.key);
           }
@@ -1045,6 +1050,11 @@
         if(this._routeDetails.b && this._routeDetails.b.stops && this._routeDetails.b.stops.length ){
           for(var b=0;b<this._routeDetails.b.stops.length;b++){
             var tempStopObject = this._routeDetails.b.stops[b];
+            if (tempStopObject.isNotificationEnabled === true) {
+              this._routeDetails.b.stops[b].isNotificationEnabled = true;
+            } else {
+              this._routeDetails.b.stops[b].isNotificationEnabled = false;
+            }
             var point = this.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, this._routeDetails.b.videoGeoPoints);
             this._routeDetails.b.stops[b].sec =  parseInt(point.key);
           }
@@ -1052,9 +1062,6 @@
 
         console.log(this._routeDetails);
         console.log('this is end of processing now going to save')
-        return false;
-
-
         this._routeInfoOrigin = this._routeInfo;
         this._routeDetailsOrigin = this._routeDetails;
         var code = this._routeInfo.code;
