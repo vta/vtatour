@@ -149,6 +149,11 @@
         padding-left: 0px;
         margin-left: 5%;
       }
+      .main-heading{
+        margin-left: 5%;
+    margin-top: 2%;
+    font-weight: bold;
+      }
     </style>
 
     <firebase-query
@@ -219,7 +224,7 @@
             </template>
           </div>
         </div>
-
+        <h3 class="main-heading">High Resolution</h3><br/>
         <div class="container item routeInfo">
           <div class="column1">
             <h3>Direction A - Info</h3>
@@ -229,8 +234,45 @@
             <paper-input id="videoARight" value="{{_routeDetails.a.videoRightUrl}}" label="Video Direction A - Right" placeholder="Right Side Video URL" required></paper-input>
             <paper-input id="videoABack" value="{{_routeDetails.a.videoBackUrl}}" label="Video Direction A - Back" placeholder="Back Side Video URL" required></paper-input>
             <paper-input id="videoANight" value="{{_routeDetails.a.videoNightUrl}}" label="Video Direction A - Night" placeholder="Night Video URL" required></paper-input>
-            <paper-input id="kmlFileA" label="KML File Direction A" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChange"></paper-input>
+            <paper-input id="kmlFileA" label="KML File Direction A Front view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChange"></paper-input>
+            <paper-input id="kmlFileALeft" label="KML File Direction A Left view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeLeft"></paper-input>
+            <paper-input id="kmlFileARight" label="KML File Direction A Right view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeRight"></paper-input>
+            <paper-input id="kmlFileABack" label="KML File Direction A Back view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeBack"></paper-input>
+            <paper-input id="kmlFileANight" label="KML File Direction A Night view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeNight"></paper-input>
 
+          </div>
+          <div class="column1">
+            <h3>Direction B - Info</h3>
+            <paper-input id="directionBName" value="{{_routeInfo.directionBName}}" placeholder="Direction B Name" required></paper-input>
+            <paper-input id="videoB" value="{{_routeDetails.b.videoUrl}}" label="Video Direction B - Front" placeholder="Front Video URL" required></paper-input>
+            <paper-input id="videoBLeft" value="{{_routeDetails.b.videoLeftUrl}}" label="Video Direction B - Left" placeholder="Left Side Video URL" required></paper-input>
+            <paper-input id="videoBRight" value="{{_routeDetails.b.videoRightUrl}}" label="Video Direction B - Right" placeholder="Right Side Video URL" required></paper-input>
+            <paper-input id="videoBBack" value="{{_routeDetails.b.videoBackUrl}}" label="Video Direction B - Back" placeholder="Back Side Video URL" required></paper-input>
+            <paper-input id="videoBNight" value="{{_routeDetails.b.videoNightUrl}}" label="Video Direction B - Night" placeholder="Night Video URL" required></paper-input>
+            <paper-input id="kmlFileB" label="KML File Direction B Front View" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChange"></paper-input>
+            <paper-input id="kmlFileBLeft" label="KML File Direction B Left view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChangeLeft"></paper-input>
+            <paper-input id="kmlFileBRight" label="KML File Direction B Right view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChangeRight"></paper-input>
+            <paper-input id="kmlFileBBack" label="KML File Direction B Back view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChangeBack"></paper-input>
+            <paper-input id="kmlFileBNight" label="KML File Direction B Night view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChangeNight"></paper-input>
+
+
+          </div>
+        </div>
+        <hr/>
+        <h3 class="main-heading">Low Resolution</h3><br/>
+        <div class="container item routeInfo">
+          <div class="column1">
+            <h3>Direction A - Info</h3>
+            <paper-input id="videoALowRes" value="{{_routeDetails.a.videoUrlLowRes}}" label="Video Direction A - Front" placeholder="Front Video URL" required></paper-input>
+            <paper-input id="videoALeftLowRes" value="{{_routeDetails.a.videoLeftUrlLowRes}}" label="Video Direction A - Left" placeholder="Left Side Video URL" required></paper-input>
+            <paper-input id="videoARightLowRes" value="{{_routeDetails.a.videoRightUrlLowRes}}" label="Video Direction A - Right" placeholder="Right Side Video URL" required></paper-input>
+            <paper-input id="videoABackLowRes" value="{{_routeDetails.a.videoBackUrlLowRes}}" label="Video Direction A - Back" placeholder="Back Side Video URL" required></paper-input>
+            <paper-input id="videoANightLowRes" value="{{_routeDetails.a.videoNightUrlLowRes}}" label="Video Direction A - Night" placeholder="Night Video URL" required></paper-input>
+            <paper-input id="kmlFileALowRes" label="KML File Direction A Front view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeLowRes"></paper-input>
+            <paper-input id="kmlFileALeftLowRes" label="KML File Direction A Left view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeLeftLowRe"></paper-input>
+            <paper-input id="kmlFileARightLowRes" label="KML File Direction A Right view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeRightLowRes"></paper-input>
+            <paper-input id="kmlFileABackLowRes" label="KML File Direction A Back view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeBackLowRes"></paper-input>
+            <paper-input id="kmlFileANightLowRes" label="KML File Direction A Night view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileAChangeNightLowRes"></paper-input>
             <template is="dom-if" if="{{_displayStops}}">
               <div class="stops-wrapper">
                 <h3>Direction A - Stops</h3>
@@ -245,29 +287,32 @@
           </div>
           <div class="column1">
             <h3>Direction B - Info</h3>
-            <paper-input id="directionBName" value="{{_routeInfo.directionBName}}" placeholder="Direction B Name" required></paper-input>
-            <paper-input id="videoB" value="{{_routeDetails.b.videoUrl}}" label="Video Direction B - Front" placeholder="Front Video URL" required></paper-input>
-            <paper-input id="videoBLeft" value="{{_routeDetails.b.videoLeftUrl}}" label="Video Direction B - Left" placeholder="Left Side Video URL" required></paper-input>
-            <paper-input id="videoBRight" value="{{_routeDetails.b.videoRightUrl}}" label="Video Direction B - Right" placeholder="Right Side Video URL" required></paper-input>
-            <paper-input id="videoBBack" value="{{_routeDetails.b.videoBackUrl}}" label="Video Direction B - Back" placeholder="Back Side Video URL" required></paper-input>
-            <paper-input id="videoBNight" value="{{_routeDetails.b.videoNightUrl}}" label="Video Direction B - Night" placeholder="Night Video URL" required></paper-input>
-            <paper-input id="kmlFileB" label="KML File Direction B" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChange"></paper-input>
+            <paper-input id="videoBLowRes" value="{{_routeDetails.b.videoUrlLowRes}}" label="Video Direction B - Front" placeholder="Front Video URL" required></paper-input>
+            <paper-input id="videoBLeftLowRes" value="{{_routeDetails.b.videoLeftUrlLowRes}}" label="Video Direction B - Left" placeholder="Left Side Video URL" required></paper-input>
+            <paper-input id="videoBRightLowRes" value="{{_routeDetails.b.videoRightUrlLowRes}}" label="Video Direction B - Right" placeholder="Right Side Video URL" required></paper-input>
+            <paper-input id="videoBBackLowRes" value="{{_routeDetails.b.videoBackUrlLowRes}}" label="Video Direction B - Back" placeholder="Back Side Video URL" required></paper-input>
+            <paper-input id="videoBNightLowRes" value="{{_routeDetails.b.videoNightUrlLowRes}}" label="Video Direction B - Night" placeholder="Night Video URL" required></paper-input>
+            <paper-input id="kmlFileBLowRes" label="KML File Direction B Front View" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChange"></paper-input>
+            <paper-input id="kmlFileBLeftLowRes" label="KML File Direction B Left view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChangeLeftLowRes"></paper-input>
+            <paper-input id="kmlFileBRightLowRes" label="KML File Direction B Right view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChangeRightLowRes"></paper-input>
+            <paper-input id="kmlFileBBackLowRes" label="KML File Direction B Back view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChangeBackLowRes"></paper-input>
+            <paper-input id="kmlFileBNightLowRes" label="KML File Direction B Night view" type="file" placeholder="File with the Geo Video points" on-change="_onKmlFileBChangeNightLowRes"></paper-input>
 
             <template is="dom-if" if="{{_displayStops}}">
               <div class="stops-wrapper">
                 <h3>Direction B - Stops</h3>
                 <stop-list stops="{{_routeDetails.b.stops}}" show-operations></stop-list>
-                <div class="add-stop-wrapper">
+                <!-- <div class="add-stop-wrapper">
                   <paper-button on-click="_openAddStopModal" data-route-direction="b">
                     <iron-icon icon="icons:add"></iron-icon>Add stop
                   </paper-button>
-                </div>
+                </div> -->
               </div>
             </template>
           </div>
         </div>
+      <hr/>
 
-        <hr/>
 
         <div class="operations edit-route-operation">
           <paper-button class="delete-route" on-click="_openDeleteRouteModal">Delete This Route</paper-button>
@@ -280,7 +325,29 @@
     </div>
 
     <kml-parser id="kmlParserA" result="{{_kmlParserAResult}}"></kml-parser>
+    <kml-parser id="kmlParserALeft" result="{{_kmlParserAResultLeft}}"></kml-parser>
+    <kml-parser id="kmlParserARight" result="{{_kmlParserAResultRight}}"></kml-parser>
+    <kml-parser id="kmlParserARight" result="{{_kmlParserAResultRight}}"></kml-parser>
+    <kml-parser id="kmlParserABack" result="{{_kmlParserAResultBack}}"></kml-parser>
+    <kml-parser id="kmlParserALowRes" result="{{_kmlParserAResultLowRes}}"></kml-parser>
+    <kml-parser id="kmlParserALeftLowRes" result="{{_kmlParserAResultLeftLowRes}}"></kml-parser>
+    <kml-parser id="kmlParserARightLowRes" result="{{_kmlParserAResultRightLowRes}}"></kml-parser>
+    <kml-parser id="kmlParserARightLowRes" result="{{_kmlParserAResultRightLowRes}}"></kml-parser>
+    <kml-parser id="kmlParserABackLowRes" result="{{_kmlParserAResultBackLowRes}}"></kml-parser>
+
+
+
     <kml-parser id="kmlParserB" result="{{_kmlParserBResult}}"></kml-parser>
+    <kml-parser id="kmlParserBLeft" result="{{_kmlParserBResultLeft}}"></kml-parser>
+    <kml-parser id="kmlParserBRight" result="{{_kmlParserBResultRight}}"></kml-parser>
+    <kml-parser id="kmlParserBBack" result="{{_kmlParserBResultBack}}"></kml-parser>
+    <kml-parser id="kmlParserBNight" result="{{_kmlParserBResultNight}}"></kml-parser>
+
+    <kml-parser id="kmlParserBLowRes" result="{{_kmlParserBResultLowRes}}"></kml-parser>
+    <kml-parser id="kmlParserBLeftLowRes" result="{{_kmlParserBResultLeftLowRes}}"></kml-parser>
+    <kml-parser id="kmlParserBRightLowRes" result="{{_kmlParserBResultRightLowRes}}"></kml-parser>
+    <kml-parser id="kmlParserBBackLowRes" result="{{_kmlParserBResultBackLowRes}}"></kml-parser>
+    <kml-parser id="kmlParserBNightLowRes" result="{{_kmlParserBResultNightLowRes}}"></kml-parser>
 
     <paper-dialog id="stopsModal" modal>
       <paper-input-autocomplete id="stopAutocompleteA" label="Stop" placeholder="Type your stop"
@@ -386,9 +453,83 @@
           type: Object,
           observer: '_kmlParserAResultChange'
         },
+        _kmlParserAResultLeft: {
+          type: Object,
+          observer: '_kmlParserAResultChangeLeft'
+        },
+        _kmlParserAResultRight: {
+          type: Object,
+          observer: '_kmlParserAResultChangeRight'
+        },
+        _kmlParserAResultBack: {
+          type: Object,
+          observer: '_kmlParserAResultChangeBack'
+        },
+        _kmlParserAResultNight: {
+          type: Object,
+          observer: '_kmlParserAResultChangeNight'
+        },
+        _kmlParserAResultLowRes: {
+          type: Object,
+          observer: '_kmlParserAResultChangeLowRes'
+        },
+        _kmlParserAResultLeftLowRes: {
+          type: Object,
+          observer: '_kmlParserAResultChangeLeftLowRes'
+        },
+        _kmlParserAResultRightLowRes: {
+          type: Object,
+          observer: '_kmlParserAResultChangeRightLowRes'
+        },
+        _kmlParserAResultBackLowRes: {
+          type: Object,
+          observer: '_kmlParserAResultChangeBackLowRes'
+        },
+        _kmlParserAResultNightLowRes: {
+          type: Object,
+          observer: '_kmlParserAResultChangeNightLowRes'
+        },
+
+
         _kmlParserBResult: {
           type: Object,
           observer: '_kmlParserBResultChange'
+        },
+        _kmlParserBResultLeft: {
+          type: Object,
+          observer: '_kmlParserBResultChangeLeft'
+        },
+        _kmlParserBResultRight: {
+          type: Object,
+          observer: '_kmlParserBResultChangeRight'
+        },
+        _kmlParserBResultBack: {
+          type: Object,
+          observer: '_kmlParserBResultChangeBack'
+        },
+        _kmlParserBResultNight: {
+          type: Object,
+          observer: '_kmlParserBResultChangeNight'
+        },
+        _kmlParserBResultLowRes: {
+          type: Object,
+          observer: '_kmlParserBResultChangeLowRes'
+        },
+        _kmlParserBResultLeftLowRes: {
+          type: Object,
+          observer: '_kmlParserBResultChangeLeftLowRes'
+        },
+        _kmlParserBResultRightLowRes: {
+          type: Object,
+          observer: '_kmlParserBResultChangeRightLowRes'
+        },
+        _kmlParserBResultBackLowRes: {
+          type: Object,
+          observer: '_kmlParserBResultChangeBackLowRes'
+        },
+        _kmlParserBResultNightLowRes: {
+          type: Object,
+          observer: '_kmlParserBResultChangeNightLowRes'
         },
         _displayStops: {
           type: Boolean,
@@ -476,6 +617,78 @@
           this.$.kmlParserA.parse();
         }
       },
+      _onKmlFileAChangeLeft: function(event) {
+        this._kmlFileALeft = event.target.files[0];
+
+        if (this._kmlFileALeft) {
+          this.$.kmlParserALeft.file = this._kmlFileALeft;
+          this.$.kmlParserALeft.parse();
+        }
+      },
+      _onKmlFileAChangeRight: function(event) {
+        this._kmlFileARight = event.target.files[0];
+
+        if (this._kmlFileARight) {
+          this.$.kmlParserARight.file = this._kmlFileARight;
+          this.$.kmlParserARight.parse();
+        }
+      },
+      _onKmlFileAChangeBack: function(event) {
+        this._kmlFileABack = event.target.files[0];
+
+        if (this._kmlFileABack) {
+          this.$.kmlParserABack.file = this._kmlFileABack;
+          this.$.kmlParserABack.parse();
+        }
+      },
+      _onKmlFileAChangeNight: function(event) {
+        this._kmlFileANight = event.target.files[0];
+
+        if (this._kmlFileANight) {
+          this.$.kmlParserANight.file = this._kmlFileANight;
+          this.$.kmlParserANight.parse();
+        }
+      },
+      _onKmlFileAChangeLowRes: function(event) {
+        this._kmlFileALowRes = event.target.files[0];
+
+        if (this._kmlFileALowRes) {
+          this.$.kmlParserALowRes.file = this._kmlFileALowRes;
+          this.$.kmlParserALowRes.parse();
+        }
+      },
+      _onKmlFileAChangeLeftLowRes: function(event) {
+        this._kmlFileALeftLowRes = event.target.files[0];
+
+        if (this._kmlFileALeftLowRes) {
+          this.$.kmlParserALeftLowRes.file = this._kmlFileALeftLowRes;
+          this.$.kmlParserALeftLowRes.parse();
+        }
+      },
+      _onKmlFileAChangeRightLowRes: function(event) {
+        this._kmlFileARightLowRes = event.target.files[0];
+
+        if (this._kmlFileARightLowRes) {
+          this.$.kmlParserARightLowRes.file = this._kmlFileARightLowRes;
+          this.$.kmlParserARightLowRes.parse();
+        }
+      },
+      _onKmlFileAChangeBackLowRes: function(event) {
+        this._kmlFileABackLowRes = event.target.files[0];
+
+        if (this._kmlFileABackLowRes) {
+          this.$.kmlParserABackLowRes.file = this._kmlFileABack;
+          this.$.kmlParserABackLowRes.parse();
+        }
+      },
+      _onKmlFileAChangeNightLowRes: function(event) {
+        this._kmlFileANightLowRes = event.target.files[0];
+
+        if (this._kmlFileANightLowRes) {
+          this.$.kmlParserANightLowRes.file = this._kmlFileANightLowRes;
+          this.$.kmlParserANightLowRes.parse();
+        }
+      },
 
       _onKmlFileBChange: function(event) {
         this._kmlFileB = event.target.files[0];
@@ -483,6 +696,78 @@
         if (this._kmlFileB) {
           this.$.kmlParserB.file = this._kmlFileB;
           this.$.kmlParserB.parse();
+        }
+      },
+      _onKmlFileBChangeLeft: function(event) {
+        this._kmlFileBLeft = event.target.files[0];
+
+        if (this._kmlFileBLeft) {
+          this.$.kmlParserBLeft.file = this._kmlFileBLeft;
+          this.$.kmlParserBLeft.parse();
+        }
+      },
+      _onKmlFileBChangeRight: function(event) {
+        this._kmlFileBRight = event.target.files[0];
+
+        if (this._kmlFileBRight) {
+          this.$.kmlParserBRight.file = this._kmlFileBRight;
+          this.$.kmlParserBRight.parse();
+        }
+      },
+      _onKmlFileBChangeBack: function(event) {
+        this._kmlFileBBack = event.target.files[0];
+
+        if (this._kmlFileBBack) {
+          this.$.kmlParserBBack.file = this._kmlFileBBack;
+          this.$.kmlParserBBack.parse();
+        }
+      },
+      _onKmlFileBChangeNight: function(event) {
+        this._kmlFileBNight = event.target.files[0];
+
+        if (this._kmlFileBNight) {
+          this.$.kmlParserBNight.file = this._kmlFileBNight;
+          this.$.kmlParserBNight.parse();
+        }
+      },
+      _onKmlFileBChangeLowRes: function(event) {
+        this._kmlFileBLowRes = event.target.files[0];
+
+        if (this._kmlFileBLowRes) {
+          this.$.kmlParserBLowRes.file = this._kmlFileBLowRes;
+          this.$.kmlParserBLowRes.parse();
+        }
+      },
+      _onKmlFileBChangeLeftLowRes: function(event) {
+        this._kmlFileBLeftLowRes = event.target.files[0];
+
+        if (this._kmlFileBLeftLowRes) {
+          this.$.kmlParserBLeftLowRes.file = this._kmlFileBLeftLowRes;
+          this.$.kmlParserBLeftLowRes.parse();
+        }
+      },
+      _onKmlFileBChangeRightLowRes: function(event) {
+        this._kmlFileBRightLowRes = event.target.files[0];
+
+        if (this._kmlFileBRightLowRes) {
+          this.$.kmlParserBRightLowRes.file = this._kmlFileBRightLowRes;
+          this.$.kmlParserBRightLowRes.parse();
+        }
+      },
+      _onKmlFileBChangeBackLowRes: function(event) {
+        this._kmlFileBBackLowRes = event.target.files[0];
+
+        if (this._kmlFileBBackLowRes) {
+          this.$.kmlParserBBackLowRes.file = this._kmlFileBBack;
+          this.$.kmlParserBBackLowRes.parse();
+        }
+      },
+      _onKmlFileBChangeNightLowRes: function(event) {
+        this._kmlFileBNightLowRes = event.target.files[0];
+
+        if (this._kmlFileBNightLowRes) {
+          this.$.kmlParserBNightLowRes.file = this._kmlFileBNightLowRes;
+          this.$.kmlParserBNightLowRes.parse();
         }
       },
 
@@ -497,7 +782,61 @@
         this.notifyPath('_routeDetails.a.videoGeoPoints', newKmlParserResultChange);
         this._checkVideoGeoPoints();
       },
+      _kmlParserAResultChangeLeft: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+        this._routeDetails.a.videoGeoPointsLeft = newKmlParserResultChange;
+      },
+      _kmlParserAResultChangeRight: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+        this._routeDetails.a.videoGeoPointsRight = newKmlParserResultChange;
+      },
+      _kmlParserAResultChangeBack: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+        this._routeDetails.a.videoGeoPointsBack = newKmlParserResultChange;
+      },
+      _kmlParserAResultChangeNight: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+        this._routeDetails.a.videoGeoPointsNight = newKmlParserResultChange;
+      },
+      _kmlParserAResultChangeLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
 
+        this._routeDetails.a.videoGeoPointsLowRes = newKmlParserResultChange;
+      },
+      _kmlParserAResultChangeLeftLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+        this._routeDetails.a.videoGeoPointsLeftLowRes = newKmlParserResultChange;
+      },
+      _kmlParserAResultChangeRightLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+        this._routeDetails.a.videoGeoPointsRightLowRes = newKmlParserResultChange;
+      },
+      _kmlParserAResultChangeBackLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+        this._routeDetails.a.videoGeoPointsBackLowRes = newKmlParserResultChange;
+      },
+      _kmlParserAResultChangeNightLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.a) {
+          this._routeDetails.a = {};
+        }
+        this._routeDetails.a.videoGeoPointsNightLowRes = newKmlParserResultChange;
+      },
       _kmlParserBResultChange: function(newKmlParserResultChange) {
         if (!this._routeDetails.b) {
           this._routeDetails.b = {};
@@ -505,6 +844,61 @@
 
         this._routeDetails.b.videoGeoPoints = newKmlParserResultChange;
         this._checkVideoGeoPoints();
+      },
+      _kmlParserBResultChangeLeft: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+        this._routeDetails.b.videoGeoPointsLeft = newKmlParserResultChange;
+      },
+      _kmlParserBResultChangeRight: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+        this._routeDetails.b.videoGeoPointsRight = newKmlParserResultChange;
+      },
+      _kmlParserBResultChangeBack: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+        this._routeDetails.b.videoGeoPointsBack = newKmlParserResultChange;
+      },
+      _kmlParserBResultChangeNight: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+        this._routeDetails.b.videoGeoPointsNight = newKmlParserResultChange;
+      },
+      _kmlParserBResultChangeLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+
+        this._routeDetails.b.videoGeoPointsLowRes = newKmlParserResultChange;
+      },
+      _kmlParserBResultChangeLeftLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+        this._routeDetails.b.videoGeoPointsLeftLowRes = newKmlParserResultChange;
+      },
+      _kmlParserBResultChangeRightLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+        this._routeDetails.b.videoGeoPointsRightLowRes = newKmlParserResultChange;
+      },
+      _kmlParserBResultChangeBackLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+        this._routeDetails.b.videoGeoPointsBackLowRes = newKmlParserResultChange;
+      },
+      _kmlParserBResultChangeNightLowRes: function(newKmlParserResultChange) {
+        if (!this._routeDetails.b) {
+          this._routeDetails.b = {};
+        }
+        this._routeDetails.b.videoGeoPointsNightLowRes = newKmlParserResultChange;
       },
 
       _checkVideoGeoPoints: function() {
@@ -643,6 +1037,11 @@
         if(this._routeDetails.a && this._routeDetails.a.stops && this._routeDetails.a.stops.length ){
           for(var a=0;a<this._routeDetails.a.stops.length;a++){
             var tempStopObject = this._routeDetails.a.stops[a];
+            if (tempStopObject.isNotificationEnabled === true) {
+              this._routeDetails.a.stops[a].isNotificationEnabled = true;
+            } else {
+              this._routeDetails.a.stops[a].isNotificationEnabled = false;
+            }
               var point = this.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, this._routeDetails.a.videoGeoPoints);
               this._routeDetails.a.stops[a].sec =  parseInt(point.key);
           }
@@ -651,15 +1050,18 @@
         if(this._routeDetails.b && this._routeDetails.b.stops && this._routeDetails.b.stops.length ){
           for(var b=0;b<this._routeDetails.b.stops.length;b++){
             var tempStopObject = this._routeDetails.b.stops[b];
+            if (tempStopObject.isNotificationEnabled === true) {
+              this._routeDetails.b.stops[b].isNotificationEnabled = true;
+            } else {
+              this._routeDetails.b.stops[b].isNotificationEnabled = false;
+            }
             var point = this.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, this._routeDetails.b.videoGeoPoints);
             this._routeDetails.b.stops[b].sec =  parseInt(point.key);
           }
         }
 
         console.log(this._routeDetails);
-        //return false;
-
-
+        console.log('this is end of processing now going to save')
         this._routeInfoOrigin = this._routeInfo;
         this._routeDetailsOrigin = this._routeDetails;
         var code = this._routeInfo.code;

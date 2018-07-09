@@ -299,48 +299,36 @@
         </div>
       </template>
 
-      <div class="inner-content" style="display:none;">
-      	<h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
+  <div class="inner-content" style="display:none;">
+    <h2 class="page-title" tabindex="-1">[[_routeInfo.name]] - [[_routeDirection]]</h2>
 
-      </div>
+  </div>
 
-      <div class="navigation-wrapper">
-        <div class="video-player-wrapper">
-            <iron-icon icon="icons:fullscreen" class="fullscreen-button"></iron-icon>
-          <video id="mainRouteVideo" class="video-js vjs-default-skin" controls preload="auto" webkit-playsinline playsinline>
+  <div class="navigation-wrapper">
+    <div class="video-player-wrapper">
+      <iron-icon icon="icons:fullscreen" class="fullscreen-button"></iron-icon>
+      <video id="mainRouteVideo" class="video-js vjs-default-skin" controls preload="auto" webkit-playsinline playsinline>
                 <!-- <source src="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/ALUMROCKTRANSITCENTER-SANTACLARA%2628TH/1024x1024-SANTA_CLARA_28TH-ALUM_ROCK_TRANSIT_CENTER.mp4" type='video/mp4'> -->
                 <p class="vjs-no-js">
                   To view this video please enable JavaScript, and consider upgrading to a web browser that
                   <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
                 </p>
           </video>
-          <paper-progress value="{{_progressBarValue}}" on-click="_videoProgressClick" class="blue"></paper-progress>
-        </div>
+      <paper-progress value="{{_progressBarValue}}" on-click="_videoProgressClick" class="blue"></paper-progress>
+    </div>
 
-        <div class="map-wrapper">
-          <google-map-search
-            id="search"
-            map="[[_map]]"
-            api-key="[[_google_api_key]]"
-            radius="3000"
-            results="{{_pois}}"
-            mapType="satellite"
-            >
-          </google-map-search>
+    <div class="map-wrapper">
+      <google-map-search id="search" map="[[_map]]" api-key="[[_google_api_key]]" radius="3000" results="{{_pois}}" mapType="satellite">
+      </google-map-search>
 
-          <google-map id="map"
-            map="{{_map}}"
-            api-key="[[_google_api_key]]"
-            additional-map-options='{"zoomControl":"true"}'
-            mapType="satellite"
-            disable-zoom>
-              <template is="dom-if" if="[[_isValidCords(_currentLat,_currentLng)]]">
+      <google-map id="map" map="{{_map}}" api-key="[[_google_api_key]]" additional-map-options='{"zoomControl":"true"}' mapType="satellite" disable-zoom>
+        <template is="dom-if" if="[[_isValidCords(_currentLat,_currentLng)]]">
                 <google-map-marker id="marker" icon="/images/fa-bus.png"
                   latitude="{{_currentLat}}" longitude="{{_currentLng}}">
                 </google-map-marker>
               </template>
 
-              <template is="dom-if" if="[[_isValidCords(_departureStop.lat,_departureStop.lng)]]">
+        <template is="dom-if" if="[[_isValidCords(_departureStop.lat,_departureStop.lng)]]">
                   <google-map-marker
                     id="departureMarker"
                     latitude="[[_departureStop.lat]]"
@@ -352,7 +340,7 @@
                   </google-map-marker>
               </template>
 
-              <template is="dom-if" if="[[_isValidCords(_destinationStop.lat,_destinationStop.lng)]]">
+        <template is="dom-if" if="[[_isValidCords(_destinationStop.lat,_destinationStop.lng)]]">
                 <google-map-marker
                   id="destinationMarker"
                   latitude="[[_destinationStop.lat]]"
@@ -365,7 +353,7 @@
               </template>
 
 
-                <template is="dom-if" if="[[_isValidCords(_nextStopGeoPoint.lat,_nextStopGeoPoint.lng)]]">
+        <template is="dom-if" if="[[_isValidCords(_nextStopGeoPoint.lat,_nextStopGeoPoint.lng)]]">
                   <google-map-marker
                     id="nextStopMarker"
                     latitude="[[_nextStopGeoPoint.lat]]"
@@ -378,7 +366,7 @@
                 </template>
 
 
-            <template is="dom-repeat" items="[[_routeDetails.stops]]" as="stopObj">
+        <template is="dom-repeat" items="[[_routeDetails.stops]]" as="stopObj">
                 <template is="dom-if" if="[[_isValidCords(stopObj.lat,stopObj.lng)]]">
                   <template is="dom-if" if="[[_isInValidRange(stopObj.sec)]]">
                       <google-map-marker latitude="[[stopObj.lat]]" longitude="[[stopObj.lng]]" data-sec="[[stopObj.sec]]" data-code="[[stopObj.code]]"
@@ -393,31 +381,31 @@
                         </div>
                       </google-map-marker>
                   </template>
-                </template>
-            </template>
+        </template>
+        </template>
 
-            <template is="dom-repeat" items="{{_pois}}" as="poi">
+        <template is="dom-repeat" items="{{_pois}}" as="poi">
               <google-map-marker latitude="{{poi.latitude}}" longitude="{{poi.longitude}}"
                 click-events on-google-map-marker-click="_onPoiClick" icon="{{_getPoiIcon()}}">
                 <h2>{{poi.name}}</h2>
                 <span>{{poi.formatted_address}}</span>
               </google-map-marker>
             </template>
-            <template is="dom-repeat" items="{{_meetUps}}" as="meetUpObject">
+        <template is="dom-repeat" items="{{_meetUps}}" as="meetUpObject">
               <google-map-marker latitude="{{meetUpObject.lat}}" longitude="{{meetUpObject.lon}}"
                 click-events on-google-map-marker-click="_onMeetUpClick" icon="/images/meetup.png">
                 <h2><a href="{{meetUpObject.link}}" target="_blank">{{meetUpObject.name}}</a></h2>
                 <span>Members: {{meetUpObject.members}}</span>
               </google-map-marker>
             </template>
-            <template is="dom-repeat" items="{{_coords}}" as="cordObject">
+        <template is="dom-repeat" items="{{_coords}}" as="cordObject">
               <google-map-marker latitude="{{cordObject.properties.lat}}" longitude="{{cordObject.properties.lon}}"
                 click-events on-google-map-marker-click="_onPoiClick" icon="/images/bike.png">
                 <h2>{{cordObject.properties.name}}</h2>
                 <span>Bikes Available: {{cordObject.properties.num_bikes_available}}, Docks Available: {{cordObject.properties.num_docks_available}}</span>
               </google-map-marker>
             </template>
-            <template is="dom-repeat" items="{{_customPois}}" as="_customPoi">
+        <template is="dom-repeat" items="{{_customPois}}" as="_customPoi">
                 <template is="dom-if" if="[[_isValidCords(_customPoi.latitude,_customPoi.longitude)]]">
                     <google-map-marker latitude="{{_customPoi.latitude}}" longitude="{{_customPoi.longitude}}"
                       click-events on-google-map-marker-click="_onPoiClick" icon="{{_getCustomPoiIcon(_customPoi.icon)}}">
@@ -426,95 +414,94 @@
                       <span>{{_customPoi.description}}</span><br/>
                     </google-map-marker>
                 </template>
-            </template>
-          </google-map>
-        </div>
-        <google-maps-api api-key="[[_google_api_key]]" library-loaded="{{_mapsApiLoaded}}" on-api-load="_onMapsApiLoad"></google-maps-api>
-      </div>
+        </template>
+      </google-map>
+    </div>
+    <google-maps-api api-key="[[_google_api_key]]" library-loaded="{{_mapsApiLoaded}}" on-api-load="_onMapsApiLoad"></google-maps-api>
+  </div>
 
-      <div class="poi-wrapper">
-        <poi-list id="pois" pois="{{_pois}}" selected="{{_selectedPoi}}"></poi-list>
-        <poi-detail id="poiDetails" place-details="{{_selectedPoiDetails}}"
-          lat-origin="{{_nextStopGeoPoint.lat}}" lng-origin="{{_nextStopGeoPoint.lng}}"></poi-detail>
-      </div>
+  <div class="poi-wrapper">
+    <poi-list id="pois" pois="{{_pois}}" selected="{{_selectedPoi}}"></poi-list>
+    <poi-detail id="poiDetails" place-details="{{_selectedPoiDetails}}" lat-origin="{{_nextStopGeoPoint.lat}}" lng-origin="{{_nextStopGeoPoint.lng}}"></poi-detail>
+  </div>
 
-      <br>
-<br/>
+  <br>
+  <br/>
 
-    <div id="spacer_div" clss="spacer_div"><br/></div>
-    <div id="spacer_div_2" clss="spacer_div"><br/></div>
-    <div id="spacer_div_3" clss="spacer_div"><br/></div>
-    <div id="spacer_div_4" clss="spacer_div"><br/></div>
+  <div id="spacer_div" clss="spacer_div"><br/></div>
+  <div id="spacer_div_2" clss="spacer_div"><br/></div>
+  <div id="spacer_div_3" clss="spacer_div"><br/></div>
+  <div id="spacer_div_4" clss="spacer_div"><br/></div>
 
 
-      <div class="background-color">
-      <template is="dom-if" if="[[_nextStop]]" >
+  <div class="background-color">
+    <template is="dom-if" if="[[_nextStop]]">
       <div id="route-list-display" hidden$="{{!_startedOnce}}">[[_nextStop.name]]
         <template is="dom-if" if="[[_nextStop.route_list]]">
         (Connects - [[_nextStop.route_list]])
          </template>
+  </div>
+  </template>
+  <div id="direction-display" hidden$="{{!_startedOnce}}"></div>
+  <div class="container">
+    <div class="row">
+      <!--feature start-->
+      <div class="button-area">
+        <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="restartVideo" on-click="_restartVideo" title="Restart">
+          <section>
+            <div class="f-box">
+              <i><img style=" width:30px;" src="../../images/restart.svg" alt=""></i>
+              <a href="javascript:void(0);"><h2>RESTART</h2></a>
+            </div>
+
+          </section>
+        </div>
+        <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="playVideo" on-click="_playVideo" hidden$="{{_shouldHidePlay}}" disabled$="{{!_startedOnce}}" title="Play">
+          <section>
+            <div class="f-box ">
+              <i><img style=" width:30px;" src="../../images/play.svg" alt=""></i>
+              <a href="javascript:void(0);"><h2>PLAY</h2></a>
+            </div>
+
+          </section>
+        </div>
+        <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="pauseVideo" on-click="_pauseVideo" hidden$="{{!_isVideoPlaying}}" title="Pause">
+          <section>
+            <div class="f-box ">
+              <i><img style=" width:30px;" src="../../images/pause.svg" alt=""></i>
+              <a href="javascript:void(0);"><h2>PAUSE</h2></a>
+            </div>
+
+          </section>
+        </div>
+        <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="stopVideo" on-click="_stopVideo" disabled title="View POI's">
+          <section>
+            <div class="f-box">
+              <i><img style=" width:30px;" src="../../images/view.svg" alt=""></i>
+              <a href="javascript:void(0);"><h2>VIEW POIs</h2></a>
+            </div>
+
+          </section>
+        </div>
+        <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="navigationAction" on-click="_pauseVideo" title="Navigation">
+          <a href="/routes/[[code]]/direction/[[direction]]/[[departureStopId]]/[[destinationStopId]]" target="_blank">
+            <section>
+              <div class="f-box">
+                <i><img style=" width:30px;" src="../../images/navigation.svg" alt=""></i>
+                <h2>NAVIGATION</h2>
+              </div>
+
+            </section>
+          </a>
+        </div>
       </div>
-     </template>
-      <div id="direction-display" hidden$="{{!_startedOnce}}"></div>
-      <div class="container">
-          <div class="row">
-              <!--feature start-->
-              <div class="button-area">
-              <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="restartVideo" on-click="_restartVideo" title="Restart">
-                  <section>
-                      <div class="f-box">
-                          <i><img style=" width:30px;" src="../../images/restart.svg" alt=""></i>
-                          <a href="javascript:void(0);"><h2>RESTART</h2></a>
-                      </div>
-
-                  </section>
-              </div>
-              <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="playVideo" on-click="_playVideo" hidden$="{{_shouldHidePlay}}" disabled$="{{!_startedOnce}}" title="Play">
-                  <section>
-                      <div class="f-box ">
-                          <i><img style=" width:30px;" src="../../images/play.svg" alt=""></i>
-                           <a href="javascript:void(0);"><h2>PLAY</h2></a>
-                      </div>
-
-                  </section>
-              </div>
-              <div class="col-lg-3 col-sm-3 col-xs-3 icon" id="pauseVideo" on-click="_pauseVideo" hidden$="{{!_isVideoPlaying}}" title="Pause">
-                  <section>
-                      <div class="f-box ">
-                          <i><img style=" width:30px;" src="../../images/pause.svg" alt=""></i>
-                           <a href="javascript:void(0);"><h2>PAUSE</h2></a>
-                      </div>
-
-                  </section>
-              </div>
-              <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="stopVideo" on-click="_stopVideo" disabled title="View POI's">
-                  <section>
-                      <div class="f-box">
-                           <i><img style=" width:30px;" src="../../images/view.svg" alt=""></i>
-                           <a href="javascript:void(0);"><h2>VIEW POIs</h2></a>
-                      </div>
-
-                  </section>
-              </div>
-              <div style=" border-right:1px solid #fff" class="col-lg-3 col-sm-3 col-xs-3 icon" id="navigationAction" on-click="_pauseVideo"  title="Navigation" >
-                <a href="/routes/[[code]]/direction/[[direction]]/[[departureStopId]]/[[destinationStopId]]" target="_blank">
-                  <section>
-                      <div class="f-box">
-                           <i><img style=" width:30px;" src="../../images/navigation.svg" alt=""></i>
-                           <h2>NAVIGATION</h2>
-                      </div>
-
-                  </section>
-                  </a>
-              </div>
-              </div>
-              <!--feature end-->
-          </div>
-
-      </div>
+      <!--feature end-->
     </div>
 
-      <!-- <div class="video-controls" >
+  </div>
+  </div>
+
+  <!-- <div class="video-controls" >
         <paper-button id="restartVideo" on-click="_restartVideo" disabled$="{{!_startedOnce}}">
           <iron-icon icon="vta-icons:restart"></iron-icon>
           <span class="button-copy">Restart</span>
@@ -532,39 +519,39 @@
           <span class="button-copy">View POIs</span>
         </paper-button>
       </div> -->
-      <maps-utils id="mapsUtils" on-pois-loaded="_poisLoaded"></maps-utils>
-    </template>
+  <maps-utils id="mapsUtils" on-pois-loaded="_poisLoaded"></maps-utils>
+  </template>
 </dom-module>
 
 <script>
-var map;
-var currentLatForPoi = null;
-var currentLngForPoi = null;
-	(function() {
+  var map;
+  var currentLatForPoi = null;
+  var currentLngForPoi = null;
+  (function() {
     'use strict';
-    try{
+    try {
       Polymer({
         is: 'route-navigation',
         properties: {
           player: {
             type: Object
           },
-        	code: {
-        		type: String,
-        		observer: '_initialPropertyChange'
-        	},
-          direction: {
-        		type: String,
-        		observer: '_initialPropertyChange'
-        	},
-        	departureStopId: {
-        	  type: String,
-        	  observer: '_initialPropertyChange'
-        	},
-        	destinationStopId: {
+          code: {
             type: String,
             observer: '_initialPropertyChange'
-        	},
+          },
+          direction: {
+            type: String,
+            observer: '_initialPropertyChange'
+          },
+          departureStopId: {
+            type: String,
+            observer: '_initialPropertyChange'
+          },
+          destinationStopId: {
+            type: String,
+            observer: '_initialPropertyChange'
+          },
           _departure: {
             type: Object
           },
@@ -586,7 +573,7 @@ var currentLngForPoi = null;
             type: Boolean,
             observer: '_playsupportedChange'
           },
-          _shouldHidePlay : {
+          _shouldHidePlay: {
             type: Boolean,
             value: true
           },
@@ -595,7 +582,7 @@ var currentLngForPoi = null;
             value: false,
             observer: '_isVideoPlayingChange'
           },
-          _map : {
+          _map: {
             type: Object
           },
           _meetUps: {
@@ -610,48 +597,48 @@ var currentLngForPoi = null;
           _customPoisOrigin: {
             type: Array
           },
-        	_tempRouteParams: {
-        	  type: Object,
-        	  value: {}
-        	},
-        	_routeDetails : {
-        	  type: Object,
+          _tempRouteParams: {
+            type: Object,
+            value: {}
+          },
+          _routeDetails: {
+            type: Object,
             value: null,
-        	  observer: '_routeDetailsChange'
-        	},
-          _routeDetailsOrigin : {
+            observer: '_routeDetailsChange'
+          },
+          _routeDetailsOrigin: {
             type: Object,
             value: null,
             observer: '_routeDetailsOriginChange'
           },
-        	_routeInfo : {
-        	  type: Object,
-        	  observer: '_routeInfoChange'
-        	},
-          _routeInfoOrigin : {
+          _routeInfo: {
+            type: Object,
+            observer: '_routeInfoChange'
+          },
+          _routeInfoOrigin: {
             type: Object,
             observer: '_routeInfoOriginChange'
           },
-        	_videoStartTime: {
-        	  type: Number,
-        	  value: 0
-        	},
+          _videoStartTime: {
+            type: Number,
+            value: 0
+          },
           _videoEndTime: {
             type: Number,
             value: -1
           },
-        	_videoCurrentTime: {
-        	  type: Number,
-        	  observer: '_videoCurrentTimeChange'
-        	},
+          _videoCurrentTime: {
+            type: Number,
+            observer: '_videoCurrentTimeChange'
+          },
           _isValidZoom: {
             type: Boolean,
             value: false,
           },
-        	_videoState: {
-        	  type: Number,
-        	  observer: '_videoStateChange'
-        	},
+          _videoState: {
+            type: Number,
+            observer: '_videoStateChange'
+          },
           _progressBarValue: {
             type: Number
           },
@@ -668,7 +655,7 @@ var currentLngForPoi = null;
             observer: '_selectedPoiChange'
           },
           _selectedPoiMarker: {
-            type : Object
+            type: Object
           },
           _currentLat: {
             type: Number
@@ -681,11 +668,11 @@ var currentLngForPoi = null;
           },
           _google_api_key: {
             type: String,
-            value:window.env.keys.google_map_api_key
+            value: window.env.keys.google_map_api_key
           },
         },
 
-        SECONDS_INTERVAL_FOR_STOPS : 10,
+        SECONDS_INTERVAL_FOR_STOPS: 10,
 
         clearRouteSelection: function() {
           this.code = null;
@@ -698,7 +685,7 @@ var currentLngForPoi = null;
           this.$.routeInfo.path = null;
           this._pois = [];
           this._customPois = [];
-          this._meetUps=[];
+          this._meetUps = [];
           this._coords = [];
           this._direction = false;
           this.reFocused = false;
@@ -737,33 +724,33 @@ var currentLngForPoi = null;
 
           this._assignSource(newRouteDetails.videoUrl);
 
-          if(!newRouteDetails.videoGeoPoints){
+          if (!newRouteDetails.videoGeoPoints) {
             newRouteDetails.videoGeoPoints = newRouteDetails.originalVideoGeoPoints
           }
 
-          if(newRouteDetails.videoUrl){
-            $('#frontView').show().attr('data-video',newRouteDetails.videoUrl);
-          }else{
+          if (newRouteDetails.videoUrl) {
+            $('#frontView').show().attr('data-video', newRouteDetails.videoUrl);
+          } else {
             $('#frontView').hide();
           }
-          if(newRouteDetails.videoLeftUrl){
-            $('#leftView').show().attr('data-video',newRouteDetails.videoLeftUrl);
-          }else{
+          if (newRouteDetails.videoLeftUrl) {
+            $('#leftView').show().attr('data-video', newRouteDetails.videoLeftUrl);
+          } else {
             $('#leftView').hide();
           }
-          if(newRouteDetails.videoRightUrl){
-            $('#rightView').show().attr('data-video',newRouteDetails.videoRightUrl);
-          }else{
+          if (newRouteDetails.videoRightUrl) {
+            $('#rightView').show().attr('data-video', newRouteDetails.videoRightUrl);
+          } else {
             $('#rightView').hide();
           }
-          if(newRouteDetails.videoBackUrl){
-            $('#backView').show().attr('data-video',newRouteDetails.videoBackUrl);
-          }else{
+          if (newRouteDetails.videoBackUrl) {
+            $('#backView').show().attr('data-video', newRouteDetails.videoBackUrl);
+          } else {
             $('#backView').hide();
           }
-          if(newRouteDetails.videoNightUrl){
-            $('#nightView').show().attr('data-video',newRouteDetails.videoNightUrl);
-          }else{
+          if (newRouteDetails.videoNightUrl) {
+            $('#nightView').show().attr('data-video', newRouteDetails.videoNightUrl);
+          } else {
             $('#nightView').hide();
           }
 
@@ -785,12 +772,12 @@ var currentLngForPoi = null;
           //spcl_console.log (newRouteDetails.stops[this.departureStopId]);
 
           this._departureStop = newRouteDetails.stops[this.departureStopId];
-          if(this._departureStop){
+          if (this._departureStop) {
             this._currentLat = parseFloat(this._departureStop.lat);
             this._currentLng = parseFloat(this._departureStop.lng);
             this._map.panTo({
-              lat:this._currentLat,
-              lng:this._currentLng,
+              lat: this._currentLat,
+              lng: this._currentLng,
             });
             //this._map.setZoom(16);
           }
@@ -807,17 +794,17 @@ var currentLngForPoi = null;
           // Set the start and end times of the video based on the departure and destination stops
           this._videoStartTime = parseInt(departurePoint.key);
           this._videoEndTime = parseInt(destinationPoint.key);
-          if(this.player.duration()<this._videoStartTime){
+          if (this.player.duration() < this._videoStartTime) {
             this.player.pause();
-          }else{
+          } else {
             this.player.currentTime(this._videoStartTime);
           }
 
 
           // Set the next stop
-          if(this.departureStopId < this.destinationStopId){
+          if (this.departureStopId < this.destinationStopId) {
             this._stopsSlot = newRouteDetails.stops.slice(this.departureStopId, parseInt(this.destinationStopId) + 1);
-          }else{
+          } else {
             this._stopsSlot = newRouteDetails.stops.slice(this.destinationStopId, parseInt(this.departureStopId) + 1).reverse();
           }
 
@@ -825,9 +812,9 @@ var currentLngForPoi = null;
 
           // Load the route path with the tour slot select by the user
           var self = this;
-          setTimeout(function(){
-              self._loadRoutePath(tourSlot);
-          },1000);
+          setTimeout(function() {
+            self._loadRoutePath(tourSlot);
+          }, 1000);
 
 
         },
@@ -860,19 +847,19 @@ var currentLngForPoi = null;
 
         _calculateMapHeight: function() {
           var getElementHeight = function(element) {
-              var elmHeight, elmMargin;
+            var elmHeight, elmMargin;
 
-              if (document.all) {// IE
-                elmHeight = element.currentStyle.height;
-                elmMargin = parseInt(element.currentStyle.marginTop, 10) + parseInt(element.currentStyle.marginBottom, 10);
-              } else {// Mozilla
-                var computedStyle = document.defaultView.getComputedStyle(element, '');
+            if (document.all) { // IE
+              elmHeight = element.currentStyle.height;
+              elmMargin = parseInt(element.currentStyle.marginTop, 10) + parseInt(element.currentStyle.marginBottom, 10);
+            } else { // Mozilla
+              var computedStyle = document.defaultView.getComputedStyle(element, '');
 
-                elmHeight = element.offsetHeight;
-                elmMargin = parseInt(computedStyle.getPropertyValue('margin-top')) + parseInt(computedStyle.getPropertyValue('margin-bottom'));
-              }
+              elmHeight = element.offsetHeight;
+              elmMargin = parseInt(computedStyle.getPropertyValue('margin-top')) + parseInt(computedStyle.getPropertyValue('margin-bottom'));
+            }
 
-              return (elmHeight + elmMargin);
+            return (elmHeight + elmMargin);
           }
 
           var windowHeight = window.outerHeight;
@@ -885,20 +872,20 @@ var currentLngForPoi = null;
           return windowHeight - mainToolbarHeight - pageTitleHeight - videoHeight - videoProggressHeight - videoControlsHeight;
         },
 
-        _setEndMessage: function(){
+        _setEndMessage: function() {
           var endRouteListMessage = "";
-          var route_list ="";
-          if(this._destinationStop && this._destinationStop.route_list){
+          var route_list = "";
+          if (this._destinationStop && this._destinationStop.route_list) {
             route_list = this._destinationStop.route_list.toString();
             var routeListArray = route_list.split(',');
-            if(routeListArray.length==1){
-              endRouteListMessage = ', Connection is available for route: '+this._destinationStop.route_list
-            }else if(routeListArray.length>1){
-              endRouteListMessage = ', Connections are available for routes: '+this._destinationStop.route_list
+            if (routeListArray.length == 1) {
+              endRouteListMessage = ', Connection is available for route: ' + this._destinationStop.route_list
+            } else if (routeListArray.length > 1) {
+              endRouteListMessage = ', Connections are available for routes: ' + this._destinationStop.route_list
             }
 
           }
-          $('#direction-display').html('Reached destination'+endRouteListMessage);
+          $('#direction-display').html('Reached destination' + endRouteListMessage);
           // var endStopMessage = this._destinationStop.name;
           // if(this._destinationStop.route_list){
           //   endStopMessage+' (connects - '+this._destinationStop.route_list+')';
@@ -910,35 +897,35 @@ var currentLngForPoi = null;
           if (!this._routeDetails || !this.player) {
             return;
           }
-          if(this._map.getZoom() >= 14){
+          if (this._map.getZoom() >= 14) {
             this._isValidZoom = true;
-          }else{
+          } else {
             this._isValidZoom = false;
           }
 
 
-          if(parseFloat(this.player.duration())<0){
-              return;
+          if (parseFloat(this.player.duration()) < 0) {
+            return;
           }
 
           //spcl_console.log ('current Time: '+newVideoCurrentTime)
           //spcl_console.log ('duration: '+this.player.duration());
           var finalPoint = {
             lat: this._destinationStop.lat,
-            lng:this._destinationStop.lng
+            lng: this._destinationStop.lng
           }
           // Check if the video reaches the end of the tour
-          if(newVideoCurrentTime<this._videoStartTime){
+          if (newVideoCurrentTime < this._videoStartTime) {
             this.player.currentTime(this._videoStartTime);
           }
-          if(newVideoCurrentTime == (this._videoEndTime+1)){
+          if (newVideoCurrentTime == (this._videoEndTime + 1)) {
             this._currentLat = parseFloat(finalPoint.lat);
             this._currentLng = parseFloat(finalPoint.lng);
             this._map.panTo(finalPoint);
             this.player.pause();
             this._setEndMessage();
             return;
-          }else if(newVideoCurrentTime > (this._videoEndTime+1)){
+          } else if (newVideoCurrentTime > (this._videoEndTime + 1)) {
             this._currentLat = parseFloat(finalPoint.lat);
             this._currentLng = parseFloat(finalPoint.lng);
             this._map.panTo(finalPoint);
@@ -946,7 +933,7 @@ var currentLngForPoi = null;
             this.player.currentTime(this._videoEndTime);
             this._setEndMessage()
             return;
-          }else if (newVideoCurrentTime >= this.player.duration()) {
+          } else if (newVideoCurrentTime >= this.player.duration()) {
             this._currentLat = parseFloat(finalPoint.lat);
             this._currentLng = parseFloat(finalPoint.lng);
             this._map.panTo(finalPoint);
@@ -958,10 +945,10 @@ var currentLngForPoi = null;
 
           var point = this._routeDetails.videoGeoPoints[newVideoCurrentTime - 1];
           var nextPoint = this._routeDetails.videoGeoPoints[newVideoCurrentTime];
-          if(point && nextPoint && point.lat && point.lng && nextPoint.lat && nextPoint.lng){
-            var currentLatLong = point.lat +','+point.lng;
-            var nextLatLong = nextPoint.lat +','+nextPoint.lng;
-            this._getDirectionData(currentLatLong,nextLatLong);
+          if (point && nextPoint && point.lat && point.lng && nextPoint.lat && nextPoint.lng) {
+            var currentLatLong = point.lat + ',' + point.lng;
+            var nextLatLong = nextPoint.lat + ',' + nextPoint.lng;
+            this._getDirectionData(currentLatLong, nextLatLong);
           }
           // Calculate the progress bar value
           this._progressBarValue = this._calculateVideoProgress(this._videoStartTime, this._videoEndTime, newVideoCurrentTime);
@@ -973,7 +960,7 @@ var currentLngForPoi = null;
             this._currentLat = parseFloat(point.lat);
             this._currentLng = parseFloat(point.lng);
             this._map.panTo(point)
-            if(this._map.getZoom() < 16 && !this.reFocused){
+            if (this._map.getZoom() < 16 && !this.reFocused) {
               this._map.setZoom(16);
               this.reFocused = true;
             }
@@ -984,8 +971,8 @@ var currentLngForPoi = null;
 
           // Check if the video current time is in the range of the next stop
           if (this._nextStop && newVideoCurrentTime >= this._nextStop.sec &&
-              newVideoCurrentTime < this._nextStop.endSec && this.$.nextStopMarker &&
-              this.$.nextStopMarker.hidden === true) {
+            newVideoCurrentTime < this._nextStop.endSec && this.$.nextStopMarker &&
+            this.$.nextStopMarker.hidden === true) {
             this._nextStopGeoPoint.lat = parseFloat(this._nextStop.lat);
             this._nextStopGeoPoint.lng = parseFloat(this._nextStop.lng);
             this.notifyPath('_nextStopGeoPoint.lat', this._nextStop.lat);
@@ -994,11 +981,11 @@ var currentLngForPoi = null;
           } else if (this._nextStop && newVideoCurrentTime > this._nextStop.endSec) {
             this._nextStop = this._calculateNextStop(this._stopsSlot, newVideoCurrentTime);
             this._disableNextStop();
-          }else{
-              this._nextStop = this._calculateNextStop(this._stopsSlot, newVideoCurrentTime);
+          } else {
+            this._nextStop = this._calculateNextStop(this._stopsSlot, newVideoCurrentTime);
           }
-          if(this._meetUps){
-              this._meetUps = null;
+          if (this._meetUps) {
+            this._meetUps = null;
           }
         },
 
@@ -1037,29 +1024,29 @@ var currentLngForPoi = null;
           }
         },
 
-        _isVideoPlayingChange: function(){
+        _isVideoPlayingChange: function() {
           this._shouldHidePlay = !this._canShowPlay();
         },
 
-        _playsupportedChange: function(){
+        _playsupportedChange: function() {
           this._shouldHidePlay = !this._canShowPlay();
-          if(this._playsupported){
+          if (this._playsupported) {
             this._adjustMapSize();
           }
         },
 
-        _canShowPlay : function(){
+        _canShowPlay: function() {
           return this._playsupported && !this._isVideoPlaying;
         },
 
         _restartVideo: function() {
           this.player.currentTime(0);
-          if(this._departureStop){
+          if (this._departureStop) {
             this._currentLat = parseFloat(this._departureStop.lat);
             this._currentLng = parseFloat(this._departureStop.lng);
             this._map.panTo({
-              lat:this._currentLat,
-              lng:this._currentLng,
+              lat: this._currentLat,
+              lng: this._currentLng,
             });
             //this._map.setZoom(16);
           }
@@ -1069,14 +1056,14 @@ var currentLngForPoi = null;
           if (this._pois) {
             this._pois = null;
           }
-          if(this._customPois){
-              this._customPois = null;
+          if (this._customPois) {
+            this._customPois = null;
           }
-          if(this._meetUps){
+          if (this._meetUps) {
             this._meetUps = null;
           }
-          if(this._coords){
-            this._coords= null;
+          if (this._coords) {
+            this._coords = null;
           }
 
           $('#direction-display').html('');
@@ -1098,14 +1085,14 @@ var currentLngForPoi = null;
           if (this._pois) {
             this._pois = null;
           }
-          if(this._customPois){
-              this._customPois = null;
+          if (this._customPois) {
+            this._customPois = null;
           }
-          if(this._meetUps){
-              this._meetUps = null;
+          if (this._meetUps) {
+            this._meetUps = null;
           }
-          if(this._coords){
-              this._coords = null;
+          if (this._coords) {
+            this._coords = null;
           }
 
 
@@ -1118,7 +1105,7 @@ var currentLngForPoi = null;
           this._shouldHidePlay = false;
           this._isVideoPlaying = false;
           // this.$.routeVideo.pause();
-          if(this.$.mapsUtils && this._mapsApiLoaded && this._map){
+          if (this.$.mapsUtils && this._mapsApiLoaded && this._map) {
             this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
             this._customPois = this._customPoisOrigin;
             console.log('Custom Pois');
@@ -1132,7 +1119,7 @@ var currentLngForPoi = null;
           console.log('check pois');
           console.log(this._pois);
           // Send the event to Google Analytics
-          if(this._routeInfo){
+          if (this._routeInfo) {
             ga('send', 'event', 'Tour', 'pause', this._routeInfo.name);
           }
         },
@@ -1141,7 +1128,7 @@ var currentLngForPoi = null;
           this._isVideoPlaying = false;
           // this.$.routeVideo.pause();
           // this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
-          if(this.$.mapsUtils && this._mapsApiLoaded && this._map){
+          if (this.$.mapsUtils && this._mapsApiLoaded && this._map) {
             this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
             this._customPois = this._customPoisOrigin;
             this._getNearByMeetUps(this._currentLat, this._currentLng);
@@ -1156,17 +1143,17 @@ var currentLngForPoi = null;
 
           this.player.pause();
           //alert();
-          if(!this._currentLat && !this._currentLng){
-              var point = this._routeDetails.videoGeoPoints[0];
-              this._currentLat = parseFloat(point.lat);
-              this._currentLng = parseFloat(point.lng);
-               currentLatForPoi = this._currentLat;
-               currentLngForPoi = this._currentLng;
+          if (!this._currentLat && !this._currentLng) {
+            var point = this._routeDetails.videoGeoPoints[0];
+            this._currentLat = parseFloat(point.lat);
+            this._currentLng = parseFloat(point.lng);
+            currentLatForPoi = this._currentLat;
+            currentLngForPoi = this._currentLng;
           }
-           currentLatForPoi = this._currentLat;
-           currentLngForPoi = this._currentLng;
+          currentLatForPoi = this._currentLat;
+          currentLngForPoi = this._currentLng;
           //this.$.routeVideo.pause();
-          if(this.$.mapsUtils && this._mapsApiLoaded && this._map){
+          if (this.$.mapsUtils && this._mapsApiLoaded && this._map) {
             this.$.mapsUtils.getPoisFromLocation(this._currentLat, this._currentLng, this._map);
             this._customPois = this._customPoisOrigin;
             this._getNearByMeetUps(this._currentLat, this._currentLng);
@@ -1191,28 +1178,28 @@ var currentLngForPoi = null;
          * Binds the mousedown listener to move the marker.
          * Disable the marker's move when the user is dragging inside the map.
          */
-        _onMapsApiLoad : function(){
+        _onMapsApiLoad: function() {
           var self = this;
           //spcl_console.log ('Maps Api Loaded');
-          setTimeout(function(){
-            google.maps.event.addListener(self._map, 'mouseup', function(event){
-              if(!self._isDragging && event.latLng){
+          setTimeout(function() {
+            google.maps.event.addListener(self._map, 'mouseup', function(event) {
+              if (!self._isDragging && event.latLng) {
                 self._moveMarker(event.latLng);
               }
             });
-            google.maps.event.addListener(self._map, 'zoom_changed', function(event){
+            google.maps.event.addListener(self._map, 'zoom_changed', function(event) {
               //spcl_console.log ('zoom event changed')
               self._calculateValidZooomStatus();
             });
 
-            google.maps.event.addListener(self._map, 'dragstart', function(event){
+            google.maps.event.addListener(self._map, 'dragstart', function(event) {
               self._isDragging = true;
             });
 
-            google.maps.event.addListener(self._map, 'dragend', function(event){
+            google.maps.event.addListener(self._map, 'dragend', function(event) {
               self._isDragging = false;
             });
-          },1000);
+          }, 1000);
 
         },
 
@@ -1221,9 +1208,9 @@ var currentLngForPoi = null;
          *
          * @param points array with the geo points
          */
-        _loadRoutePath : function(points){
+        _loadRoutePath: function(points) {
 
-          if(!points || !this._mapsApiLoaded){
+          if (!points || !this._mapsApiLoaded) {
             return;
           }
           //spcl_console.log ('check points');
@@ -1253,41 +1240,41 @@ var currentLngForPoi = null;
           //spcl_console.log ('final cords');
           //spcl_console.log (cords);
           cords.unshift({
-            lat:this._departureStop.lat,
-            lng:this._departureStop.lng,
+            lat: this._departureStop.lat,
+            lng: this._departureStop.lng,
           })
           cords.push({
-            lat:this._destinationStop.lat,
-            lng:this._destinationStop.lng,
+            lat: this._destinationStop.lat,
+            lng: this._destinationStop.lng,
           })
-             try{
-               self._mapPolyline = new google.maps.Polyline({
-                 path: cords,
-                 geodesic: true,
-                 strokeColor: '#009FDD',
-                 strokeOpacity: 1.0,
-                 strokeWeight: 2
-               });
+          try {
+            self._mapPolyline = new google.maps.Polyline({
+              path: cords,
+              geodesic: true,
+              strokeColor: '#009FDD',
+              strokeOpacity: 1.0,
+              strokeWeight: 2
+            });
 
-               // Draw the route line
-               //spcl_console.log (self._map)
-               self._mapPolyline.setMap(self._map);
-               self._map.fitBounds(bounds);
+            // Draw the route line
+            //spcl_console.log (self._map)
+            self._mapPolyline.setMap(self._map);
+            self._map.fitBounds(bounds);
 
 
-               google.maps.event.addListener(self._mapPolyline, 'mouseup', function(event){
-                 if(!self._isDragging){
-                   self._moveMarker(event.latLng);
-                 }
-               });
-             }catch(err){
-               //spcl_console.log ('map specific error');
-               //spcl_console.log (err);
-               // //spcl_console.log (map);
-               // //spcl_console.log ('element');
-               // //spcl_console.log (self.$.map)
-               // map = new google.maps.Map(self.$.map, {});
-             }
+            google.maps.event.addListener(self._mapPolyline, 'mouseup', function(event) {
+              if (!self._isDragging) {
+                self._moveMarker(event.latLng);
+              }
+            });
+          } catch (err) {
+            //spcl_console.log ('map specific error');
+            //spcl_console.log (err);
+            // //spcl_console.log (map);
+            // //spcl_console.log ('element');
+            // //spcl_console.log (self.$.map)
+            // map = new google.maps.Map(self.$.map, {});
+          }
         },
 
         /**
@@ -1296,7 +1283,7 @@ var currentLngForPoi = null;
          * and seek the video to point's second
          * @param latLng Object with latitude and longitude of the click
          */
-        _moveMarker : function(latLng){
+        _moveMarker: function(latLng) {
           var point = this.$.mapsUtils.getClosestPoint(latLng.lat(), latLng.lng(), this._routeDetails.videoGeoPoints);
           this._currentLat = point.latLng.lat;
           this._currentLng = point.latLng.lng;
@@ -1320,13 +1307,13 @@ var currentLngForPoi = null;
           return slotVideoPoints;
         },
 
-        _adjustMapSize : function(){
+        _adjustMapSize: function() {
           var self = this;
-          if(!this.code){
+          if (!this.code) {
             return;
           }
           //spcl_console.log ('Map Getting Adjusted');
-          if(!this._mapsApiLoaded){
+          if (!this._mapsApiLoaded) {
             return;
           }
           var mapHeight;
@@ -1340,40 +1327,40 @@ var currentLngForPoi = null;
             mapHeight = this.$.mainRouteVideo.offsetHeight;
           } else {
             // Calculate the map height
-            mapHeight = this.$.mainRouteVideo.offsetHeight;//this._calculateMapHeight();
+            mapHeight = this.$.mainRouteVideo.offsetHeight; //this._calculateMapHeight();
           }
 
-          if(mapHeight<=0){
+          if (mapHeight <= 0) {
             mapHeight = $('.video-player-wrapper').find('video').height();
             //spcl_console.log ('From Dom: '+mapHeight);
-            if(mapHeight<=0){
+            if (mapHeight <= 0) {
               mapHeight = $('.video-player-wrapper').height();
-              if(!mapHeight){
-                  mapHeight = 450;
-                  setTimeout(function(){
-                     self._adjustMapSize();
-                  }, 1000);
+              if (!mapHeight) {
+                mapHeight = 450;
+                setTimeout(function() {
+                  self._adjustMapSize();
+                }, 1000);
               }
             }
             //spcl_console.log ('Final Map Height: '+mapHeight);
           }
-          this.$.map.style.height = mapHeight+ 'px';
-          this.$.map.style.minHeight = mapHeight+ 'px';
+          this.$.map.style.height = mapHeight + 'px';
+          this.$.map.style.minHeight = mapHeight + 'px';
           google.maps.event.trigger(this._map, 'resize');
         },
 
         _enableNextStop: function() {
-          if(this.$.nextStopMarker){
-              this.$.nextStopMarker.hidden = false;
+          if (this.$.nextStopMarker) {
+            this.$.nextStopMarker.hidden = false;
           }
 
           this.$.stopVideo.disabled = false;
         },
 
         _disableNextStop: function() {
-            if(this.$.nextStopMarker){
-                this.$.nextStopMarker.hidden = true;
-            }
+          if (this.$.nextStopMarker) {
+            this.$.nextStopMarker.hidden = true;
+          }
 
           this.$.stopVideo.disabled = true;
         },
@@ -1381,18 +1368,18 @@ var currentLngForPoi = null;
         _calculateNextStop: function(stopsSlot, videoCurrentTime) {
           // Get the next stop according to the actual time
           var nextStopOrigin = this._getNextStop(stopsSlot, videoCurrentTime);
-          if(!nextStopOrigin){
-            return ;
+          if (!nextStopOrigin) {
+            return;
           }
-          if(!nextStopOrigin.sec){
-            return ;
+          if (!nextStopOrigin.sec) {
+            return;
           }
           var nextStopSec = parseInt(nextStopOrigin.sec);
           var nextStop = {
             lat: nextStopOrigin.lat,
             lng: nextStopOrigin.lng,
             name: nextStopOrigin.name,
-            route_list:nextStopOrigin.route_list,
+            route_list: nextStopOrigin.route_list,
             sec: nextStopSec - this.SECONDS_INTERVAL_FOR_STOPS,
             endSec: nextStopSec + this.SECONDS_INTERVAL_FOR_STOPS
           };
@@ -1422,30 +1409,30 @@ var currentLngForPoi = null;
           this._pois = event.detail;
         },
 
-        _onPoiClick : function(e){
-          if(this._selectedPoiMarker){
+        _onPoiClick: function(e) {
+          if (this._selectedPoiMarker) {
             this._selectedPoiMarker.open = false;
           }
 
           this._selectedPoiMarker = e.srcElement;
           this._selectedPoiMarker.open = true;
         },
-        _onDepartureClick : function(e){
+        _onDepartureClick: function(e) {
           var element = $(e.srcElement);
           element.find('h3').html(this._departureStop.name);
-          if(this._selectedPoiMarker){
+          if (this._selectedPoiMarker) {
             this._selectedPoiMarker.open = false;
           }
 
           this._selectedPoiMarker = e.srcElement;
           this._selectedPoiMarker.open = true;
         },
-        _onDestinationClick : function(e){
+        _onDestinationClick: function(e) {
           //alert(this._destinationStop.name);
           var element = $(e.srcElement);
           element.find('h3').html(this._destinationStop.name);
 
-          if(this._selectedPoiMarker){
+          if (this._selectedPoiMarker) {
             this._selectedPoiMarker.open = false;
           }
 
@@ -1453,8 +1440,8 @@ var currentLngForPoi = null;
           this._selectedPoiMarker.open = true;
         },
 
-        _onMeetUpClick : function(e){
-          if(this._selectedPoiMarker){
+        _onMeetUpClick: function(e) {
+          if (this._selectedPoiMarker) {
             this._selectedPoiMarker.open = false;
           }
           this._selectedPoiMarker = e.srcElement;
@@ -1464,8 +1451,8 @@ var currentLngForPoi = null;
           // var link = element.find('a').attr('href');
           // window.open(link, '_blank');
         },
-        _onStopIconClick : function(e){
-          if(this._selectedPoiMarker){
+        _onStopIconClick: function(e) {
+          if (this._selectedPoiMarker) {
             this._selectedPoiMarker.open = false;
           }
           this._selectedPoiMarker = e.srcElement;
@@ -1473,17 +1460,17 @@ var currentLngForPoi = null;
           var sourceElement = e.srcElement;
           var element = $(e.srcElement);
           var toTitleCase = function(str) {
-              return str.replace(
-                  /\w\S*/g,
-                  function(txt) {
-                      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-                  }
-              );
+            return str.replace(
+              /\w\S*/g,
+              function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+              }
+            );
           }
           console.log(element);
           console.log('check below stop code');
           console.log(element.find('.amenities_list'));
-          if(element.find('.amenities_list').length){
+          if (element.find('.amenities_list').length) {
             var code = parseInt(element.find('.amenities_list')[0].dataCode);
             console.log(code);
             // return false;
@@ -1492,39 +1479,39 @@ var currentLngForPoi = null;
               .then(function(data) {
                 console.log('Got aminities data')
                 console.log(data)
-                if(data && data.list){
+                if (data && data.list) {
                   var amenities_list = data.list;
-                  var amenities_list_string  = "";
-                  for(var i=0;i<amenities_list.length;i++){
+                  var amenities_list_string = "";
+                  for (var i = 0; i < amenities_list.length; i++) {
                     var amenity_key_value_pair = "";
-                    if(amenities_list[i].value){
+                    if (amenities_list[i].value) {
                       var key = amenities_list[i].key;
-                      if(key){
+                      if (key) {
                         key = toTitleCase(key.split('_').join(' '));
                       }
                       amenity_key_value_pair = key;
                       var value = amenities_list[i].value;
                       var numericValue = parseInt(value);
-                      if(numericValue != 0 && numericValue != 1 ){
-                        amenity_key_value_pair = amenity_key_value_pair+": "+value;
+                      if (numericValue != 0 && numericValue != 1) {
+                        amenity_key_value_pair = amenity_key_value_pair + ": " + value;
                       }
-                      amenity_key_value_pair = amenity_key_value_pair+', '; //key+": "+value+", ";
+                      amenity_key_value_pair = amenity_key_value_pair + ', '; //key+": "+value+", ";
                     }
 
-                    if(amenities_list[i].value =='0' || amenities_list[i].value == 0 || amenities_list[i].key =='stop_id'){
+                    if (amenities_list[i].value == '0' || amenities_list[i].value == 0 || amenities_list[i].key == 'stop_id') {
                       amenity_key_value_pair = "";
                     }
 
-                    amenities_list_string+=amenity_key_value_pair;
+                    amenities_list_string += amenity_key_value_pair;
                   }
 
                   amenities_list_string = amenities_list_string.replace(/,\s*$/, "");
-                  if(amenities_list_string){
-                    amenities_list_string =   "Amenities: "+amenities_list_string;
+                  if (amenities_list_string) {
+                    amenities_list_string = "Amenities: " + amenities_list_string;
                   }
 
 
-                  $("#stop_amenities_"+code).html(amenities_list_string);
+                  $("#stop_amenities_" + code).html(amenities_list_string);
                 }
               }).catch(function(error) {
                 console.log(error);
@@ -1549,7 +1536,7 @@ var currentLngForPoi = null;
               self._selectedPoiDetails = data;
 
               // When is mobile hide the poi list and show the poi details
-              if(!self.isDesktop){
+              if (!self.isDesktop) {
                 page(page.current + "/detail");
               }
             }).catch(function(error) {
@@ -1561,23 +1548,23 @@ var currentLngForPoi = null;
           }
         },
 
-        showTour : function(){
+        showTour: function() {
           this._selectedPoi = null;
           this._selectedPoiDetails = null;
           this.$.poiDetails.classList.remove('active');
           this.$.pois.classList.remove('active');
         },
 
-        showPois : function(){
+        showPois: function() {
           this.$.poiDetails.classList.remove('active');
           this.$.pois.classList.add('active');
-          if(this.isDesktop){
+          if (this.isDesktop) {
             this.$.poiDetails.classList.add('active');
           }
           app.condenseHeader();
         },
 
-        showPoiDetails : function(){
+        showPoiDetails: function() {
           this.$.poiDetails.classList.add('active');
           this.$.pois.classList.remove('active');
           app.condenseHeader();
@@ -1586,17 +1573,17 @@ var currentLngForPoi = null;
         /**
          * Goes back to the navigation page when its on poi list or poi details
          */
-        _back : function(){
-          if(page.current.indexOf('/pois') != -1){
-            var navPage = page.current.replace("/detail" , "");
+        _back: function() {
+          if (page.current.indexOf('/pois') != -1) {
+            var navPage = page.current.replace("/detail", "");
             navPage = navPage.replace("/pois", "");
-            if(page.current.indexOf('/detail') != -1){
+            if (page.current.indexOf('/detail') != -1) {
               page.back(navPage);
             }
             page.back(navPage);
           }
         },
-        reAlightElements: function(){
+        reAlightElements: function() {
 
           // //spcl_console.log ('Resizing fullscreen button');
           // var fullSkinButton = document.querySelector('.video-js .vjs-fullscreen-control');
@@ -1606,115 +1593,121 @@ var currentLngForPoi = null;
           // fullSkinButton.style.position = 'relative';
           // fullSkinButton.style.fontSize = '17px';
         },
-        _bingVideo:function(src){
-            if(!videojs){
-              return;
+        _bingVideo: function(src) {
+          if (!videojs) {
+            return;
+          }
+
+          var options = {
+            //aspectRatio:'20:20'
+            //controls:false
+            fluid: true
+          };
+          var self = this;
+          this.player = videojs(self.$.mainRouteVideo, options, function onPlayerReady() {
+            videojs.log('Your player is ready!');
+            var playButton = document.querySelectorAll('.video-js button');
+            for (var i = 0; i < playButton.length; i++) {
+              playButton[i].style.display = 'none';
+            }
+            self.reAlightElements();
+            $('.fullscreen-button').on('click', function() {
+              $('.video-js .vjs-fullscreen-control').click();
+            });
+
+            var progressBar = document.querySelector('.video-js .vjs-progress-control');
+            progressBar.style.visibility = 'hidden';
+            var timeRemaing = document.querySelector('.vjs-remaining-time-display');
+            timeRemaing.style.visibility = 'hidden';
+            timeRemaing.style.display = 'none';
+            var controllBar = document.querySelector('.video-js .vjs-control-bar');
+            controllBar.style.backgroundColor = 'transparent';
+            self._adjustMapSize();
+            window.addEventListener("resize", function() {
+              self._adjustMapSize();
+              self.reAlightElements();
+            });
+            setTimeout(function() {
+              self._adjustMapSize();
+            }, 2000);
+            setTimeout(function() {
+              self._adjustMapSize();
+            }, 4000);
+            var screenEvent = document.querySelector('.vjs-tech');
+            if (screenEvent) {
+              screenEvent.style.pointerEvents = 'none';
             }
 
-              var options = {
-                  //aspectRatio:'20:20'
-                  //controls:false
-                  fluid:true
-              };
-              var self = this;
-               this.player = videojs(self.$.mainRouteVideo, options, function onPlayerReady() {
-                videojs.log('Your player is ready!');
-                var playButton = document.querySelectorAll('.video-js button');
-                for (var i = 0; i < playButton.length; i++) {
-                  playButton[i].style.display = 'none';
-                }
-                self.reAlightElements();
-                $('.fullscreen-button').on('click',function(){
-                  $('.video-js .vjs-fullscreen-control').click();
-                });
-
-                var progressBar = document.querySelector('.video-js .vjs-progress-control');
-                progressBar.style.visibility='hidden';
-                var timeRemaing = document.querySelector('.vjs-remaining-time-display');
-                timeRemaing.style.visibility='hidden';
-                timeRemaing.style.display='none';
-                var controllBar = document.querySelector('.video-js .vjs-control-bar');
-                controllBar.style.backgroundColor = 'transparent';
-                self._adjustMapSize();
-                window.addEventListener("resize", function(){
-                  self._adjustMapSize();
-                  self.reAlightElements();
-                });
-                setTimeout(function(){
-                     self._adjustMapSize();
-                }, 2000);
-                setTimeout(function(){
-                     self._adjustMapSize();
-                }, 4000);
-                var screenEvent = document.querySelector('.vjs-tech');
-                if(screenEvent){
-                  screenEvent.style.pointerEvents = 'none';
-                }
 
 
+            //self.player.src({type: "video/mp4", src: "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/ALUMROCKTRANSITCENTER-SANTACLARA%2628TH/1024x1024-SANTA_CLARA_28TH-ALUM_ROCK_TRANSIT_CENTER.mp4"});
 
-                //self.player.src({type: "video/mp4", src: "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/ALUMROCKTRANSITCENTER-SANTACLARA%2628TH/1024x1024-SANTA_CLARA_28TH-ALUM_ROCK_TRANSIT_CENTER.mp4"});
-
-                // In this context, `this` is the player that was created by Video.js.
-                if(src){
-                  self.player.src({type: "video/mp4", src: src});
-                }
-                //self.player.pause();
-                self._shouldHidePlay = false;
-                videojs.log('Paused now');
-
-                // How about an event listener?
-                self.player.on('ended', function() {
-                  videojs.log('Awww...over so soon?!');
-                  self._endVideo();
-                  self._adjustMapSize();
-                });
-                self.player.on('play', function() {
-                  //spcl_console.log ('Video Played');
-                  self._playVideo();
-                  self._adjustMapSize();
-                  self.reAlightElements();
-                });
-                self.player.on('pause', function() {
-                  //spcl_console.log ('Video Paused');
-                  self._pauseVideo();
-                  self._adjustMapSize();
-                });
-                self.player.on('error', function(e) {
-                  //spcl_console.log ('Video error');
-                  //spcl_console.log (e);
-                });
-                  self.player.on('fullscreenchange', function() {
-                    //alert('resized')
-                    //spcl_console.log ('full screen event');
-                    self._adjustMapSize();
-                    self.reAlightElements();
-                  });
-
-                self.player.on('timeupdate', function () {
-                    ////spcl_console.log (this.currentTime());
-                  self._videoCurrentTimeChange(parseInt(this.currentTime()));
-                  self.reAlightElements();
-                });
+            // In this context, `this` is the player that was created by Video.js.
+            if (src) {
+              self.player.src({
+                type: "video/mp4",
+                src: src
               });
+            }
+            //self.player.pause();
+            self._shouldHidePlay = false;
+            videojs.log('Paused now');
+
+            // How about an event listener?
+            self.player.on('ended', function() {
+              videojs.log('Awww...over so soon?!');
+              self._endVideo();
+              self._adjustMapSize();
+            });
+            self.player.on('play', function() {
+              //spcl_console.log ('Video Played');
+              self._playVideo();
+              self._adjustMapSize();
+              self.reAlightElements();
+            });
+            self.player.on('pause', function() {
+              //spcl_console.log ('Video Paused');
+              self._pauseVideo();
+              self._adjustMapSize();
+            });
+            self.player.on('error', function(e) {
+              //spcl_console.log ('Video error');
+              //spcl_console.log (e);
+            });
+            self.player.on('fullscreenchange', function() {
+              //alert('resized')
+              //spcl_console.log ('full screen event');
+              self._adjustMapSize();
+              self.reAlightElements();
+            });
+
+            self.player.on('timeupdate', function() {
+              ////spcl_console.log (this.currentTime());
+              self._videoCurrentTimeChange(parseInt(this.currentTime()));
+              self.reAlightElements();
+            });
+          });
 
           //spcl_console.log ('done')
 
         },
-        _assignSource : function(src){
-          if(this.player){
-            this.player.src({type: "video/mp4", src: src});
+        _assignSource: function(src) {
+          if (this.player) {
+            this.player.src({
+              type: "video/mp4",
+              src: src
+            });
             var self = this;
             this._adjustMapSize();
-            setTimeout(function(){
-               self._adjustMapSize();
+            setTimeout(function() {
+              self._adjustMapSize();
             }, 2000);
 
-          }else{
+          } else {
             this._bingVideo(src);
           }
         },
-        _videoViewChange:function(src){
+        _videoViewChange: function(src) {
           // //spcl_console.log ('video direction change');
           // //spcl_console.log (this.$.videoViewSelection.value);
           // this._assignSource(this.$.videoViewSelection.value);
@@ -1724,111 +1717,160 @@ var currentLngForPoi = null;
           this._videoCurrentTimeChange(0);
           this._pauseVideo();
         },
-        _goBack:function(){
+        _goBack: function() {
           $('#backBtn').click();
         },
+        _changeGeoPointsUi: function(view) {
+          if (!view) {
+            return false;
+          }
+          console.log('view');
+          console.log(view);
+          console.log(this._routeDetails);
+          var geoPoints = null;
+          if (view == 'frontView' && this._routeDetails.videoGeoPoints) {
+            geoPoints = this._routeDetails.videoGeoPoints;
+          } else if (view == 'leftView' && this._routeDetails.videoGeoPointsLeft) {
+            geoPoints = this._routeDetails.videoGeoPointsLeft;
+          } else if (view == 'rightView' && this._routeDetails.videoGeoPointsRight) {
+            geoPoints = this._routeDetails.videoGeoPointsRight;
+          } else if (view == 'backView' && this._routeDetails.videoGeoPointsBack) {
+            geoPoints = this._routeDetails.videoGeoPointsBack;
+          } else if (view == 'nightView' && this._routeDetails.videoGeoPointsNight) {
+            geoPoints = this._routeDetails.videoGeoPointsNight;
+          }
+          if (!geoPoints && !this._routeDetails.videoGeoPoints) {
+            return false;
+          }else if(!geoPoints){
+            geoPoints = this._routeDetails.videoGeoPoints;
+          }
+          var departurePoint = this.$.mapsUtils.getClosestPoint(this._routeDetails.stops[this.departureStopId].lat,
+            this._routeDetails.stops[this.departureStopId].lng, geoPoints);
+          var destinationPoint = this.$.mapsUtils.getClosestPoint(this._routeDetails.stops[this.destinationStopId].lat,
+            this._routeDetails.stops[this.destinationStopId].lng, geoPoints);
+
+          var departurePointInt = parseInt(departurePoint.key);
+          var destinationPointInt = parseInt(destinationPoint.key);
+          var tourSlot = this.getRouteSlot(geoPoints, departurePointInt, destinationPointInt);
+          this._videoStartTime = parseInt(departurePoint.key);
+          this._videoEndTime = parseInt(destinationPoint.key);
+          if (this.departureStopId < this.destinationStopId) {
+            this._stopsSlot = this._routeDetails.stops.slice(this.departureStopId, parseInt(this.destinationStopId) + 1);
+          } else {
+            this._stopsSlot = this._routeDetails.stops.slice(this.destinationStopId, parseInt(this.departureStopId) + 1).reverse();
+          }
+          this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
+          console.log('now settngs new tour path');
+          this._loadRoutePath(tourSlot);
+          },
         ready: function() {
 
           var self = this;
-          setTimeout(function(){
+          setTimeout(function() {
             self._bingVideo();
           }, 1000);
 
-          $(document).ready(function(e){
+          $(document).ready(function(e) {
             $('.SelectViewItems').hide();
-            $('.SelectViewItems').on('click',function(e){
+            $('.SelectViewItems').on('click', function(e) {
+              console.log('check below data');
+              console.log(self._routeDetails);
+
+
               var videoSource = $(this).attr('data-video');
+              var viewType = $(this).attr('id');
               $('#viewSelectionText').text($(this).find('a').text());
               self._videoViewChange(videoSource);
+              self._changeGeoPointsUi(viewType);
             });
             // $('.paper-progress-0 #primaryProgress.paper-progress').css({
             //   'background':'#44B5E3',
             //   'height':'20px'
             // })
-            $(window).resize(function(e){
-                // console.log(e);
-                // console.log('width below');
-                // console.log($(window).width());
-                var screenWidth = $(window).width();
-                if(screenWidth>600){
-                  self.isDesktop = true;
-                  if($('#pois').hasClass('active')){
-                    self.$.poiDetails.classList.add('active');
-                  }
-                }else{
-                  self.isDesktop = false;
-                    //self.$.poiDetails.classList.remove('active');
+            $(window).resize(function(e) {
+              // console.log(e);
+              // console.log('width below');
+              // console.log($(window).width());
+              var screenWidth = $(window).width();
+              if (screenWidth > 600) {
+                self.isDesktop = true;
+                if ($('#pois').hasClass('active')) {
+                  self.$.poiDetails.classList.add('active');
                 }
+              } else {
+                self.isDesktop = false;
+                //self.$.poiDetails.classList.remove('active');
+              }
             });
 
           });
 
         },
-        _isValidCords:function(lat,lng){
-          if(isNaN(parseFloat(lat))){
+        _isValidCords: function(lat, lng) {
+          if (isNaN(parseFloat(lat))) {
             return false;
           }
-          if(isNaN(parseFloat(lng))){
+          if (isNaN(parseFloat(lng))) {
             return false;
           }
           return true;
         },
-        _isInValidRange:function(sec){
-          if(sec>=this._videoStartTime && sec<=this._videoEndTime){
+        _isInValidRange: function(sec) {
+          if (sec >= this._videoStartTime && sec <= this._videoEndTime) {
             return true;
           }
           return false;
         },
-        _getStopIcon:function(){
+        _getStopIcon: function() {
           return new google.maps.MarkerImage(
-           '/images/fa-map-marker-stop.png', //url
-           null, //size
-           null, //origin
-           null, //anchor
-           new google.maps.Size(20, 20)
+            '/images/fa-map-marker-stop.png', //url
+            null, //size
+            null, //origin
+            null, //anchor
+            new google.maps.Size(20, 20)
           );
         },
-        _getPoiIcon:function(url){
-          if(!url){
+        _getPoiIcon: function(url) {
+          if (!url) {
             url = '/images/custom_poi.png';
           }
           return new google.maps.MarkerImage(
-           url, //url
-           null, //size
-           null, //origin
-           null, //anchor
-           new google.maps.Size(18, 18)
+            url, //url
+            null, //size
+            null, //origin
+            null, //anchor
+            new google.maps.Size(18, 18)
           );
         },
-        _getCustomPoiIcon:function(url){
-          if(!url){
+        _getCustomPoiIcon: function(url) {
+          if (!url) {
             url = '/images/custom_poi.png';
             //return url;
           }
           return new google.maps.MarkerImage(
-           url, //url
-           null, //size
-           null, //origin
-           null, //anchor
-           new google.maps.Size(18, 18)
+            url, //url
+            null, //size
+            null, //origin
+            null, //anchor
+            new google.maps.Size(18, 18)
           );
         },
-        _getCustomPoiLink:function(url){
-          if(url && url!=null && url != undefined){
+        _getCustomPoiLink: function(url) {
+          if (url && url != null && url != undefined) {
             return url;
-          }else{
+          } else {
             return 'javasctipt:void(0)';
           }
 
         },
-        _calculateValidZooomStatus:function(){
-          if(this._map.getZoom() >= 14){
+        _calculateValidZooomStatus: function() {
+          if (this._map.getZoom() >= 14) {
             this._isValidZoom = true;
-          }else{
+          } else {
             this._isValidZoom = false;
           }
         },
-        _getDirectionData: function(startLat,endLatLng) {
+        _getDirectionData: function(startLat, endLatLng) {
           var directionsService = new google.maps.DirectionsService();
           var start = startLat;
           var end = endLatLng;
@@ -1843,23 +1885,23 @@ var currentLngForPoi = null;
               //spcl_console.log ('check experimental direction data below');
               //spcl_console.log (result);
               //directionsDisplay.setDirections(result);
-              if(result){
-                if(result.routes && result.routes.length){
-                    if(result.routes[0].legs && result.routes[0].legs.length){
-                        if(result.routes[0].legs[0].steps && result.routes[0].legs[0].steps.length){
-                          var directionData = result.routes[0].legs[0].steps && result.routes[0].legs[0].steps[0];
-                          var instruction = directionData.instructions;
-                          if(instruction){
-                            instruction = instruction.replace('Head','Heading');
-                            var instructionArray = instruction.split("<div");
-                            instruction = instructionArray[0];
-                          }
-                          if(directionData.maneuver){
-                             instruction = instruction +' ('+directionData.maneuver+')';
-                          }
-                          $('#direction-display').html(instruction);
-                        }
+              if (result) {
+                if (result.routes && result.routes.length) {
+                  if (result.routes[0].legs && result.routes[0].legs.length) {
+                    if (result.routes[0].legs[0].steps && result.routes[0].legs[0].steps.length) {
+                      var directionData = result.routes[0].legs[0].steps && result.routes[0].legs[0].steps[0];
+                      var instruction = directionData.instructions;
+                      if (instruction) {
+                        instruction = instruction.replace('Head', 'Heading');
+                        var instructionArray = instruction.split("<div");
+                        instruction = instructionArray[0];
+                      }
+                      if (directionData.maneuver) {
+                        instruction = instruction + ' (' + directionData.maneuver + ')';
+                      }
+                      $('#direction-display').html(instruction);
                     }
+                  }
                 }
               }
             }
@@ -1868,56 +1910,56 @@ var currentLngForPoi = null;
           //this.$.search.getDetails(newSelectedPoi.place_id);
 
         },
-        _toggleDirectionNavigation:function(){
-          this._direction = this._direction ? false:true;
+        _toggleDirectionNavigation: function() {
+          this._direction = this._direction ? false : true;
         },
-        _getNearByMeetUps:function(lat,lon){
-            var self = this;
-            var settings = {
-              "async": true,
-              "crossDomain": true,
-              "url": "/api/meetups/"+lat+"/"+lon+"",
-              "method": "GET",
-              "headers": {
-                "cache-control": "no-cache",
-              }
+        _getNearByMeetUps: function(lat, lon) {
+          var self = this;
+          var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "/api/meetups/" + lat + "/" + lon + "",
+            "method": "GET",
+            "headers": {
+              "cache-control": "no-cache",
             }
-            $.ajax(settings).done(function (response) {
-              console.log('check meetups data below');
-              console.log(response);
-              if(response.results){
-                self._meetUps = response.results;
+          }
+          $.ajax(settings).done(function(response) {
+            console.log('check meetups data below');
+            console.log(response);
+            if (response.results) {
+              self._meetUps = response.results;
 
-                console.log('check actual meetUp Data');
-                console.log(self._meetUps);
-              }
-            });
+              console.log('check actual meetUp Data');
+              console.log(self._meetUps);
+            }
+          });
         },
-        _getNearByCoords:function(lat,lon){
-            var self = this;
-            var settings = {
-              "async": true,
-              "crossDomain": true,
-              "url": "/api/coords/"+lat+"/"+lon+"",
-              "method": "GET",
-              "headers": {
-                "cache-control": "no-cache",
-              }
+        _getNearByCoords: function(lat, lon) {
+          var self = this;
+          var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "/api/coords/" + lat + "/" + lon + "",
+            "method": "GET",
+            "headers": {
+              "cache-control": "no-cache",
             }
-            $.ajax(settings).done(function (response) {
-              console.log('check meetups data below');
-              console.log(response);
-              if(response.features){
-                self._coords = response.features;
+          }
+          $.ajax(settings).done(function(response) {
+            console.log('check meetups data below');
+            console.log(response);
+            if (response.features) {
+              self._coords = response.features;
 
-                console.log('check actual coords Data');
-                console.log(self._coords);
-              }
-            });
+              console.log('check actual coords Data');
+              console.log(self._coords);
+            }
+          });
         },
 
       });
-    }catch(err){
+    } catch (err) {
       //spcl_console.log ('route navigation error');
       //spcl_console.log (err);
     }
