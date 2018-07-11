@@ -219,8 +219,22 @@
 
           </div>
           <div class="column2">
-            <template is="dom-if" if="[[_routeDetails.a.videoGeoPoints]]">
-            <route-map id="routeMap" geo-points="{{_routeDetails.a.videoGeoPoints}}"></route-map>
+            <paper-dropdown-menu id="mapViewDropdown" label="Map View" vertical-align="bottom" horizontal-align="left" on-iron-select="_changeMapView">
+               <paper-listbox id="directionDropdownListBox" slot="dropdown-content" class="dropdown-content" selected="0">
+                   <template is="dom-if" if="[[_routeDetails.a.videoGeoPoints]]">
+                      <paper-item value="a">Direction A</paper-item>
+                   </template>
+                   <template is="dom-if" if="[[_routeDetails.b.videoGeoPoints]]">
+                    <paper-item value="b">Direction B</paper-item>
+                  </template>
+                </paper-listbox>
+          </paper-dropdown-menu>
+            <!-- <select id="mapDirectionSelection">
+              <option  value="a"> Direction A </option>
+              <option  value="b"> Direction B </option>
+            </select> -->
+            <template is="dom-if" if="[[_videoGeoPoints]]">
+            <route-map id="routeMap" geo-points="{{_videoGeoPoints}}"></route-map>
             </template>
           </div>
         </div>
@@ -569,6 +583,7 @@
         this._routeDetails = baseRouteDetails;
         this._displayStops = false;
         this._isNewRoute = true;
+        this._videoGeoPoints = null;
       },
 
       _codeChange: function(newCode) {
@@ -584,6 +599,12 @@
               return self.$.routeDetails.getStoredValue('/route-details/' + newCode);
             }).then(function(data) {
               self._routeDetailsOrigin = data;
+              if(self._routeDetailsOrigin && self._routeDetailsOrigin.a && self._routeDetailsOrigin.a.videoGeoPoints){
+                self._videoGeoPoints = self._routeDetailsOrigin.a.videoGeoPoints;
+              }else if(self._routeDetailsOrigin && self._routeDetailsOrigin.b && self._routeDetailsOrigin.b.videoGeoPoints){
+                self._videoGeoPoints = self._routeDetailsOrigin.b.videoGeoPoints;
+              }
+
               self._displayStops = true;
             }).catch(function(error) {
               console.log(error);
@@ -592,6 +613,22 @@
           this.clear();
         }
       },
+      _getDropdownSelectedValue : function(event) {
+        var selectedItem = $(event.target.selectedItem)[0];
+        if (selectedItem) {
+          return $(selectedItem).attr('value');
+        } else {
+          return null;
+        }
+      },
+      _changeMapView: function(event) {
+          var selectedView = this._getDropdownSelectedValue(event);
+          if(selectedView && this._routeDetailsOrigin && this._routeDetailsOrigin[selectedView] &&  this._routeDetailsOrigin[selectedView].videoGeoPoints){
+            this._videoGeoPoints = this._routeDetailsOrigin[selectedView].videoGeoPoints;
+          }
+
+
+        },
 
       _routeInfoOriginChange: function(newRouteInfo) {
         if (this._jsonHasKeys(newRouteInfo)) {

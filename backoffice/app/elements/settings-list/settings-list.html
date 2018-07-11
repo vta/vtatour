@@ -158,6 +158,9 @@
       .field-heading{
         font-size: 18px;
       }
+      .full-width{
+        clear: both;
+      }
     </style>
     <firebase-document
       app-name="vta"
@@ -183,10 +186,21 @@
             <h3 class="field-heading">API Key</h3>
             <paper-input id="apiKey" class="input-keys"  value="{{_settings.apiKey}}" placeholder="Enter strong API Key and it should be hard to guess" required></paper-input>
           </div>
-          <!-- <div class="full-width">
+          <br/>
+          <div class="full-width">
             <h3 class="field-heading">Environment</h3>
             <paper-input id="environment" class="input-keys" value="{{_settings.environment}}" placeholder="Enter Environment name" required></paper-input>
-          </div> -->
+          </div>
+            <br/>
+          <div class="full-width">
+            <h3 class="field-heading">Video Server Url</h3>
+            <paper-input id="video_server_url" class="input-keys" value="{{_settings.video_server_url}}" placeholder="Enter Video Server Url" required></paper-input>
+          </div>
+            <br/>
+          <div class="full-width">
+            <h3 class="field-heading">S3 Bucket Name</h3>
+            <paper-input id="s3_bucket_name" class="input-keys" value="{{_settings.s3_bucket_name}}" placeholder="Enter s3 bucket name, if video stored in s3 bucket" required></paper-input>
+          </div>
         </div>
 
         <hr/>
