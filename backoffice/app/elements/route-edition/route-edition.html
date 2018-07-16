@@ -316,11 +316,11 @@
               <div class="stops-wrapper">
                 <h3>Direction B - Stops</h3>
                 <stop-list stops="{{_routeDetails.b.stops}}" show-operations></stop-list>
-                <!-- <div class="add-stop-wrapper">
+                <div class="add-stop-wrapper">
                   <paper-button on-click="_openAddStopModal" data-route-direction="b">
                     <iron-icon icon="icons:add"></iron-icon>Add stop
                   </paper-button>
-                </div> -->
+                </div>
               </div>
             </template>
           </div>
@@ -1145,10 +1145,12 @@
 
       _getStopObj: function(baseStop) {
         var newStopObj = {
+          code:baseStop.id,
           name: baseStop.name,
           lat: baseStop.lat,
           lng: baseStop.lng,
           route_list: baseStop.route_list,
+          stop_code:baseStop.stop_code,
         };
 
         return newStopObj;

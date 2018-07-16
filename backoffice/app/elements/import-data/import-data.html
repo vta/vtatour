@@ -827,10 +827,12 @@
 
                   if (rawRouteObject.direction) {
                     routeObject.directionAName = rawRouteObject.direction;
+                    routeObject.originalDirectionAName = rawRouteObject.direction;
                   }
 
                   if (rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.direction) {
                     routeObject.directionBName = rawRouteObjectOtherDirection.direction;
+                    routeObject.originalDirectionBName = rawRouteObjectOtherDirection.direction;
                   }
 
                   var routesStopsArray = [];
@@ -949,10 +951,12 @@
 
                   if (rawRouteObject.direction) {
                     routeObject.directionAName = rawRouteObject.direction;
+                    routeObject.originalDirectionAName = rawRouteObject.direction;
                   }
 
                   if (rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.direction) {
                     routeObject.directionBName = rawRouteObjectOtherDirection.direction;
+                    routeObject.originalDirectionBName = rawRouteObjectOtherDirection.direction;
                   }
 
                   var routesStopsArray = [];
@@ -1141,127 +1145,147 @@
           //firebase.database().ref().update(update);
           var firebaseDb = this.$.routeInfo.db;
           var firebaseDbRef = firebaseDb.ref();
-          self.$.routeDetails.getStoredValue('/route-details/' + code)
-            .then(function(data) {
-              if (data && data.latestResources) {
-                routeDetails.latestResources = data.latestResources;
-              }
-              if (data && data.latestResourcesLowResolution) {
-                routeDetails.latestResourcesLowResolution = data.latestResourcesLowResolution;
-              }
-              if (data && data.a) {
-                if (data.a.videoGeoPoints) {
-                  routeDetails.a.videoGeoPoints = data.a.videoGeoPoints;
-                }
-                if (data.a.videoGeoPointsLowRes) {
-                  routeDetails.a.videoGeoPointsLowRes = data.a.videoGeoPointsLowRes;
-                }
-                if (data.a.videoGeoPointsLeft) {
-                  routeDetails.a.videoGeoPointsLeft = data.a.videoGeoPointsLeft;
-                }
-                if (data.a.videoGeoPointsLeftLowRes) {
-                  routeDetails.a.videoGeoPointsLeftLowRes = data.a.videoGeoPointsLeftLowRes;
-                }
-                if (data.a.videoGeoPointsRight) {
-                  routeDetails.a.videoGeoPointsRight = data.a.videoGeoPointsRight;
-                }
-                if (data.a.videoGeoPointsRightLowRes) {
-                  routeDetails.a.videoGeoPointsRightLowRes = data.a.videoGeoPointsRightLowRes;
-                }
-                if (data.a.videoGeoPointsBack) {
-                  routeDetails.a.videoGeoPointsBack = data.a.videoGeoPointsBack;
-                }
-                if (data.a.videoGeoPointsBackLowRes) {
-                  routeDetails.a.videoGeoPointsBackLowRes = data.a.videoGeoPointsBackLowRes;
-                }
-                routeDetails.a.videoUrl = data.a.videoUrl || "";
-                routeDetails.a.videoLeftUrl = data.a.videoLeftUrl || "";
-                routeDetails.a.videoRightUrl = data.a.videoRightUrl || "";
-                routeDetails.a.videoBackUrl = data.a.videoBackUrl || "";
-                routeDetails.a.videoNightUrl = data.a.videoNightUrl || "";
-                routeDetails.a.videoUrlLowRes = data.a.videoUrlLowRes || "";
-                routeDetails.a.videoLeftUrlLowRes = data.a.videoLeftUrlLowRes || "";
-                routeDetails.a.videoRightUrlLowRes = data.a.videoRightUrlLowRes || "";
-                routeDetails.a.videoBackUrlLowRes = data.a.videoBackUrlLowRes || "";
-                routeDetails.a.videoNightUrlLowRes = data.a.videoNightUrlLowRes || "";
+          self.$.routeDetails.getStoredValue('/routes/' + code)
+            .then(function(routeInfoFromDb) {
 
+              routeInfo.originalDeparture = routeInfo.departure;
+              if(routeInfoFromDb.departure){
+                routeInfo.departure = routeInfoFromDb.departure;
+              }
 
-                if (routeDetails.a && routeDetails.a.stops && routeDetails.a.stops.length) {
-                  for (var a = 0; a < routeDetails.a.stops.length; a++) {
-                    var tempStopObject = routeDetails.a.stops[a];
-                    if (data && data.a && data.a.stops[a].length && data.a.stops[a].isNotificationEnabled === true) {
-                      routeDetails.a.stops[a].isNotificationEnabled = true;
-                    } else {
-                      routeDetails.a.stops[a].isNotificationEnabled = false;
-                    }
-                    var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.a.videoGeoPoints);
-                    routeDetails.a.stops[a].sec = parseInt(point.key);
+              routeInfo.originalDestination = routeInfo.destination;
+              if(routeInfoFromDb.destination){
+                routeInfo.destination = routeInfoFromDb.destination;
+              }
+
+              routeInfo.originalName = routeInfo.name;
+              if(routeInfoFromDb.name){
+                routeInfo.name = routeInfoFromDb.name;
+              }
+
+              self.$.routeDetails.getStoredValue('/route-details/' + code)
+                .then(function(data) {
+                  if (data && data.latestResources) {
+                    routeDetails.latestResources = data.latestResources;
                   }
-                }
-              }
-              if (data && data.b) {
-                if (data.b.videoGeoPoints) {
-                  routeDetails.b.videoGeoPoints = data.b.videoGeoPoints;
-                }
-                if (data.b.videoGeoPointsLowRes) {
-                  routeDetails.b.videoGeoPointsLowRes = data.b.videoGeoPointsLowRes;
-                }
-                if (data.b.videoGeoPointsLeft) {
-                  routeDetails.b.videoGeoPointsLeft = data.b.videoGeoPointsLeft;
-                }
-                if (data.b.videoGeoPointsLeftLowRes) {
-                  routeDetails.b.videoGeoPointsLeftLowRes = data.b.videoGeoPointsLeftLowRes;
-                }
-
-                if (data.b.videoGeoPointsRight) {
-                  routeDetails.b.videoGeoPointsRight = data.b.videoGeoPointsRight;
-                }
-                if (data.b.videoGeoPointsRightLowRes) {
-                  routeDetails.b.videoGeoPointsRightLowRes = data.b.videoGeoPointsRightLowRes;
-                }
-
-                if (data.b.videoGeoPointsBack) {
-                  routeDetails.b.videoGeoPointsBack = data.b.videoGeoPointsBack;
-                }
-                if (data.b.videoGeoPointsBackLowRes) {
-                  routeDetails.b.videoGeoPointsBackLowRes = data.b.videoGeoPointsBackLowRes;
-                }
-                routeDetails.b.videoUrl = data.b.videoUrl || "";
-                routeDetails.b.videoLeftUrl = data.b.videoLeftUrl || "";
-                routeDetails.b.videoRightUrl = data.b.videoRightUrl || "";
-                routeDetails.b.videoBackUrl = data.b.videoBackUrl || "";
-                routeDetails.b.videoNightUrl = data.b.videoNightUrl || "";
-                routeDetails.b.videoUrlLowRes = data.b.videoUrlLowRes || "";
-                routeDetails.b.videoLeftUrlLowRes = data.b.videoLeftUrlLowRes || "";
-                routeDetails.b.videoRightUrlLowRes = data.b.videoRightUrlLowRes || "";
-                routeDetails.b.videoBackUrlLowRes = data.b.videoBackUrlLowRes || "";
-                routeDetails.b.videoNightUrlLowRes = data.b.videoNightUrlLowRes || "";
-                if (routeDetails.b && routeDetails.b.stops && routeDetails.b.stops.length) {
-                  for (var b = 0; b < routeDetails.b.stops.length; b++) {
-                    var tempStopObject = routeDetails.b.stops[b];
-                    if (data && data.b && data.b.stops[b].length && data.b.stops[b].isNotificationEnabled === true) {
-                      routeDetails.b.stops[b].isNotificationEnabled = true;
-                    } else {
-                      routeDetails.b.stops[b].isNotificationEnabled = false;
-                    }
-                    var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.b.videoGeoPoints);
-                    routeDetails.b.stops[b].sec = parseInt(point.key);
+                  if (data && data.latestResourcesLowResolution) {
+                    routeDetails.latestResourcesLowResolution = data.latestResourcesLowResolution;
                   }
-                }
-              }
-              update['routes/' + code] = routeInfo;
-              update['route-details/' + code] = routeDetails;
-              console.log('check below update deep path');
-              console.log(update)
-              firebaseDbRef.update(update, function(error) {
-                if (error) {
-                  console.log("Error updating data:", error);
-                } else {
-                  console.log('Write Success');
-                }
-                return callback(null, true);
-              });
+                  if (data && data.a) {
+                    if (data.a.videoGeoPoints) {
+                      routeDetails.a.videoGeoPoints = data.a.videoGeoPoints;
+                    }
+                    if (data.a.videoGeoPointsLowRes) {
+                      routeDetails.a.videoGeoPointsLowRes = data.a.videoGeoPointsLowRes;
+                    }
+                    if (data.a.videoGeoPointsLeft) {
+                      routeDetails.a.videoGeoPointsLeft = data.a.videoGeoPointsLeft;
+                    }
+                    if (data.a.videoGeoPointsLeftLowRes) {
+                      routeDetails.a.videoGeoPointsLeftLowRes = data.a.videoGeoPointsLeftLowRes;
+                    }
+                    if (data.a.videoGeoPointsRight) {
+                      routeDetails.a.videoGeoPointsRight = data.a.videoGeoPointsRight;
+                    }
+                    if (data.a.videoGeoPointsRightLowRes) {
+                      routeDetails.a.videoGeoPointsRightLowRes = data.a.videoGeoPointsRightLowRes;
+                    }
+                    if (data.a.videoGeoPointsBack) {
+                      routeDetails.a.videoGeoPointsBack = data.a.videoGeoPointsBack;
+                    }
+                    if (data.a.videoGeoPointsBackLowRes) {
+                      routeDetails.a.videoGeoPointsBackLowRes = data.a.videoGeoPointsBackLowRes;
+                    }
+                    routeDetails.a.videoUrl = data.a.videoUrl || "";
+                    routeDetails.a.videoLeftUrl = data.a.videoLeftUrl || "";
+                    routeDetails.a.videoRightUrl = data.a.videoRightUrl || "";
+                    routeDetails.a.videoBackUrl = data.a.videoBackUrl || "";
+                    routeDetails.a.videoNightUrl = data.a.videoNightUrl || "";
+                    routeDetails.a.videoUrlLowRes = data.a.videoUrlLowRes || "";
+                    routeDetails.a.videoLeftUrlLowRes = data.a.videoLeftUrlLowRes || "";
+                    routeDetails.a.videoRightUrlLowRes = data.a.videoRightUrlLowRes || "";
+                    routeDetails.a.videoBackUrlLowRes = data.a.videoBackUrlLowRes || "";
+                    routeDetails.a.videoNightUrlLowRes = data.a.videoNightUrlLowRes || "";
 
+
+                    if (routeDetails.a && routeDetails.a.stops && routeDetails.a.stops.length) {
+                      for (var a = 0; a < routeDetails.a.stops.length; a++) {
+                        var tempStopObject = routeDetails.a.stops[a];
+                        var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.a.videoGeoPoints);
+                        routeDetails.a.stops[a].sec = parseInt(point.key);
+                      }
+                    }
+                    routeDetails.a.originalStops = routeDetails.a.stops;
+                    if(data.a.stops && data.a.stops.length){
+                      routeDetails.a.stops = data.a.stops;
+                    }
+                  }
+                  if (data && data.b) {
+                    if (data.b.videoGeoPoints) {
+                      routeDetails.b.videoGeoPoints = data.b.videoGeoPoints;
+                    }
+                    if (data.b.videoGeoPointsLowRes) {
+                      routeDetails.b.videoGeoPointsLowRes = data.b.videoGeoPointsLowRes;
+                    }
+                    if (data.b.videoGeoPointsLeft) {
+                      routeDetails.b.videoGeoPointsLeft = data.b.videoGeoPointsLeft;
+                    }
+                    if (data.b.videoGeoPointsLeftLowRes) {
+                      routeDetails.b.videoGeoPointsLeftLowRes = data.b.videoGeoPointsLeftLowRes;
+                    }
+
+                    if (data.b.videoGeoPointsRight) {
+                      routeDetails.b.videoGeoPointsRight = data.b.videoGeoPointsRight;
+                    }
+                    if (data.b.videoGeoPointsRightLowRes) {
+                      routeDetails.b.videoGeoPointsRightLowRes = data.b.videoGeoPointsRightLowRes;
+                    }
+
+                    if (data.b.videoGeoPointsBack) {
+                      routeDetails.b.videoGeoPointsBack = data.b.videoGeoPointsBack;
+                    }
+                    if (data.b.videoGeoPointsBackLowRes) {
+                      routeDetails.b.videoGeoPointsBackLowRes = data.b.videoGeoPointsBackLowRes;
+                    }
+                    routeDetails.b.videoUrl = data.b.videoUrl || "";
+                    routeDetails.b.videoLeftUrl = data.b.videoLeftUrl || "";
+                    routeDetails.b.videoRightUrl = data.b.videoRightUrl || "";
+                    routeDetails.b.videoBackUrl = data.b.videoBackUrl || "";
+                    routeDetails.b.videoNightUrl = data.b.videoNightUrl || "";
+                    routeDetails.b.videoUrlLowRes = data.b.videoUrlLowRes || "";
+                    routeDetails.b.videoLeftUrlLowRes = data.b.videoLeftUrlLowRes || "";
+                    routeDetails.b.videoRightUrlLowRes = data.b.videoRightUrlLowRes || "";
+                    routeDetails.b.videoBackUrlLowRes = data.b.videoBackUrlLowRes || "";
+                    routeDetails.b.videoNightUrlLowRes = data.b.videoNightUrlLowRes || "";
+                    if (routeDetails.b && routeDetails.b.stops && routeDetails.b.stops.length) {
+                      for (var b = 0; b < routeDetails.b.stops.length; b++) {
+                        var tempStopObject = routeDetails.b.stops[b];
+                        var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.b.videoGeoPoints);
+                        routeDetails.b.stops[b].sec = parseInt(point.key);
+                      }
+                    }
+                    routeDetails.b.originalStops = routeDetails.b.stops;
+                    if(data.b.stops && data.b.stops.length){
+                      routeDetails.b.stops = data.b.stops;
+                    }
+                  }
+                  update['routes/' + code] = routeInfo;
+                  update['route-details/' + code] = routeDetails;
+                  console.log('check below update deep path');
+                  console.log(update)
+                  firebaseDbRef.update(update, function(error) {
+                    if (error) {
+                      console.log("Error updating data:", error);
+                    } else {
+                      console.log('Write Success');
+                    }
+                    return callback(null, true);
+                  });
+
+                }).catch(function(error) {
+                  console.log(error);
+                  return callback(null, true);
+                });
             }).catch(function(error) {
               console.log(error);
               return callback(null, true);
@@ -1292,7 +1316,96 @@
           //     });
           // }, 1000);
         },
+        _saveStop: function(fullStopData, callback) {
+          var self = this;
+          if (!fullStopData) {
+            return callback({
+              message: 'data missing'
+            }, false);
+          }
+          if (!fullStopData.id) {
+            return callback({
+              message: 'data missing - before trim'
+            }, false);
+          }
+          var code = fullStopData.id.trim();
+          if (!code) {
+            return callback({
+              message: 'Code missing - after trim'
+            }, false)
+          }
+          var stopInfo = fullStopData;
+
+          var update = {};
+          //return callback(null,true);
+          //firebase.database().ref().update(update);
+          var firebaseDb = this.$.routeInfo.db;
+          var firebaseDbRef = firebaseDb.ref();
+          update['stops/' + code] = stopInfo;
+          console.log('check below update deep path');
+          console.log(update)
+          firebaseDbRef.update(update, function(error) {
+            if (error) {
+              console.log("Error updating data:", error);
+            } else {
+              console.log('Write Success');
+            }
+            return callback(null, true);
+          });
+        },
+        _batchImportStopListData:function(){
+          //this._imported_stops
+          var self = this;
+          var update = {};
+          //return callback(null,true);
+          //firebase.database().ref().update(update);
+          self._showOperationResultModal(true, "Starting Stop List update in firebase");
+          var firebaseDb = this.$.routeInfo.db;
+          var firebaseDbRef = firebaseDb.ref();
+          update['stops'] = null;
+          console.log('check below update deep path');
+          console.log(update);
+          firebaseDbRef.update(update, function(error) {
+            if (error) {
+              console.log("field write Error updating data:", error);
+              //self._showOperationResultModal(false,"Err!!! data not updated in firebase db, please import proper csv file");
+            }else{
+              console.log('fields Write Success');
+              //self._showOperationResultModal(true,"All imported_stops data updated in firebase db");
+            }
+
+            var startUpdate =  function(index){
+              console.log('Index: '+index);
+              if(index<self._imported_stops.length){
+                var fullStopDetails = {};
+                fullStopDetails = self._imported_stops[index];
+                self._saveStop(fullStopDetails,function(err,success){
+                    if(err){
+                      console.log('There is a error to check')
+                      console.log(err);
+                    }
+
+                    console.log('Success: '+success);
+
+                    startUpdate(index+1);
+                });
+              }else{
+                self._showOperationResultModal(true,"All Stops data updated in firebase db");
+                setTimeout(function(){
+                   self.$.saveOperationResultModal.close();
+                }, 2000);
+                return;
+              }
+            }
+            startUpdate(0);
+
+            // setTimeout(function(){
+            //    self.$.saveOperationResultModal.close();
+            // }, 2000);
+          });
+        },
         _batchImportRoutesListData: function(e) {
+          //return this._batchImportStopListData();
 
           if (!confirm('Are you sure? This action will update new routes in database, Notice: It will overwrite existing routes.')) {
             return false;
@@ -1361,6 +1474,9 @@
               self._showOperationResultModal(true, "All routes updated in firebase db");
               setTimeout(function() {
                 self.$.saveOperationResultModal.close();
+
+                self._batchImportStopListData();
+
               }, 2000);
               return;
             }
