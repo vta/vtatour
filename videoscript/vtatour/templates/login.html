@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="" name="description">
+  <meta content="Mosaddek" name="author">
+  <link href="img/favicon.png" rel="shortcut icon">
+  <title>Home</title><!-- js placed at the end of the document so the pages load faster -->
+  <!-- jQuery library -->
+  <!-- Latest compiled and minified CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"><!-- jQuery library -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+  </script><!-- Latest compiled JavaScript -->
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+  </script><!-- Bootstrap core CSS -->
+  <link href="/static/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/theme.css" rel="stylesheet">
+  <link href="/static/bootstrap-reset.css" rel="stylesheet"><!--external css-->
+  <link href="/static/font-awesome.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js">
+  </script><!-- Custom styles for this template -->
+  <link href="/static/font-awesome.css" rel="stylesheet">
+  <link href="/static/le-responsive.css.css" rel="stylesheet">
+  <link href="/static/style.css" rel="stylesheet">
+  <style>
+        .top-header {
+  background-color: #02528a;
+  border-bottom: 1px solid #DDDDDD;
+  padding: 6px 0;
+  height: 38px !important;
+  /* padding-left: 15px; */
+  padding-right: 15px;
+}
+@media (min-width: 992px) {
+  .container {
+    max-width: 670px !important;
+  }
+  @media (max-width: 768px) {
+    .top-header .header-item {
+      display: inline-block;
+      margin-left: 19px !important;
+      margin-right: 20px;
+      font-size: 14px;
+      color: #FFF;
+      /* padding-top: 4px; */
+    }
+  }
+  a {font-size: 20px}
+  h2 {font-size: 20px}
+  p {font-size: 20px}
+  </style>
+
+  <script>
+        
+      var flag=0;
+      var routeslist = [];
+      var config = {
+        apiKey: "AIzaSyCDtI3bfIhVlYdG9zrYzKtqCOqQWldRI7c",
+        authDomain: "vtavirtualtransit-7c904.firebaseapp.com",
+        databaseURL: "https://vtavirtualtransit-7c904.firebaseio.com",
+        projectId: "vtavirtualtransit-7c904",
+        storageBucket: "vtavirtualtransit-7c904.appspot.com",
+        messagingSenderId: "141415834682"
+      };
+
+      firebase.initializeApp(config)
+      routeslist = [];
+      console.log("here")
+      firebase.database().ref('/').once('value').then(function(snapshot) {
+        snapshot.forEach(function(userSnapshot) {
+          var rdata = userSnapshot.val();
+          this.routeslist.push(rdata);
+        });
+        console.log(routeslist[2])
+        this.select = document.getElementById('routeid');
+        select.add(new Option("Select the route"));
+        for (i in routeslist[3]) {
+          select.add(new Option(routeslist[3][i]['name']));
+        };
+        $('#routeid').prop('disabled', false);
+        $('#directionid').prop('disabled', false);
+        $('#camangle').prop('disabled', false);
+        $("#progress").html("Please select a route.");
+      });
+
+      var refreshIntervalId;
+      function chkdir(period) {
+        this.flag=0 
+        var route = undefined
+        var cam = undefined
+        var dir = undefined
+        document.getElementById("searchButton").disabled = true;
+        console.log(routeslist)
+        $("#progress").html("");
+        $("#urls").html("");
+        refreshIntervalId = setInterval(ajax_call, 1000);
+        angsel();
+        for (i in routeslist[3]) {
+          if (period.replace(/\s/g, "").localeCompare(routeslist[3][i]['name'].replace(/\s/g, "")) == 0) {
+            this.select = document.getElementById('directionid');
+            select.options.length = 0;
+            a = routeslist[3][i]['directionAName']
+            a1 = a.charAt(0).toUpperCase() + a.slice(1);
+            b = routeslist[3][i]['directionBName']
+            b1 = b.charAt(0).toUpperCase() + b.slice(1);
+            select.add(new Option("Select the direction"));
+            select.add(new Option(a1));
+            select.add(new Option(b1));
+          }
+        };
+        if (period == "") {
+          alert("No data!")
+        }
+      }
+
+      function angsel() {
+        $("#progress").html("");
+        $("#urls").html("");
+        refreshIntervalId = setInterval(ajax_call, 1000);
+        this.sel = document.getElementById('camangle');
+        sel.options.length = 0;
+        //sel.add(new Option("Select the view"));
+        //sel.add(new Option("Forward"));
+        //sel.add(new Option("Backward"));
+        //sel.add(new Option("Left"));
+        //sel.add(new Option("Right"));
+        sel.add(new Option("All"));
+        
+      }
+
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        console.log("ret cookie");
+        return cookieValue;
+      }
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          console.log(settings.url)
+          //if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+          // Only send the token to relative URLs i.e. locally.
+          xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          //}
+        }
+      });
+      var idleTime = 0;
+      var stats=0;
+      $(document).ready(function() {
+        document.getElementById("searchButton").disabled = true;
+        $("#progress").html("Loading.. please wait");
+        $('#routeid').prop('disabled', 'disabled');
+        $('#directionid').prop('disabled', 'disabled');
+        $('#camangle').prop('disabled', 'disabled');
+        var obj, len, progress, routeid, direction, urllen, forward, backward, left, right, pstatus;
+        pstatus = 0;
+        $.ajaxSetup({
+          cache: false
+        });
+        console.log("pstatus1:" + pstatus);
+        //var interval = 1000; // seconds
+        //refreshIntervalId = setInterval(ajax_call, interval);
+        //Increment the idle time counter every minute.
+        var idleInterval = setInterval(timerIncrement, 60000); /* --------------session !*/
+
+        //Zero the idle timer on mouse movement.
+        $(this).mousemove(function (e) {
+            idleTime = 0;
+        });
+        $(this).keypress(function (e) {
+            idleTime = 0;
+        });
+      });
+
+
+
+
+    function timerIncrement() {
+        idleTime = idleTime + 1;
+        console.log(idleTime);
+        if (idleTime > 20) { /* 20 minutes --------------------------------------------------------LOGS OUT AFTER 20 MINUTES OF INACTIVITY-------!*/
+        window.location.href = "/logout"
+        }
+    }
+      var tmp='a';
+      var change=0;
+      var stats='c';
+
+       function check_generate(temp,r,d,c) {
+         console.log("CHECKING")         
+         $(function(){
+             $.ajax({
+                 url: "/static/" + r + "_" + d + "_" + c + ".txt",
+                 cache: false,   // with this, you can force the browser to not make cache of the retrieved data
+                 dataType: "text",  // jQuery will infer this, but you can set explicitly
+                 success: function( data, textStatus, jqXHR ) {
+                if (temp==data) {
+                    document.getElementById("searchButton").disabled = false;
+                    console.log("UNBLOCKED")
+                }else{flag=0;}
+                 }
+             });
+         });
+
+
+          
+      }
+      var ajax_call = function() {
+        var route = undefined
+        var cam = undefined
+        var dir = undefined
+        var e = document.getElementById("directionid");
+        console.log(e.options.selectedIndex);
+        if (e.options.selectedIndex != -1) {
+          dir_1 = e.options[e.selectedIndex].value;
+        }
+        var f = document.getElementById("routeid");
+        if (f.options.selectedIndex != -1) {
+          route = f.options[f.selectedIndex].value;
+          r1 = route.split("-")
+          r2 = r1[0].replace(" ", "")
+          console.log(r2 + "----------")
+        }
+        var g = document.getElementById("camangle");
+        if (g.options.selectedIndex != -1) {
+          cam = g.options[g.selectedIndex].value;
+          if (dir_1 == 'West') {
+            dir = 'a'
+          }
+          if (dir_1 == 'East') {
+            dir = 'b'
+          }
+        }
+        
+        console.log(route + dir + cam)
+       /*var xhr = $.ajax({
+                url: "/static/" + r2 + "_" + dir + "_" + cam + ".txt",
+                success: function(response) {
+                stats=xhr.getResponseHeader("Last-Modified");
+                $("#urls").append(stats);
+                    }
+                });
+       */ 
+
+        if (dir != "Select the direction") {
+          if (cam != "Select the view") {
+          if (dir != undefined){
+            if (route != undefined) {
+              if (cam != undefined) {
+                $.ajax({
+                  url: "/static/" + r2 + "_" + dir + "_" + cam + ".txt",
+                  dataType: "json",
+                  contentType: "json",
+                  success: function(data) {
+                    $("#urls").html("");
+                    if (data == '100') {
+                      $("#progress").html("Route : " + r2 + " , Direction : " + dir_1 + " , View : " + cam + " , Generating video");
+                    } 
+                    if (parseInt(data,10)<100) {
+                        $("#progress").html("Route : " + r2 + " , Direction : " + dir_1 + " , View : " + cam + " , Progress : " + data + "% Completed.");
+                    }
+                    
+                    if (data == '201') {
+                      $("#progress").html("Route : " + r2 + " , Direction : " + dir_1 + " , View : " + cam + " , Fetching coordinates , please wait ");
+                    }
+                    if (data == '405') {
+                      //$("#progress").html("Please select Forward or All for Route : "+r2+" , Direction : "+dir+" , Camera view : "+cam);
+                    }
+                    if (data == '404') {
+                      $("#progress").html("No coordinates found in database.");
+                    }
+                    if (data == '101') {
+                      $("#urls").append('<a target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '_forward.mp4">Forward<\/a><br>');
+                      $("#urls").append('<a  target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '_backward.mp4">Backward<\/a><br>');
+                      $("#urls").append('<a target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '_right.mp4">Right<\/a><br>');
+                      $("#urls").append('<a target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '_left.mp4">Left<\/a><br>');
+                      $("#urls").append('<a target="_blank"  href="https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/' + r2 + '/' + r2 + '_' + dir + '.kml">KML<\/a><br>');
+                      $("#progress").html("Please click on the links below to play the video.");
+                      clearInterval(refreshIntervalId);
+                    }
+                    
+                   if (parseInt(data,10)<100 || data == '201') {
+                      if(change!=data){
+                        document.getElementById("searchButton").disabled = true;
+
+                      }
+                        console.log("CHECK Data:"+data+" FLAG:"+flag);
+                        if(flag<2) {
+                        
+                            if(flag==0) {
+                              console.log("GENERATE");
+                              flag=5;
+                                stats=data;
+                             
+                                setTimeout(function(){check_generate(stats,r2,dir,cam)},300000);
+                            };
+                    
+                        
+                        }                    
+                    }else {
+                      document.getElementById("searchButton").disabled = false;
+                     }
+                    change=data;
+                  },
+                  error: function(data, errorThrown) {
+                    $("#progress").html("");
+                    $("#urls").html("");
+                    if (dir != "Select the direction") {
+                      if (cam != "Select the view") {
+                        if (dir != undefined){
+                        if (route != undefined) {
+                          if (cam != undefined) {
+                            console.log("ssssssssss"+dir);
+                    document.getElementById("searchButton").disabled = false;}
+                else{
+                     document.getElementById("searchButton").disabled = true;}
+                    }}}}
+                    
+                    
+                    $("#progress").html("No video generation in progress for Route : " + r2 + " , Direction : " + dir_1 + " , View : " + cam);
+                    flag=0;
+                    if (data == '101') {
+                      clearInterval(refreshIntervalId);
+                    }
+                    //alert('this is else condition no file found, pass your ajax request here');
+                  // clearInterval(refreshIntervalId); //to s??/*/top the auto refresh
+                  }
+                });
+              } else {
+
+                $("#progress").html();
+                $("#urls").html("");
+            }
+           }
+          }
+         }
+        }
+       
+      };
+
+
+
+      var dir;
+      var routedirid = [];
+
+      function getrouteinfo() {
+        document.getElementById("searchButton").disabled = true;
+        var interval = 1000;
+        refreshIntervalId = setInterval(ajax_call, interval);
+        var d = document.getElementById("directionid");
+        dir = d.options[d.selectedIndex].value;
+        var r = document.getElementById("routeid");
+        routename = r.options[r.selectedIndex].value;
+        camview = document.getElementById("camangle").value;
+        if (dir == "West - East") {
+          dir = 'a';
+        }
+        if (dir == "North - South") {
+          dir = 'b';
+        }
+        routedirid[0] = "rid";
+        routedirid[1] = routename;
+        routedirid[2] = dir;
+        routedirid[3] = camview;
+        console.log(routedirid)
+        var stationJson = JSON.stringify(routedirid);
+        console.log(stationJson)
+        var pythonUrl = "/"; //python url to post data 
+        var sendCordinates = $.ajax({
+          type: 'POST',
+          url: pythonUrl,
+          dataType: "json",
+          data: stationJson,
+          contentType: 'application/json',
+          "beforeSend": function(xhr, settings) {
+            console.log("Before Send");
+            $.ajaxSettings.beforeSend(xhr, settings);
+          },
+          success: function(resultData) {
+            console.log("done");
+          }
+        });
+      }
+  </script>
+</head>
+<body>
+ <!--header start-->
+  <header class="header-frontend">
+    <div class="navbar navbar-default navbar-static-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#"><img alt="" src="/static/vtavirtualtransit-logo.jpg" style="margin-top:4px; height:48px"></a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="top-header hidden-sm">
+    <div class="container-fluid header-area">
+      <div class="pull-left">
+        <div class="header-item" style="height:30px;">
+        </div>
+      </div>
+      <div class="pull-right"></div><!-- #top-social end -->
+    </div>
+  </div>
+<!--header end-->
+<form class="form-horizontal tasi-form" action="/login/" method="post">
+ <section class="home-services">
+   <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
+      <div class="container">
+        <div class="row">
+           <input name='csrfmiddlewaretoken' type='hidden' value='Rha8XnTVJye745oyJhcNn4CEtYxkZOCDBaI5Y92hHfwCt3LAwuJEXiiXq0kT0ygC'>
+             <div class="form-group">
+              <div class="col-lg-12">
+                {% csrf_token %}
+                <div class="panel-body" ><label class="col-lg-2 control-label" for="id_username">Username:</label> 
+                  <input class="form-control input-sm m-bot15" type="text" name="username" autofocus required id="id_username" maxlength="254" /></div>
+                   <div class="panel-body" ><label class="col-lg-2 control-label" for="id_password">Password:</label> 
+                  <input class="form-control input-sm m-bot15" type="password" name="password" required id="id_password" /></div>
+                 <div style="margin-left:auto; margin-right:auto; width:130px; padding-top:10px;">
+                <button class="btn btn-kool-default" type="submit">Login</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+   </section>
+ </form>
+</body>
+</html>
