@@ -15,7 +15,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-#project_home = u'/home/crowdplat/vta'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -25,10 +25,20 @@ SECRET_KEY = 'fm$0d#@^^lp4fbqt&1@c+2$z1d%dcf9^ryw#zpvo7s0e!pz4)n'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = [' * ']
+#ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['127.0.0.1','52.9.113.34','ip-172-31-15-203.us-west-1.compute.internal']
 
 # Application definition
+DB_HOST = "localhost"
+DB_USER = "root"
+DB_PASSWORD = "password"
+DB_DB = "vta"
+G_KEY= "AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0"
+
+FB_LINK = "https://vtavirtualtransit-7c904.firebaseio.com"
+FB_URL = "https://vtavirtualtransit-7c904.firebaseapp.com/api/route-details/"
+
+PM_TOKEN = "0158af7a-c003-ae16-f5f4-3921ea149237"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -46,6 +56,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -74,10 +85,15 @@ WSGI_APPLICATION = 'vta.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'vta',
+        'USER': 'root',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -106,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'US/Pacific'
 
 USE_I18N = True
 
@@ -125,3 +141,25 @@ STATICFILES_DIRS = (
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+#Production
+FBC_PRODUCTION = "https://vtavirtualtransit-7c904.firebaseio.com"
+FB_PRODUCTION  = "https://vtavirtualtransit-7c904.firebaseapp.com/api/route-details/"
+
+PM_PRODUCTION = "0158af7a-c003-ae16-f5f4-3921ea149237"
+
+AWS_PRODUCTION_KEY = 'AKIAJBDVJQ6FJV6PVS7A'
+AWS_PRODUCTION_SECRET ='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'
+
+
+#Development
+FBC_DEVELOPMENT = "https://vtavirtualtransit-7c904.firebaseio.com"
+FB_DEVELOPMENT = "https://vtavirtualtransit-7c904.firebaseapp.com/api/route-details/"
+
+PM_DEVELOPMENT = "0158af7a-c003-ae16-f5f4-3921ea149237"
+
+AWS_DEVELOPMENT_KEY = 'AKIAJBDVJQ6FJV6PVS7A'
+AWS_DEVELOPMENT_SECRET ='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'
+AWS_KEY = 'AKIAJBDVJQ6FJV6PVS7A'
+AWS_SECRET ='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'
+FB_LINK = 'https://vtavirtualtransit-7c904.firebaseio.com'
+LOGIN_REDIRECT_URL = 'home'
