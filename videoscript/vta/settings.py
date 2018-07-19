@@ -20,25 +20,25 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fm$0d#@^^lp4fbqt&1@c+2$z1d%dcf9^ryw#zpvo7s0e!pz4)n'
+SECRET_KEY = 'n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 #ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['127.0.0.1','52.9.113.34','ip-172-31-15-203.us-west-1.compute.internal']
+ALLOWED_HOSTS = ['127.0.0.1'']
 
 # Application definition
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASSWORD = "password"
-DB_DB = "vta"
-G_KEY= "AIzaSyC2zG8n0SSvjlED4driQO4cSToszU0WIc0"
+DB_PASSWORD = ""
+DB_DB = ""
+G_KEY= ""
 
-FB_LINK = "https://vtavirtualtransit-7c904.firebaseio.com"
-FB_URL = "https://vtavirtualtransit-7c904.firebaseapp.com/api/route-details/"
+FB_LINK = ""
+FB_URL = ""
 
-PM_TOKEN = "0158af7a-c003-ae16-f5f4-3921ea149237"
+PM_TOKEN = ""
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -89,10 +89,10 @@ WSGI_APPLICATION = 'vta.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vta',
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
         'PORT': '',
     }
 }
@@ -142,24 +142,24 @@ STATICFILES_DIRS = (
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 #Production
-FBC_PRODUCTION = "https://vtavirtualtransit-7c904.firebaseio.com"
-FB_PRODUCTION  = "https://vtavirtualtransit-7c904.firebaseapp.com/api/route-details/"
+FBC_PRODUCTION = ""
+FB_PRODUCTION  = ""
 
-PM_PRODUCTION = "0158af7a-c003-ae16-f5f4-3921ea149237"
+PM_PRODUCTION = ""
 
-AWS_PRODUCTION_KEY = 'AKIAJBDVJQ6FJV6PVS7A'
-AWS_PRODUCTION_SECRET ='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'
+AWS_PRODUCTION_KEY = ''
+AWS_PRODUCTION_SECRET =''
 
 
 #Development
-FBC_DEVELOPMENT = "https://vtavirtualtransit-7c904.firebaseio.com"
-FB_DEVELOPMENT = "https://vtavirtualtransit-7c904.firebaseapp.com/api/route-details/"
+FBC_DEVELOPMENT = ""
+FB_DEVELOPMENT = ""
 
-PM_DEVELOPMENT = "0158af7a-c003-ae16-f5f4-3921ea149237"
+PM_DEVELOPMENT = ""
 
-AWS_DEVELOPMENT_KEY = 'AKIAJBDVJQ6FJV6PVS7A'
-AWS_DEVELOPMENT_SECRET ='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'
-AWS_KEY = 'AKIAJBDVJQ6FJV6PVS7A'
-AWS_SECRET ='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'
-FB_LINK = 'https://vtavirtualtransit-7c904.firebaseio.com'
+AWS_DEVELOPMENT_KEY = ''
+AWS_DEVELOPMENT_SECRET =''
+AWS_KEY = ''
+AWS_SECRET =''
+FB_LINK = ''
 LOGIN_REDIRECT_URL = 'home'
