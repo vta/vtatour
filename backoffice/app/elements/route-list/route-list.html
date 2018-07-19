@@ -224,6 +224,12 @@
             return false;
           }
 
+          if(!this._activeRouteCode){
+            return false;
+          }
+
+          console.log('selecting view');
+
           var valueArray = selectedView.split('-');
           var route_code = valueArray[0];
           var direction = valueArray[1];
@@ -262,8 +268,13 @@
           // Append the map element
           Polymer.dom(activeRoute.querySelector('.route-map')).appendChild(routeMap);
           this._activeRouteCode = activeRoute.getAttribute('data-route-code');
+          if(this._activeRouteCode){
+            console.log('code: '+this._activeRouteCode);
+            var path = '/route-details/' + this._activeRouteCode + '/a/videoGeoPoints';
+            console.log('path is: '+path);
+            this.$.videoGeoPoints.path = path;
+          }
 
-          this.$.videoGeoPoints.path = '/route-details/' + this._activeRouteCode + '/a/videoGeoPoints';
         }
       }
     });

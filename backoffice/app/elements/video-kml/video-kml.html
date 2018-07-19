@@ -155,8 +155,8 @@
       }
       .column1 {
         width: 50%;
-        padding: 0 20px 0 0;
-        margin-right: 16%;
+        padding: 0 2px 0 0;
+        margin-right: 0%;
       }
 
       .column-container {
@@ -213,6 +213,11 @@
         word-wrap: break-word;
         display: none;
       }
+
+      .video-wrapper{
+        width: 50%;
+        word-wrap: break-word;
+      }
     </style>
 
     <firebase-document
@@ -237,7 +242,7 @@
       &nbsp;Step 1: Click on "Video Generation" to generate route video and KML data :
       <br/>
         <div class="add-stop-wrapper">
-        <a href="http://52.9.113.34/" target="_blank">
+        <a href="[[_video_generation_server_url]]" target="_blank">
           <paper-button  >
           <iron-icon icon="file-download" class="download-icon"></iron-icon>Video Generation
         </paper-button>
@@ -248,11 +253,30 @@
         <br/><br/><br/>
       &nbsp;Step 2: Click on "Preview Route List" to preview latest route video and KML data:
       <br/>
-        <div class="add-stop-wrapper">
-        <paper-button on-click="_startVideoUrlsAndStartKmlPrepareDataAndStartProcessing" >
-          <iron-icon icon="file-download" class="download-icon"></iron-icon>Preview Route List
-        </paper-button>
-       </div>
+        <template is="dom-if" if="[[!_imported_routes.length]]">
+          <div class="add-stop-wrapper">
+          <paper-button on-click="_startVideoUrlsAndStartKmlPrepareDataAndStartProcessing" >
+            <iron-icon icon="file-download" class="download-icon"></iron-icon>Preview Route List
+          </paper-button>
+         </div>
+        </template>
+
+        <template is="dom-if" if="[[_imported_routes.length]]">
+          <div class="add-stop-wrapper">
+          <paper-button disabled >
+            <iron-icon icon="file-download" class="download-icon"></iron-icon>Preview Route List
+          </paper-button>
+         </div>
+         <div class="add-stop-wrapper">
+         <paper-button onclick="if(confirm('Are you sure? this will reset the list and you will have to generate the list again')){location.reload();}" >
+           <iron-icon icon="icons:autorenew" class="download-icon"></iron-icon>Reset Route List Preview
+         </paper-button>
+        </div>
+        </template>
+
+        <input type="checkbox" id="generated_video_only"> Only recently generated videos
+
+
       </div>
       <br/><br/>
       <div>
@@ -489,6 +513,10 @@
             type: String,
             value: ''
           },
+          _video_generation_server_url:{
+            type: String,
+            value: ''
+          },
           _routes: {
             type: Array
           },
@@ -526,14 +554,12 @@
               a: {
                 stops: [],
                 videoGeoPoints: {},
-                videoId: null,
-                videoUrl: null
+                videoUrl: ""
               },
               b: {
                 stops: [],
                 videoGeoPoints: {},
-                videoId: null,
-                videoUrl: null
+                videoUrl: ""
               }
             }
           },
@@ -658,66 +684,66 @@
               var mismatchableA = false;
               var mismatchableB = false;
 
-              if (fullRouteDetails.routeDetails.latestResources) {
-                if (fullRouteDetails.routeDetails.latestResources.a) {
+              if (fullRouteDetails.routeDetailsResources && fullRouteDetails.routeDetailsResources.latestResources) {
+                if (fullRouteDetails.routeDetailsResources.latestResources.a) {
                   mismatchableA = true;
-                  if (fullRouteDetails.routeDetails.latestResources.a.KmlUrl) {
-                    directionAKmlUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.a.KmlUrl;
+                  if (fullRouteDetails.routeDetailsResources.latestResources.a.KmlUrl) {
+                    directionAKmlUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.a.KmlUrl;
                   }
-                  if (fullRouteDetails.routeDetails.latestResources.a.KmlUrlLeft) {
-                    directionALeftViewKmlUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.a.KmlUrlLeft;
+                  if (fullRouteDetails.routeDetailsResources.latestResources.a.KmlUrlLeft) {
+                    directionALeftViewKmlUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.a.KmlUrlLeft;
                   }
-                  if (fullRouteDetails.routeDetails.latestResources.a.KmlUrlRight) {
-                    directionARightViewKmlUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.a.KmlUrlRight;
+                  if (fullRouteDetails.routeDetailsResources.latestResources.a.KmlUrlRight) {
+                    directionARightViewKmlUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.a.KmlUrlRight;
                   }
-                  if (fullRouteDetails.routeDetails.latestResources.a.KmlUrlBack) {
-                    directionABackViewKmlUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.a.KmlUrlBack;
+                  if (fullRouteDetails.routeDetailsResources.latestResources.a.KmlUrlBack) {
+                    directionABackViewKmlUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.a.KmlUrlBack;
                   }
                 }
-                if (fullRouteDetails.routeDetails.latestResources.b) {
+                if (fullRouteDetails.routeDetailsResources.latestResources.b) {
                     mismatchableB = true;
-                  if (fullRouteDetails.routeDetails.latestResources.b.KmlUrl) {
-                    directionBKmlUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.b.KmlUrl;
+                  if (fullRouteDetails.routeDetailsResources.latestResources.b.KmlUrl) {
+                    directionBKmlUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.b.KmlUrl;
                   }
-                  if (fullRouteDetails.routeDetails.latestResources.b.KmlUrlLeft) {
-                    directionBLeftViewKmlUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.b.KmlUrlLeft;
+                  if (fullRouteDetails.routeDetailsResources.latestResources.b.KmlUrlLeft) {
+                    directionBLeftViewKmlUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.b.KmlUrlLeft;
                   }
-                  if (fullRouteDetails.routeDetails.latestResources.b.KmlUrlRight) {
-                    directionBRightViewKmlUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.b.KmlUrlRight;
+                  if (fullRouteDetails.routeDetailsResources.latestResources.b.KmlUrlRight) {
+                    directionBRightViewKmlUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.b.KmlUrlRight;
                   }
-                  if (fullRouteDetails.routeDetails.latestResources.b.KmlUrlBack) {
-                    directionBBackViewKmlUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.b.KmlUrlBack;
+                  if (fullRouteDetails.routeDetailsResources.latestResources.b.KmlUrlBack) {
+                    directionBBackViewKmlUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.b.KmlUrlBack;
                   }
                 }
               }
 
-              if (fullRouteDetails.routeDetails.latestResourcesLowResolution) {
-                if (fullRouteDetails.routeDetails.latestResourcesLowResolution.a) {
-                  if (fullRouteDetails.routeDetails.latestResourcesLowResolution.a.KmlUrl) {
-                    directionAKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.a.KmlUrl;
+              if (fullRouteDetails.routeDetailsResources && fullRouteDetails.routeDetailsResources.latestResourcesLowResolution) {
+                if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a) {
+                  if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.KmlUrl) {
+                    directionAKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.KmlUrl;
                   }
-                  if (fullRouteDetails.routeDetails.latestResourcesLowResolution.a.KmlUrlLeft) {
-                    directionALeftViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.a.KmlUrlLeft;
+                  if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.KmlUrlLeft) {
+                    directionALeftViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.KmlUrlLeft;
                   }
-                  if (fullRouteDetails.routeDetails.latestResourcesLowResolution.a.KmlUrlRight) {
-                    directionARightViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.a.KmlUrlRight;
+                  if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.KmlUrlRight) {
+                    directionARightViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.KmlUrlRight;
                   }
-                  if (fullRouteDetails.routeDetails.latestResourcesLowResolution.a.KmlUrlBack) {
-                    directionABackViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.a.KmlUrlBack;
+                  if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.KmlUrlBack) {
+                    directionABackViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.KmlUrlBack;
                   }
                 }
-                if (fullRouteDetails.routeDetails.latestResourcesLowResolution.b) {
-                  if (fullRouteDetails.routeDetails.latestResourcesLowResolution.b.KmlUrl) {
-                    directionBKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.b.KmlUrl;
+                if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b) {
+                  if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.KmlUrl) {
+                    directionBKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.KmlUrl;
                   }
-                  if (fullRouteDetails.routeDetails.latestResourcesLowResolution.b.KmlUrlLeft) {
-                    directionBLeftViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.b.KmlUrlLeft;
+                  if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.KmlUrlLeft) {
+                    directionBLeftViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.KmlUrlLeft;
                   }
-                  if (fullRouteDetails.routeDetails.latestResourcesLowResolution.b.KmlUrlRight) {
-                    directionBRightViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.b.KmlUrlRight;
+                  if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.KmlUrlRight) {
+                    directionBRightViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.KmlUrlRight;
                   }
-                  if (fullRouteDetails.routeDetails.latestResourcesLowResolution.b.KmlUrlBack) {
-                    directionBBackViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.b.KmlUrlBack;
+                  if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.KmlUrlBack) {
+                    directionBBackViewKmlUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.KmlUrlBack;
                   }
                 }
               }
@@ -728,22 +754,9 @@
                 fullRouteDetails.routeDetails.a.KmlUrl = directionAKmlUrl;
                 if (parsedAData) {
                   fullRouteDetails.routeDetails.a.videoGeoPoints = parsedAData;
-                  if (fullRouteDetails.routeDetails.a && fullRouteDetails.routeDetails.a.stops && fullRouteDetails.routeDetails.a.stops.length) {
-                    for (var a = 0; a < fullRouteDetails.routeDetails.a.stops.length; a++) {
-                      var tempStopObject = fullRouteDetails.routeDetails.a.stops[a];
-                      var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.a.videoGeoPoints);
-                      var sec = parseInt(point.key);
-                      if (!isNaN(sec)) {
-                        fullRouteDetails.routeDetails.a.stops[a].sec = parseInt(point.key);
-                      } else {
-                        fullRouteDetails.routeDetails.a.stops[a].sec = null;
-                      }
-
-                    }
-                  }
                 }else{
                   fullRouteDetails.routeDetails.a.videoUrl = "";
-                  if(mismatchableA){
+                  if(mismatchableA && directionAKmlUrl){
                       mismatch = true;
                   }
 
@@ -752,32 +765,19 @@
                   fullRouteDetails.routeDetails.b.KmlUrl = directionBKmlUrl;
                   if (parsedBData) {
                     fullRouteDetails.routeDetails.b.videoGeoPoints = parsedBData;
-                    if (fullRouteDetails.routeDetails.b && fullRouteDetails.routeDetails.b.stops && fullRouteDetails.routeDetails.b.stops.length) {
-                      for (var b = 0; b < fullRouteDetails.routeDetails.b.stops.length; b++) {
-                        var tempStopObject = fullRouteDetails.routeDetails.b.stops[b];
-                        var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.b.videoGeoPoints);
-                        var sec = parseInt(point.key);
-                        if (!isNaN(sec)) {
-                          fullRouteDetails.routeDetails.b.stops[b].sec = parseInt(point.key);
-                        } else {
-                          fullRouteDetails.routeDetails.b.stops[b].sec = null;
-                        }
-
-                      }
-                    }
                   }else{
                     fullRouteDetails.routeDetails.b.videoUrl = "";
-                    if(mismatchableB){
+                    if(mismatchableB && directionBKmlUrl){
                         mismatch = true;
                     }
                   }
                   processKmlUrl(directionALeftViewKmlUrl, function(parsedALeftViewKmlUrl) {
-                    fullRouteDetails.routeDetails.a.KmlUrlRight = directionALeftViewKmlUrl;
+                    fullRouteDetails.routeDetails.a.KmlUrlLeft = directionALeftViewKmlUrl;
                     if (parsedALeftViewKmlUrl) {
                       fullRouteDetails.routeDetails.a.videoGeoPointsLeft = parsedALeftViewKmlUrl;
                     }else{
                     fullRouteDetails.routeDetails.a.videoLeftUrl = "";
-                    if(mismatchableA){
+                    if(mismatchableA && directionALeftViewKmlUrl){
                         mismatch = true;
                     }
                     }
@@ -787,7 +787,7 @@
                         fullRouteDetails.routeDetails.a.videoGeoPointsRight = parsedARightViewKmlUrl;
                       }else{
                         fullRouteDetails.routeDetails.a.videoRightUrl = "";
-                        if(mismatchableA){
+                        if(mismatchableA && directionARightViewKmlUrl){
                             mismatch = true;
                         }
                       }
@@ -797,7 +797,7 @@
                           fullRouteDetails.routeDetails.a.videoGeoPointsBack = parsedABackViewKmlUrl;
                         }else{
                           fullRouteDetails.routeDetails.a.videoBackUrl = "";
-                          if(mismatchableA){
+                          if(mismatchableA && directionABackViewKmlUrl){
                               mismatch = true;
                           }
                         }
@@ -808,7 +808,7 @@
                             fullRouteDetails.routeDetails.b.videoGeoPointsLeft = parsedBLeftViewKmlUrl;
                           }else{
                             fullRouteDetails.routeDetails.b.videoLeftUrl = "";
-                            if(mismatchableB){
+                            if(mismatchableB && directionBLeftViewKmlUrl){
                                 mismatch = true;
                             }
                           }
@@ -818,7 +818,7 @@
                               fullRouteDetails.routeDetails.b.videoGeoPointsRight = parsedBRightViewKmlUrl;
                             }else{
                               fullRouteDetails.routeDetails.b.videoRightUrl = "";
-                              if(mismatchableB){
+                              if(mismatchableB && directionBRightViewKmlUrl){
                                   mismatch = true;
                               }
                             }
@@ -828,6 +828,9 @@
                                 fullRouteDetails.routeDetails.b.videoGeoPointsBack = parsedBBackViewKmlUrl;
                               }else{
                                 fullRouteDetails.routeDetails.b.videoBackUrl = "";
+                                if(mismatchableB && directionBBackViewKmlUrl){
+                                    mismatch = true;
+                                }
                               }
                               processKmlUrl(directionAKmlUrlLowRes, function(parsedADataLowRes) {
                                 fullRouteDetails.routeDetails.a.KmlUrlLowRes = directionAKmlUrlLowRes;
@@ -835,7 +838,7 @@
                                   fullRouteDetails.routeDetails.a.videoGeoPointsLowRes = parsedADataLowRes;
                                 }else{
                                   fullRouteDetails.routeDetails.a.videoUrlLowRes = "";
-                                  if(mismatchableA){
+                                  if(mismatchableA && directionAKmlUrlLowRes){
                                       mismatch = true;
                                   }
                                 }
@@ -845,7 +848,7 @@
                                     fullRouteDetails.routeDetails.b.videoGeoPointsLowRes = parsedBDataLowRes;
                                   }else{
                                       fullRouteDetails.routeDetails.b.videoUrlLowRes = "";
-                                      if(mismatchableB){
+                                      if(mismatchableB && directionBKmlUrlLowRes){
                                           mismatch = true;
                                       }
                                   }
@@ -855,7 +858,7 @@
                                       fullRouteDetails.routeDetails.a.videoGeoPointsLeftLowRes = parsedALeftViewKmlUrlLowRes;
                                     }else{
                                         fullRouteDetails.routeDetails.a.videoLeftUrlLowRes = "";
-                                        if(mismatchableA){
+                                        if(mismatchableA && directionALeftViewKmlUrlLowRes){
                                             mismatch = true;
                                         }
                                     }
@@ -865,7 +868,7 @@
                                         fullRouteDetails.routeDetails.a.videoGeoPointsRightLowRes = parsedARightViewKmlUrlLowRes;
                                       }else{
                                           fullRouteDetails.routeDetails.a.videoRightUrlLowRes = "";
-                                          if(mismatchableA){
+                                          if(mismatchableA && directionARightViewKmlUrlLowRes){
                                               mismatch = true;
                                           }
                                       }
@@ -875,7 +878,7 @@
                                           fullRouteDetails.routeDetails.a.videoGeoPointsBackLowRes = parsedABackViewKmlUrlLowRes;
                                         }else{
                                           fullRouteDetails.routeDetails.a.videoBackUrlLowRes = "";
-                                          if(mismatchableA){
+                                          if(mismatchableA && directionABackViewKmlUrlLowRes){
                                               mismatch = true;
                                           }
                                         }
@@ -886,7 +889,7 @@
                                             fullRouteDetails.routeDetails.b.videoGeoPointsLeftLowRes = parsedBLeftViewKmlUrlLowRes;
                                           }else{
                                               fullRouteDetails.routeDetails.b.videoLeftUrlLowRes = "";
-                                              if(mismatchableB){
+                                              if(mismatchableB && directionBLeftViewKmlUrlLowRes){
                                                   mismatch = true;
                                               }
                                           }
@@ -896,7 +899,7 @@
                                               fullRouteDetails.routeDetails.b.videoGeoPointsRightLowRes = parsedBRightViewKmlUrlLowRes;
                                             }else{
                                                 fullRouteDetails.routeDetails.b.videoRightUrlLowRes = "";
-                                                if(mismatchableB){
+                                                if(mismatchableB && directionBRightViewKmlUrlLowRes){
                                                     mismatch = true;
                                                 }
                                             }
@@ -906,7 +909,7 @@
                                                 fullRouteDetails.routeDetails.b.videoGeoPointsBackLowRes = parsedBBackViewKmlUrlLowRes;
                                               }else{
                                                 fullRouteDetails.routeDetails.b.videoBackUrlLowRes = "";
-                                                if(mismatchableB){
+                                                if(mismatchableB && directionBBackViewKmlUrlLowRes){
                                                     mismatch = true;
                                                 }
                                               }
@@ -973,27 +976,12 @@
             }
           }
           console.log('base Url: '+baseUrl);
-          consol.log(routeListArray);
+          console.log(routeListArray);
           var processVideoUrl = function(url, cb) {
             if (!url) {
               return cb(false);
             }
-            // console.log("processing: "+url);
-            // var settings = {
-            //     "async": true,
-            //     "crossDomain": true,
-            //     "url": "http://localhost:5001/kml_file/10_a.kml",
-            //     "method": "GET",
-            //   }
-            //
-            //   $.ajax(settings).done(function (response) {
-            //     console.log(response);
-            //     if(response.status==200){
-            //       self.$.tempKmlParser.parseFromText(response.responseText,cb);
-            //     }else{
-            //       cb(null);
-            //     }
-            //   });
+
             var data = null;
             var xhr = new XMLHttpRequest();
             xhr.withCredentials = false;
@@ -1017,8 +1005,9 @@
           }
           var processRoute = function(index) {
             console.log('Processing: ' + index);
-            console.log('Toral Routes: '+ outeListArray.length);
+            console.log('Toral Routes: '+ routeListArray.length);
             if (index < routeListArray.length) {
+              console.log('Entering Loop');
               var fullRouteDetails = routeListArray[index];
               var videoCode = fullRouteDetails.code;
               var videoAUrl = "";
@@ -1040,65 +1029,45 @@
               var isLatestSerourceA = false;
               var isLatestSerourceB = false;
 
-              if (fullRouteDetails.routeDetails.a.videoUrl) {
-                videoAUrl = fullRouteDetails.routeDetails.a.videoUrl;
-              }
-              if (fullRouteDetails.routeDetails.a.videoLeftUrl) {
-                videoALeftUrl = fullRouteDetails.routeDetails.a.videoLeftUrl;
-              }
-              if (fullRouteDetails.routeDetails.a.videoARightUrl) {
-                videoARightUrl = fullRouteDetails.routeDetails.a.videoARightUrl;
-              }
-              if (fullRouteDetails.routeDetails.a.videoABackUrl) {
-                videoABackUrl = fullRouteDetails.routeDetails.a.videoABackUrl;
-              }
 
-              if (fullRouteDetails.routeDetails.b.videoUrl) {
-                videoBUrl = fullRouteDetails.routeDetails.b.videoUrl;
-              }
-              if (fullRouteDetails.routeDetails.b.videoLeftUrl) {
-                videoBLeftUrl = fullRouteDetails.routeDetails.b.videoLeftUrl;
-              }
-              if (fullRouteDetails.routeDetails.b.videoARightUrl) {
-                videoBRightUrl = fullRouteDetails.routeDetails.b.videoARightUrl;
-              }
-              if (fullRouteDetails.routeDetails.b.videoABackUrl) {
-                videoBBackUrl = fullRouteDetails.routeDetails.b.videoABackUrl;
-              }
 
-              if (fullRouteDetails.routeDetails.latestResources) {
-                if (fullRouteDetails.routeDetails.latestResources.a) {
-                  videoAUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.a.videoUrl;
-                  videoALeftUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.a.videoLeftUrl;
-                  videoARightUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.a.videoRightUrl;
-                  videoABackUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.a.videoBackUrl;
-                  isLatestSerourceA = true;
+                console.log('Parsing stage 1');
+
+              if (fullRouteDetails.routeDetailsResources && fullRouteDetails.routeDetailsResources.latestResources) {
+                if (fullRouteDetails.routeDetailsResources.latestResources.a) {
+                  videoAUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.a.videoUrl;
+                  videoALeftUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.a.videoLeftUrl;
+                  videoARightUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.a.videoRightUrl;
+                  videoABackUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.a.videoBackUrl;
                 }
-                if (fullRouteDetails.routeDetails.latestResources.b) {
-                  videoBUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.b.videoUrl;
-                  videoBLeftUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.b.videoLeftUrl;
-                  videoBRightUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.b.videoRightUrl;
-                  videoBBackUrl = baseUrl+fullRouteDetails.routeDetails.latestResources.b.videoBackUrl;
-                  isLatestSerourceB = true;
+                if (fullRouteDetails.routeDetailsResources.latestResources.b) {
+                  videoBUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.b.videoUrl;
+                  videoBLeftUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.b.videoLeftUrl;
+                  videoBRightUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.b.videoRightUrl;
+                  videoBBackUrl = baseUrl+fullRouteDetails.routeDetailsResources.latestResources.b.videoBackUrl;
+                }
+              }
+                console.log('Parsing stage 2');
+
+              if (fullRouteDetails.routeDetailsResources && fullRouteDetails.routeDetailsResources.latestResourcesLowResolution) {
+                if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a) {
+                  //console.log(fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a);
+                  videoAUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.videoUrl;
+                  videoALeftUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.videoLeftUrl;
+                  videoARightUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.videoRightUrl;
+                  videoABackUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.a.videoBackUrl;
+
+                }
+                  console.log('Parsing stage 2.1');
+                if (fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b) {
+                  videoBUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.videoUrl;
+                  videoBLeftUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.videoLeftUrl;
+                  videoBRightUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.videoRightUrl;
+                  videoBBackUrlLowRes = baseUrl+fullRouteDetails.routeDetailsResources.latestResourcesLowResolution.b.videoBackUrl;
                 }
               }
 
-              if (fullRouteDetails.routeDetails.latestResourcesLowResolution) {
-                if (fullRouteDetails.routeDetails.latestResourcesLowResolution.a) {
-                  videoAUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.a.videoUrl;
-                  videoALeftUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.a.videoLeftUrl;
-                  videoARightUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.a.videoRightUrl;
-                  videoABackUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.a.videoBackUrl;
-                  isLatestSerourceALowRes = true;
-                }
-                if (fullRouteDetails.routeDetails.latestResourcesLowResolution.b) {
-                  videoBUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.b.videoUrl;
-                  videoBLeftUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.b.videoLeftUrl;
-                  videoBRightUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.b.videoRightUrl;
-                  videoBBackUrlLowRes = baseUrl+fullRouteDetails.routeDetails.latestResourcesLowResolution.b.videoBackUrl;
-                  isLatestSerourceBLowRes = true;
-                }
-              }
+              console.log('Parsing stage 3');
 
               console.log('Starting now');
 
@@ -1231,6 +1200,7 @@
           var self = this;
           var routes = [];
           var routesDetailses = [];
+          var routesDetailsResources = [];
           this.$.saveOperationResultModal.close();
           this._showOperationResultModal(false, "loading data...please wait ");
           this.$.routeDataProcessing.getStoredValue('/settings')
@@ -1243,20 +1213,17 @@
                   // //console.log(data);
                   // //console.log(data.length);
                   routes = data;
-                  self.$.routeDataProcessing.getStoredValue('/route-details')
-                    .then(function(data) {
-                      // //console.log('Rotue Details Data');
-                      // //console.log(data);
-                      routesDetailses = data;
-                      self._combineRouteAndRouteDetails(routes, routesDetailses);
-                    }).catch(function(error) {
-                      //console.log(error);
-                    });
+                  self.$.routeDataProcessing.getStoredValue('/route-details-resources')
+                        .then(function(data) {
+                          routesDetailsResources = data;
+                          self._combineRouteAndRouteDetails(routes, routesDetailsResources);
+                        });
+
                 }).catch(function(error) {
-                  //console.log(error);
+                  console.log(error);
                 });
             }).catch(function(error) {
-              //console.log(error);
+              console.log(error);
             });
         },
         _startVideoUrlsAndStartKmlProcessing: function() {
@@ -1283,73 +1250,73 @@
               }, 2000);
             });
           })
-          // for(var i=0;i<tempRouteList.length;i++){
-          //   var routeObject = tempRouteList[i];
-          //   var videoCode = routeObject.code;
-          //   routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
-          //   routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
-          //   routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
-          //   routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
-          //
-          //   routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
-          //   routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
-          //   routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
-          //   routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
-          //   tempRouteList[i] = routeObject;
-          // }
+
         },
         _setRoutes: function(routeListArray) {
           var self = this;
-          //this._imported_routes = routeListArray;
           this._imported_routes_original = routeListArray;
-          // routeObject.routeDetails.a.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_forward.mp4";
-          // routeObject.routeDetails.a.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_left.mp4";
-          // routeObject.routeDetails.a.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_right.mp4";
-          // routeObject.routeDetails.a.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_a_backward.mp4";
-          //
-          // routeObject.routeDetails.b.videoUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_forward.mp4";
-          // routeObject.routeDetails.b.videoLeftUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_left.mp4";
-          // routeObject.routeDetails.b.videoRightUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_right.mp4";
-          // routeObject.routeDetails.b.videoBackUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/"+videoCode+"/"+videoCode+"_b_backward.mp4";
+
           console.log('Final Routes array');
           console.log(self._imported_routes);
           self.selectedTab = 1;
-          // self.$.saveOperationResultModal.close();
-          // self._showOperationResultModal(true,"All data loaded");
-          // setTimeout(function(){
-          //    self.$.saveOperationResultModal.close();
-          // }, 2000);
-          // this._setKmlFiles(routeListArray,function(newRouteListArray){
-          //   self._imported_routes = routeListArray;
-          //   console.log('Final Routes array after processing KML files');
-          //   console.log(self._imported_routes);
-          //   self.selectedTab = 1;
-          //   self.$.saveOperationResultModal.close();
-          //   self._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
-          //   setTimeout(function(){
-          //      self.$.saveOperationResultModal.close();
-          //   }, 2000);
-          // })
           this._startVideoUrlsAndStartKmlProcessing();
         },
-        _combineRouteAndRouteDetails: function(routes, routeDetailses) {
+        _combineRouteAndRouteDetails: function(routes, routeDetailsResources) {
+          var self = this;
+          var generatedVideoOnly = $('#generated_video_only').is(':checked');
           var finalRoutes = [];
-          // //console.log('routes parameter');
-          // //console.log(routes);
-          // //console.log('Route Detailses parameter');
-          // //console.log(routeDetailses);
           for (var routeKey in routes) {
             var tempRoute = routes[routeKey]
             if (tempRoute) {
-              //console.log(tempRoute.code);
-              if ((routeDetailses && routeDetailses[routeKey] && routeDetailses[routeKey].a && routeDetailses[routeKey].a.stops) || (routeDetailses[routeKey].b && routeDetailses[routeKey].b.stops)) {
-                tempRoute.routeDetails = routeDetailses[routeKey];
-                console.log(tempRoute);
+              if(routeDetailsResources && routeDetailsResources[routeKey]){
+                tempRoute.routeDetailsResources = routeDetailsResources[routeKey];
+              }
+              if(generatedVideoOnly){
+                if(tempRoute.routeDetailsResources){
+                  finalRoutes.push(tempRoute);
+                }
+              }else{
                 finalRoutes.push(tempRoute);
               }
+
             }
           }
-          this._setRoutes(finalRoutes);
+
+          // if ((routeDetailses && routeDetailses[routeKey] && routeDetailses[routeKey].a && routeDetailses[routeKey].a.stops) ||
+          //     (routeDetailses && routeDetailses[routeKey] && routeDetailses[routeKey].b && routeDetailses[routeKey].b.stops)) {
+          //   tempRoute.routeDetails = routeDetailses[routeKey];
+          //   //tempRoute.routeDetails = this._routeDetails;
+          //   console.log(tempRoute);
+          //   finalRoutes.push(tempRoute);
+          // }
+          var finalSuitbleRoutes = [];
+          var startMerge =  function(index){
+
+            console.log('merge Index: '+index);
+            if(index<finalRoutes.length){
+              console.log('condition success')
+              var fullRouteDetails = {};
+              fullRouteDetails = finalRoutes[index];
+              console.log('code: '+fullRouteDetails.code);
+              self.$.routeDataProcessing.getStoredValue('/route-details-original/'+fullRouteDetails.code)
+                .then(function(routeDetailsData) {
+                 //self._combineRouteAndRouteDetails(routes,routesDetailses);
+                 if(routeDetailsData && ((routeDetailsData.a && routeDetailsData.a.stops) || (routeDetailsData.b && routeDetailsData.b.stops))){
+                   fullRouteDetails.routeDetails = routeDetailsData;
+                   finalSuitbleRoutes.push(fullRouteDetails);
+                 }
+                 startMerge(index+1);
+                }).catch(function(error) {
+                  //console.log(error);
+                });
+            }else{
+              console.log('Main Routes selection Done');
+              console.log(finalSuitbleRoutes);
+              self._setRoutes(finalSuitbleRoutes);
+            }
+          }
+          startMerge(0);
+          //
         },
         _toggleRoute: function(e) {
           var oldActiveRoute = Polymer.dom(this.root).querySelector('.item-wrapper.active');
@@ -1404,62 +1371,148 @@
               message: 'Code missing - after trim'
             }, false)
           }
+
+
           var routeInfo = {
             code: fullRouteData.code,
-            departure: fullRouteData.originalDeparture || fullRouteData.departure,
-            destination: fullRouteData.originalDestination || fullRouteData.destination,
-            directionAName: fullRouteData.originalDirectionAName || fullRouteData.directionAName,
-            directionBName: fullRouteData.originalDirectionBName || fullRouteData.directionBName,
+            departure: fullRouteData.departure,
+            destination: fullRouteData.destination,
+            directionAName:fullRouteData.directionAName,
+            directionBName: fullRouteData.directionBName,
             latitude: fullRouteData.latitude,
             longitude: fullRouteData.longitude,
-            name: fullRouteData.originalName || fullRouteData.name,
-            originalDeparture:fullRouteData.originalDeparture,
-            originalDestination:fullRouteData.originalDestination,
-            originalDirectionAName:fullRouteData.originalDirectionAName,
-            originalDirectionBName:fullRouteData.originalDirectionBName,
-            originalName:fullRouteData.originalName
+            name: fullRouteData.name,
           };
-          var routeDetails = fullRouteData.routeDetails;
+
+
+          if(fullRouteData.routeDetails && fullRouteData.routeDetails.departure){
+            routeInfo.departure = fullRouteData.routeDetails.departure;
+          }
+          if(fullRouteData.routeDetails && fullRouteData.routeDetails.destination){
+            routeInfo.destination = fullRouteData.routeDetails.destination;
+          }
+          if(fullRouteData.routeDetails && fullRouteData.routeDetails.directionAName){
+            routeInfo.directionAName = fullRouteData.routeDetails.directionAName;
+          }
+          if(fullRouteData.routeDetails && fullRouteData.routeDetails.directionBName){
+            routeInfo.directionBName = fullRouteData.routeDetails.directionBName;
+          }
+          if(fullRouteData.routeDetails && fullRouteData.routeDetails.name){
+            routeInfo.name = fullRouteData.routeDetails.name
+          }
+          var routeDetails = {
+            a:fullRouteData.routeDetails.a,
+            b:fullRouteData.routeDetails.b
+          };
+
+          if(!routeDetails.a){
+            routeDetails.a = {};
+          }
+          if(!routeDetails.b){
+            routeDetails.b = {};
+          }
           var update = {};
 
-          if(routeDetails.a.originalStops && routeDetails.a.originalStops.length){
-            routeDetails.a.stops = routeDetails.a.originalStops;
-            if (routeDetails.a && routeDetails.a.stops && routeDetails.a.stops.length) {
-              for (var a = 0; a < routeDetails.a.stops.length; a++) {
-                var tempStopObject = routeDetails.a.stops[a];
-                var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.a.videoGeoPoints);
-                var sec = parseInt(point.key);
-                if (!isNaN(sec)) {
-                  routeDetails.a.stops[a].sec = parseInt(point.key);
-                } else {
-                  routeDetails.a.stops[a].sec = null;
-                }
-
+          if (routeDetails.a && routeDetails.a.stops && routeDetails.a.stops.length) {
+            for (var a = 0; a < routeDetails.a.stops.length; a++) {
+              var tempStopObject = routeDetails.a.stops[a];
+              var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.a.videoGeoPoints);
+              var sec = parseInt(point.key);
+              if (!isNaN(sec)) {
+                routeDetails.a.stops[a].sec = parseInt(point.key);
+              } else {
+                routeDetails.a.stops[a].sec = null;
               }
+
             }
           }
 
-          if(routeDetails.b.originalStops && routeDetails.b.originalStops.length){
-            routeDetails.b.stops = routeDetails.b.originalStops;
-            if (routeDetails.b && routeDetails.b.stops && routeDetails.b.stops.length) {
-              for (var b = 0; b < routeDetails.b.stops.length; b++) {
-                var tempStopObject = routeDetails.b.stops[b];
-                var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.b.videoGeoPoints);
-                var sec = parseInt(point.key);
-                if (!isNaN(sec)) {
-                  routeDetails.b.stops[b].sec = parseInt(point.key);
-                } else {
-                  routeDetails.b.stops[b].sec = null;
-                }
-
+          if (routeDetails.b && routeDetails.b.stops && routeDetails.b.stops.length) {
+            for (var b = 0; b < routeDetails.b.stops.length; b++) {
+              var tempStopObject = routeDetails.b.stops[b];
+              var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.b.videoGeoPoints);
+              var sec = parseInt(point.key);
+              if (!isNaN(sec)) {
+                routeDetails.b.stops[b].sec = parseInt(point.key);
+              } else {
+                routeDetails.b.stops[b].sec = null;
               }
+
             }
           }
 
+          if(routeDetails.a && routeDetails.a.videoGeoPointsLeft){
+            update['route-details-video-geopoints-left/'+code+'/a'] = routeDetails.a.videoGeoPointsLeft;
+            delete routeDetails.a.videoGeoPointsLeft;
+          }
+          if(routeDetails.a && routeDetails.a.videoGeoPointsRight){
+            update['route-details-video-geopoints-right/'+code+'/a'] = routeDetails.a.videoGeoPointsRight;
+            delete routeDetails.a.videoGeoPointsRight;
+          }
+          if(routeDetails.a && routeDetails.a.videoGeoPointsBack){
+            update['route-details-video-geopoints-back/'+code+'/a'] = routeDetails.a.videoGeoPointsBack;
+            delete routeDetails.a.videoGeoPointsBack;
+          }
 
+          if(routeDetails.b && routeDetails.b.videoGeoPointsLeft){
+            update['route-details-video-geopoints-left/'+code+'/b'] = routeDetails.b.videoGeoPointsLeft;
+            delete routeDetails.b.videoGeoPointsLeft;
+          }
+          if(routeDetails.b && routeDetails.b.videoGeoPointsRight){
+            update['route-details-video-geopoints-right/'+code+'/b'] = routeDetails.b.videoGeoPointsRight;
+            delete routeDetails.b.videoGeoPointsRight;
+          }
+          if(routeDetails.b && routeDetails.b.videoGeoPointsBack){
+            update['route-details-video-geopoints-back/'+code+'/b'] = routeDetails.b.videoGeoPointsBack;
+            delete routeDetails.b.videoGeoPointsBack;
+          }
+
+
+          if(routeDetails.a && routeDetails.a.videoGeoPointsLowRes){
+            update['route-details-video-geopoints-low-res-front/'+code+'/a'] = routeDetails.a.videoGeoPointsLowRes;
+            delete routeDetails.a.videoGeoPointsLowRes;
+          }
+
+          if(routeDetails.a && routeDetails.a.videoGeoPointsLeftLowRes){
+            update['route-details-video-geopoints-low-res-left/'+code+'/a'] = routeDetails.a.videoGeoPointsLeftLowRes;
+            delete routeDetails.a.videoGeoPointsLeftLowRes;
+          }
+
+          if(routeDetails.a && routeDetails.a.videoGeoPointsRightLowRes){
+            update['route-details-video-geopoints-low-res-right/'+code+'/a'] = routeDetails.a.videoGeoPointsRightLowRes;
+            delete routeDetails.a.videoGeoPointsRightLowRes;
+          }
+
+          if(routeDetails.a && routeDetails.a.videoGeoPointsBackLowRes){
+            update['route-details-video-geopoints-low-res-back/'+code+'/a'] = routeDetails.a.videoGeoPointsBackLowRes;
+            delete routeDetails.a.videoGeoPointsBackLowRes;
+          }
+
+
+
+          if(routeDetails.b && routeDetails.b.videoGeoPointsLowRes){
+            update['route-details-video-geopoints-low-res-front/'+code+'/b'] = routeDetails.b.videoGeoPointsLowRes;
+            delete routeDetails.b.videoGeoPointsLowRes;
+          }
+
+          if(routeDetails.b && routeDetails.b.videoGeoPointsLeftLowRes){
+            update['route-details-video-geopoints-low-res-left/'+code+'/b'] = routeDetails.b.videoGeoPointsLeftLowRes;
+            delete routeDetails.b.videoGeoPointsLeftLowRes;
+          }
+
+          if(routeDetails.b && routeDetails.b.videoGeoPointsRightLowRes){
+            update['route-details-video-geopoints-low-res-right/'+code+'/b'] = routeDetails.b.videoGeoPointsRightLowRes;
+            delete routeDetails.b.videoGeoPointsRightLowRes;
+          }
+
+          if(routeDetails.b && routeDetails.b.videoGeoPointsBackLowRes){
+            update['route-details-video-geopoints-low-res-back/'+code+'/b'] = routeDetails.b.videoGeoPointsBackLowRes;
+            delete routeDetails.b.videoGeoPointsBackLowRes;
+          }
 
           update['routes/' + code] = routeInfo;
           update['route-details/' + code] = routeDetails;
+
           console.log('check below update deep path');
           console.log(update)
           //return callback(null,true);
@@ -1517,7 +1570,11 @@
           startUpdate(0);
         },
         ready: function() {
-
+          var self = this;
+          this.$.routeDataProcessing.getStoredValue('/settings/video_generation_server_url')
+            .then(function(data) {
+              self._video_generation_server_url = data;
+            });
         },
       });
     })();

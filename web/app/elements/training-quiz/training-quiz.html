@@ -326,11 +326,30 @@
       </div>
 
       <div class="inner-content">
+
+
+        <template is="dom-if" if="[[!_startPrepareingQA]]">
+            <div class="" style="text-align: center;margin-top: 5%;">
+              <div class="add-stop-wrapper">
+              <paper-button on-click="_startPrepareingQuizQA" toggles raised class="green" style="width: 175px;
+    height: 45px;
+    font-size: 20px;
+    padding: 0px;background-color:#0B5388" >
+                <iron-icon icon="icons:chevron-right" ></iron-icon> Start Quiz
+              </paper-button>
+             </div>
+            </div>
+        </template>
+
+    <template is="dom-if" if="[[_startPrepareingQA]]">
         <template is="dom-if" if="[[!_qa.length]]">
           <div class="special-messge">
             <h3>Preparing Training Q&A Please wait.....<iron-icon icon="icons:hourglass-empty"></iron-icon></h3>
           </div>
         </template>
+    </template>
+
+
         <template is="dom-if" if="[[_allQuestionAnswered]]">
           <div class="special-messge">
             <h3>Thanks for completing quiz, you can review your answers below or go to main screen and continue exploring different routes</h3>
@@ -455,6 +474,10 @@
         },
         _allQuestionAnswered:{
           type: Boolean,
+        },
+        _startPrepareingQA:{
+            type: Boolean,
+            value:false
         }
       },
 
@@ -688,29 +711,82 @@
       _getQuestionNumber : function(index){
          return parseInt(index)+1;
       },
-      ready: function() {
+      _startPrepareingQuizQA:function(){
+        this._startPrepareingQA = true;
         this._allQuestionAnswered = false;
         var self = this;
         var routes = [];
         var routesDetailses = [];
          this.$.routeDataProcessing.getStoredValue('/routes')
            .then(function(data) {
-             // //console.log('Rotues Data');
-             // //console.log(data);
-             // //console.log(data.length);
+             console.log('Rotues Data');
+             console.log(data);
+             console.log(data.length);
              routes = data;
-             self.$.routeDataProcessing.getStoredValue('/route-details')
-               .then(function(data) {
-                 // //console.log('Rotue Details Data');
-                 // //console.log(data);
-                 routesDetailses = data;
-                 self._combineRouteAndRouteDetails(routes,routesDetailses);
-               }).catch(function(error) {
-                 //console.log(error);
-               });
+             var finalRoutes = [];
+             // //console.log('routes parameter');
+             // //console.log(routes);
+             // //console.log('Route Detailses parameter');
+             // //console.log(routeDetailses);
+             for (var routeKey in routes) {
+               var tempRoute = routes[routeKey]
+                   if(tempRoute){
+                     finalRoutes.push(tempRoute);
+                   }
+             }
+             //console.log('Final Routes Data');
+             //console.log(finalRoutes);
+             //randomly selecting 10 routes
+             var arr = [];
+             var ranDomRoutes = [];
+             while(arr.length < 20){
+                 var randomnumber = Math.floor(Math.random()*finalRoutes.length) + 1;
+                 if(arr.indexOf(randomnumber) > -1) continue;
+                 //console.log('random number: '+randomnumber);
+                 if(finalRoutes[randomnumber]){
+                   arr[arr.length] = randomnumber;
+                   ranDomRoutes.push(finalRoutes[randomnumber]);
+                 }
+             }
+             console.log('Final plain routes');
+             console.log(ranDomRoutes);
+
+             var finalSuitbleRoutes = [];
+
+
+             var startMerge =  function(index){
+               console.log('merge Index: '+index);
+               if(index<ranDomRoutes.length && finalSuitbleRoutes.length<10){
+                 console.log('condition success')
+                 var fullRouteDetails = {};
+                 fullRouteDetails = ranDomRoutes[index];
+                 console.log('code: '+fullRouteDetails.code);
+                 self.$.routeDataProcessing.getStoredValue('/route-details/'+fullRouteDetails.code)
+                   .then(function(routeDetailsData) {
+                    //self._combineRouteAndRouteDetails(routes,routesDetailses);
+                    if(routeDetailsData && ((routeDetailsData.a && routeDetailsData.a.stops) || (routeDetailsData.b && routeDetailsData.b.stops))){
+                      fullRouteDetails.routeDetails = routeDetailsData;
+                      finalSuitbleRoutes.push(fullRouteDetails);
+                    }
+                    startMerge(index+1);
+                   }).catch(function(error) {
+                     //console.log(error);
+                   });
+               }else{
+                 console.log('Main Routes selection Done');
+                 console.log(finalSuitbleRoutes);
+                 self._generateQASet(finalSuitbleRoutes);
+               }
+             }
+             startMerge(0);
+
+             //return false;
            }).catch(function(error) {
              //console.log(error);
            });
+      },
+      ready: function() {
+
       },
       _showOperationResultModal: function(isSuccess, operationDetailMessage) {
         this.$.saveOperationResultModal.open();

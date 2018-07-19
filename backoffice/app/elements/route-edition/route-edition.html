@@ -291,11 +291,11 @@
               <div class="stops-wrapper">
                 <h3>Direction A - Stops</h3>
                 <stop-list stops="{{_routeDetails.a.stops}}" show-operations></stop-list>
-                <div class="add-stop-wrapper">
+                <!-- <div class="add-stop-wrapper">
                   <paper-button on-click="_openAddStopModal" data-route-direction="a">
                     <iron-icon icon="icons:add"></iron-icon>Add stop
                   </paper-button>
-                </div>
+                </div> -->
               </div>
             </template>
           </div>
@@ -316,11 +316,11 @@
               <div class="stops-wrapper">
                 <h3>Direction B - Stops</h3>
                 <stop-list stops="{{_routeDetails.b.stops}}" show-operations></stop-list>
-                <div class="add-stop-wrapper">
+                <!-- <div class="add-stop-wrapper">
                   <paper-button on-click="_openAddStopModal" data-route-direction="b">
                     <iron-icon icon="icons:add"></iron-icon>Add stop
                   </paper-button>
-                </div>
+                </div> -->
               </div>
             </template>
           </div>
@@ -1103,6 +1103,92 @@
         this._routeDetailsOrigin = this._routeDetails;
         var code = this._routeInfo.code;
         var update = {};
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsLeft){
+          update['route-details-video-geopoints-left/'+code+'/a'] = this._routeDetails.a.videoGeoPointsLeft;
+          delete this._routeDetails.a.videoGeoPointsLeft;
+        }
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsRight){
+          update['route-details-video-geopoints-right/'+code+'/a'] = this._routeDetails.a.videoGeoPointsRight;
+          delete this._routeDetails.a.videoGeoPointsRight;
+        }
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsBack){
+          update['route-details-video-geopoints-back/'+code+'/a'] = this._routeDetails.a.videoGeoPointsBack;
+          delete this._routeDetails.a.videoGeoPointsBack;
+        }
+
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsNight){
+          update['route-details-video-geopoints-night/'+code+'/a'] = this._routeDetails.a.videoGeoPointsNight;
+          delete this._routeDetails.a.videoGeoPointsNight;
+        }
+
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsLeft){
+          update['route-details-video-geopoints-left/'+code+'/b'] = this._routeDetails.b.videoGeoPointsLeft;
+          delete this._routeDetails.b.videoGeoPointsLeft;
+        }
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsRight){
+          update['route-details-video-geopoints-right/'+code+'/b'] = this._routeDetails.b.videoGeoPointsRight;
+          delete this._routeDetails.b.videoGeoPointsRight;
+        }
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsBack){
+          update['route-details-video-geopoints-back/'+code+'/b'] = this._routeDetails.b.videoGeoPointsBack;
+          delete this._routeDetails.b.videoGeoPointsBack;
+        }
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsNight){
+          update['route-details-video-geopoints-night/'+code+'/b'] = this._routeDetails.b.videoGeoPointsNight;
+          delete this._routeDetails.b.videoGeoPointsNight;
+        }
+
+
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsLowRes){
+          update['route-details-video-geopoints-low-res-front/'+code+'/a'] = this._routeDetails.a.videoGeoPointsLowRes;
+          delete this._routeDetails.a.videoGeoPointsLowRes;
+        }
+
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsLeftLowRes){
+          update['route-details-video-geopoints-low-res-left/'+code+'/a'] = this._routeDetails.a.videoGeoPointsLeftLowRes;
+          delete this._routeDetails.a.videoGeoPointsLeftLowRes;
+        }
+
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsRightLowRes){
+          update['route-details-video-geopoints-low-res-right/'+code+'/a'] = this._routeDetails.a.videoGeoPointsRightLowRes;
+          delete this._routeDetails.a.videoGeoPointsRightLowRes;
+        }
+
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsBackLowRes){
+          update['route-details-video-geopoints-low-res-back/'+code+'/a'] = this._routeDetails.a.videoGeoPointsBackLowRes;
+          delete this._routeDetails.a.videoGeoPointsBackLowRes;
+        }
+
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsNightLowRes){
+          update['route-details-video-geopoints-low-res-night/'+code+'/a'] = this._routeDetails.a.videoGeoPointsNightLowRes;
+          delete this._routeDetails.a.videoGeoPointsNightLowRes;
+        }
+
+
+
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsLowRes){
+          update['route-details-video-geopoints-low-res-front/'+code+'/b'] = this._routeDetails.b.videoGeoPointsLowRes;
+          delete this._routeDetails.b.videoGeoPointsLowRes;
+        }
+
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsLeftLowRes){
+          update['route-details-video-geopoints-low-res-left/'+code+'/b'] = this._routeDetails.b.videoGeoPointsLeftLowRes;
+          delete this._routeDetails.b.videoGeoPointsLeftLowRes;
+        }
+
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsRightLowRes){
+          update['route-details-video-geopoints-low-res-right/'+code+'/b'] = this._routeDetails.b.videoGeoPointsRightLowRes;
+          delete this._routeDetails.b.videoGeoPointsRightLowRes;
+        }
+
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsBackLowRes){
+          update['route-details-video-geopoints-low-res-back/'+code+'/b'] = this._routeDetails.b.videoGeoPointsBackLowRes;
+          delete this._routeDetails.b.videoGeoPointsBackLowRes;
+        }
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsNightLowRes){
+          update['route-details-video-geopoints-low-res-night/'+code+'/b'] = this._routeDetails.b.videoGeoPointsNightLowRes;
+          delete this._routeDetails.b.videoGeoPointsNightLowRes;
+        }
         update['routes/'+code] = this._routeInfo;
         update['route-details/'+code] = this._routeDetails;
         console.log('check below update deep path data');

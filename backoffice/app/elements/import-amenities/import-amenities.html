@@ -234,6 +234,13 @@
                 <paper-button  on-click="_batchImportRoutesListData" ><iron-icon icon="file-download" class="download-icon"></iron-icon>Batch Import / Save</paper-button>
            </div>
       </div>
+      <br/><br/>  <br/><br/>  <br/><br/>
+        &nbsp;Optional: Load existing Amenities data from firebase database:<br/>
+      <div class="clear-break" id="main_amenities_updater">
+            <div class="add-stop-wrapper">
+                <paper-button  on-click="_getAmenities" ><iron-icon icon="file-download" class="download-icon"></iron-icon>Show Existing Amenities</paper-button>
+           </div>
+      </div>
       <br/><br/>
       <paper-material elevation="1">
         <paper-tabs scrollable fit-container>
@@ -682,7 +689,7 @@
         }
         return ret;
       },
-      ready: function() {
+      _getAmenities:function(){
         var self = this;
         var serialize = function(objectArray){
           var newArray = [];
@@ -719,6 +726,9 @@
           }).catch(function(error) {
             console.log(error);
           });
+      },
+      ready: function() {
+
       }
 
     });

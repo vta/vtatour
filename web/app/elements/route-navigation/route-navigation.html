@@ -724,10 +724,6 @@
 
           this._assignSource(newRouteDetails.videoUrl);
 
-          if (!newRouteDetails.videoGeoPoints) {
-            newRouteDetails.videoGeoPoints = newRouteDetails.originalVideoGeoPoints
-          }
-
           if (newRouteDetails.videoUrl) {
             $('#frontView').show().attr('data-video', newRouteDetails.videoUrl);
           } else {
@@ -814,6 +810,12 @@
           var self = this;
           setTimeout(function() {
             self._loadRoutePath(tourSlot);
+            self._currentLat = parseFloat(self._departureStop.lat);
+            self._currentLng = parseFloat(self._departureStop.lng);
+            self._map.panTo({
+              lat: self._currentLat,
+              lng: self._currentLng,
+            });
           }, 1000);
 
 
@@ -916,7 +918,18 @@
           }
           // Check if the video reaches the end of the tour
           if (newVideoCurrentTime < this._videoStartTime) {
-            this.player.currentTime(this._videoStartTime);
+            //return false;
+            return this.player.currentTime(this._videoStartTime + 1);
+            //newVideoCurrentTime = this._videoStartTime + 1;
+          }
+          if(newVideoCurrentTime==this._videoEndTime){
+            this._currentLat = parseFloat(finalPoint.lat);
+            this._currentLng = parseFloat(finalPoint.lng);
+            this._map.panTo(finalPoint);
+            this.player.pause();
+            this._setEndMessage();
+            console.log('block 1');
+            return;
           }
           if (newVideoCurrentTime == (this._videoEndTime + 1)) {
             this._currentLat = parseFloat(finalPoint.lat);
@@ -924,6 +937,8 @@
             this._map.panTo(finalPoint);
             this.player.pause();
             this._setEndMessage();
+            this._map.panTo(finalPoint);
+            console.log('block 2');
             return;
           } else if (newVideoCurrentTime > (this._videoEndTime + 1)) {
             this._currentLat = parseFloat(finalPoint.lat);
@@ -932,12 +947,16 @@
             this.player.pause();
             this.player.currentTime(this._videoEndTime);
             this._setEndMessage()
+            this._map.panTo(finalPoint);
+            console.log('block 3');
             return;
           } else if (newVideoCurrentTime >= this.player.duration()) {
             this._currentLat = parseFloat(finalPoint.lat);
             this._currentLng = parseFloat(finalPoint.lng);
             this._map.panTo(finalPoint);
             this.player.pause();
+            this._map.panTo(finalPoint);
+            console.log('block 4');
             return;
           }
 
@@ -1247,7 +1266,14 @@
             lat: this._destinationStop.lat,
             lng: this._destinationStop.lng,
           })
+
+          if(this._mapPolyline){
+              this._mapPolyline.setMap(null);
+          }
+
           try {
+
+
             self._mapPolyline = new google.maps.Polyline({
               path: cords,
               geodesic: true,
@@ -1714,54 +1740,73 @@
           // this._videoCurrentTimeChange(0);
           // this._pauseVideo();
           this._assignSource(src);
-          this._videoCurrentTimeChange(0);
+          this._videoCurrentTimeChange(self._videoStartTime);
           this._pauseVideo();
         },
         _goBack: function() {
           $('#backBtn').click();
         },
         _changeGeoPointsUi: function(view) {
+          var self = this;
           if (!view) {
             return false;
           }
           console.log('view');
           console.log(view);
           console.log(this._routeDetails);
-          var geoPoints = null;
-          if (view == 'frontView' && this._routeDetails.videoGeoPoints) {
-            geoPoints = this._routeDetails.videoGeoPoints;
-          } else if (view == 'leftView' && this._routeDetails.videoGeoPointsLeft) {
-            geoPoints = this._routeDetails.videoGeoPointsLeft;
-          } else if (view == 'rightView' && this._routeDetails.videoGeoPointsRight) {
-            geoPoints = this._routeDetails.videoGeoPointsRight;
-          } else if (view == 'backView' && this._routeDetails.videoGeoPointsBack) {
-            geoPoints = this._routeDetails.videoGeoPointsBack;
-          } else if (view == 'nightView' && this._routeDetails.videoGeoPointsNight) {
-            geoPoints = this._routeDetails.videoGeoPointsNight;
-          }
-          if (!geoPoints && !this._routeDetails.videoGeoPoints) {
-            return false;
-          }else if(!geoPoints){
-            geoPoints = this._routeDetails.videoGeoPoints;
-          }
-          var departurePoint = this.$.mapsUtils.getClosestPoint(this._routeDetails.stops[this.departureStopId].lat,
-            this._routeDetails.stops[this.departureStopId].lng, geoPoints);
-          var destinationPoint = this.$.mapsUtils.getClosestPoint(this._routeDetails.stops[this.destinationStopId].lat,
-            this._routeDetails.stops[this.destinationStopId].lng, geoPoints);
+          // var geoPoints = null;
+          var viewPath = "";
+          var applyNewGeoPoints = function(newGeoPoints){
+          var geoPoints = newGeoPoints;
+            var departurePoint = self.$.mapsUtils.getClosestPoint(self._routeDetails.stops[self.departureStopId].lat,
+              self._routeDetails.stops[self.departureStopId].lng, geoPoints);
+            var destinationPoint = self.$.mapsUtils.getClosestPoint(self._routeDetails.stops[self.destinationStopId].lat,
+              self._routeDetails.stops[self.destinationStopId].lng, geoPoints);
 
-          var departurePointInt = parseInt(departurePoint.key);
-          var destinationPointInt = parseInt(destinationPoint.key);
-          var tourSlot = this.getRouteSlot(geoPoints, departurePointInt, destinationPointInt);
-          this._videoStartTime = parseInt(departurePoint.key);
-          this._videoEndTime = parseInt(destinationPoint.key);
-          if (this.departureStopId < this.destinationStopId) {
-            this._stopsSlot = this._routeDetails.stops.slice(this.departureStopId, parseInt(this.destinationStopId) + 1);
-          } else {
-            this._stopsSlot = this._routeDetails.stops.slice(this.destinationStopId, parseInt(this.departureStopId) + 1).reverse();
+            var departurePointInt = parseInt(departurePoint.key);
+            var destinationPointInt = parseInt(destinationPoint.key);
+            self._videoStartTime = parseInt(departurePoint.key);
+            self._videoEndTime = parseInt(destinationPoint.key);
+            var tourSlot = self.getRouteSlot(geoPoints, departurePointInt, destinationPointInt);
+            self._videoStartTime = parseInt(departurePoint.key);
+            self._videoEndTime = parseInt(destinationPoint.key);
+            if (self.departureStopId < self.destinationStopId) {
+              self._stopsSlot = self._routeDetails.stops.slice(self.departureStopId, parseInt(self.destinationStopId) + 1);
+            } else {
+              self._stopsSlot = self._routeDetails.stops.slice(self.destinationStopId, parseInt(self.departureStopId) + 1).reverse();
+            }
+            self._nextStop = self._calculateNextStop(self._stopsSlot, self._videoStartTime);
+            console.log('now settngs new tour path');
+            self._loadRoutePath(tourSlot);
+
           }
-          this._nextStop = this._calculateNextStop(this._stopsSlot, this._videoStartTime);
-          console.log('now settngs new tour path');
-          this._loadRoutePath(tourSlot);
+              if (view == 'frontView') {
+                return applyNewGeoPoints(this._routeDetails.videoGeoPoints);
+              //viewPath = "route-details-video-geopoints-left/"+this.code+"/"+self.direction
+              //geoPoints = this._routeDetails.videoGeoPoints;
+              } else if (view == 'leftView') {
+                viewPath = "route-details-video-geopoints-left/"+this.code+"/"+self.direction
+              } else if (view == 'rightView') {
+                viewPath = "route-details-video-geopoints-right/"+this.code+"/"+self.direction
+              } else if (view == 'backView') {
+                viewPath = "route-details-video-geopoints-back/"+this.code+"/"+self.direction
+              } else if (view == 'nightView') {
+                viewPath = "route-details-video-geopoints-night/"+this.code+"/"+self.direction
+              }
+
+              console.log('going to looks for view path: '+ viewPath);
+              this.$.customQueryObject.getStoredValue(viewPath)
+                .then(function(data) {
+                  console.log('data received from firebase for this view path');
+                  console.log(data);
+                    if(data){
+                      return applyNewGeoPoints(data)
+                    }else{
+                      return applyNewGeoPoints(self._routeDetails.videoGeoPoints)
+                    }
+
+                });
+
           },
         ready: function() {
 

@@ -153,7 +153,7 @@ app.post('/api/route-details/:route_code/:direction', (req, res) => {
 
         const ref = firebaseApp.database().ref();
         const update = {};
-        update['route-details/'+route_code+'/latestResources/'+direction] = latestResources;
+        update['route-details-resources/'+route_code+'/latestResources/'+direction] = latestResources;
         ref.update(update, (error) => {
           if (error) {
             console.log("Error updating data:", error);
@@ -267,8 +267,8 @@ app.post('/api/route-details/:resolution/:route_code/:direction/:view', (req, re
             message:'KmlUrl node not present in request body'
           });
         }
-        update['route-details/'+route_code+'/'+resolutionPath+'/'+direction+'/videoUrl'] = videoUrl;
-        update['route-details/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrl'] = KmlUrl;
+        update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/videoUrl'] = videoUrl;
+        update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrl'] = KmlUrl;
       }
 
       if(view==='back'){
@@ -286,8 +286,8 @@ app.post('/api/route-details/:resolution/:route_code/:direction/:view', (req, re
             message:'KmlUrlBack node not present in request body'
           });
         }
-        update['route-details/'+route_code+'/'+resolutionPath+'/'+direction+'/videoBackUrl'] = videoBackUrl;
-        update['route-details/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrlBack'] = KmlUrlBack;
+        update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/videoBackUrl'] = videoBackUrl;
+        update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrlBack'] = KmlUrlBack;
       }
 
       if(view==='left'){
@@ -305,8 +305,8 @@ app.post('/api/route-details/:resolution/:route_code/:direction/:view', (req, re
             message:'KmlUrlLeft node not present in request body'
           });
         }
-        update['route-details/'+route_code+'/'+resolutionPath+'/'+direction+'/videoLeftUrl'] = videoLeftUrl;
-        update['route-details/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrlLeft'] = KmlUrlLeft;
+        update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/videoLeftUrl'] = videoLeftUrl;
+        update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrlLeft'] = KmlUrlLeft;
       }
 
       if(view==='right'){
@@ -324,8 +324,8 @@ app.post('/api/route-details/:resolution/:route_code/:direction/:view', (req, re
             message:'KmlUrlRight node not present in request body'
           });
         }
-        update['route-details/'+route_code+'/'+resolutionPath+'/'+direction+'/videoRightUrl'] = videoRightUrl;
-        update['route-details/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrlRight'] = KmlUrlRight;
+        update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/videoRightUrl'] = videoRightUrl;
+        update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrlRight'] = KmlUrlRight;
       }
 
 

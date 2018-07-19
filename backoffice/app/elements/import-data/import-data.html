@@ -139,7 +139,7 @@
         border: 1px solid var(--primary-color);
         color: var(--primary-color);
         padding: 0.2em .6em;
-        width: 167px;
+        width: 214px;
 
       }
       .clear-break{
@@ -242,13 +242,26 @@
       <br/><br/>
       <div class="clear-break">
         <br/>
-      &nbsp; Step 3: Click on "Batch Import" to upload data in firebase database:
+      &nbsp; Step 3: Click on "Batch Import Sroutes" to upload data in firebase database:
       <br/>
       <div class="add-stop-wrapper">
         <paper-button  on-click="_batchImportRoutesListData" >
-          <iron-icon icon="file-download" class="download-icon"></iron-icon>Batch Import
+          <iron-icon icon="file-download" class="download-icon"></iron-icon>Batch Import Routes
         </paper-button>
       </div>
+      <br/>
+      <br/>
+      <!-- <div class="clear-break"></div>
+      <br/>
+      &nbsp; Step 4(optional): Click on "Batch Import Stops" to upload data in firebase database:
+      <br/>
+      <div class="add-stop-wrapper">
+        <paper-button  on-click="_batchImportStopListData" >
+          <iron-icon icon="file-download" class="download-icon"></iron-icon>Batch Import Stops
+        </paper-button>
+      </div> -->
+
+
       <br/>
       <br/>
       </div>
@@ -493,15 +506,11 @@
               a: {
                 stops: [],
                 videoGeoPoints: {},
-                originalVideoGeoPoints: {},
-                videoId: null,
                 videoUrl: null
               },
               b: {
                 stops: [],
                 videoGeoPoints: {},
-                originalVideoGeoPoints: {},
-                videoId: null,
                 videoUrl: null
               }
             }
@@ -532,99 +541,7 @@
             self.$.saveOperationResultModal.close();
           }, 1000);
         },
-        _setKmlFiles: function(routeListArray, callback) {
-          console.log('Going to start Processing KML file');
-          var self = this;
-          var processKmlUrl = function(url, cb) {
-            // console.log("processing: "+url);
-            // var settings = {
-            //     "async": true,
-            //     "crossDomain": true,
-            //     "url": "http://localhost:5001/kml_file/10_a.kml",
-            //     "method": "GET",
-            //   }
-            //
-            //   $.ajax(settings).done(function (response) {
-            //     console.log(response);
-            //     if(response.status==200){
-            //       self.$.tempKmlParser.parseFromText(response.responseText,cb);
-            //     }else{
-            //       cb(null);
-            //     }
-            //   });
-            var data = null;
 
-            var xhr = new XMLHttpRequest();
-            xhr.withCredentials = true;
-
-            xhr.addEventListener("readystatechange", function() {
-              console.log(this.readyState);
-              if (this.readyState === 4) {
-                console.log('check response');
-                console.log(this.responseText);
-                //console.log(this)
-                if (this.status == 200) {
-                  self.$.tempKmlParser.parseFromText(this.responseText, cb);
-                } else {
-                  cb(null);
-                }
-              }
-            });
-
-            xhr.open("GET", url);
-            //xhr.setRequestHeader("cache-control", "no-cache");
-            //xhr.setRequestHeader("postman-token", "861478f2-6ea2-0a27-a144-1475782148d3");
-
-            xhr.send(data);
-          }
-
-          var processRoute = function(index) {
-            console.log('Processing: ' + index);
-            if (index < routeListArray.length) {
-              var fullRouteDetails = routeListArray[index];
-              var directionAKmlUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/" + fullRouteDetails.code + "/" + fullRouteDetails.code + "_a.kml";
-              var directionBKmlUrl = "https://s3-us-west-1.amazonaws.com/vta-tour-rtmp/" + fullRouteDetails.code + "/" + fullRouteDetails.code + "_b.kml"
-              processKmlUrl(directionAKmlUrl, function(parsedAData) {
-                console.log('check parsed data');
-                console.log(parsedAData);
-                if (parsedAData) {
-                  fullRouteDetails.routeDetails.a.videoGeoPoints = parsedAData;
-                  //fullRouteDetails.routeDetails.a.originalVideoGeoPoints = parsedAData;
-
-                  if (fullRouteDetails.routeDetails.a && fullRouteDetails.routeDetails.a.stops && fullRouteDetails.routeDetails.a.stops.length) {
-                    for (var a = 0; a < fullRouteDetails.routeDetails.a.stops.length; a++) {
-                      var tempStopObject = fullRouteDetails.routeDetails.a.stops[a];
-                      var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.a.videoGeoPoints);
-                      fullRouteDetails.routeDetails.a.stops[a].sec = parseInt(point.key);
-                    }
-                  }
-                }
-                processKmlUrl(directionBKmlUrl, function(parsedBData) {
-                  if (parsedBData) {
-                    fullRouteDetails.routeDetails.b.videoGeoPoints = parsedBData;
-                    //fullRouteDetails.routeDetails.b.originalVideoGeoPoints = parsedBData;
-                    if (fullRouteDetails.routeDetails.b && fullRouteDetails.routeDetails.b.stops && fullRouteDetails.routeDetails.b.stops.length) {
-                      for (var b = 0; b < fullRouteDetails.routeDetails.b.stops.length; b++) {
-                        var tempStopObject = fullRouteDetails.routeDetails.b.stops[b];
-                        var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, fullRouteDetails.routeDetails.b.videoGeoPoints);
-                        fullRouteDetails.routeDetails.b.stops[b].sec = parseInt(point.key);
-                      }
-                    }
-                  }
-                  routeListArray[index] = fullRouteDetails;
-                  processRoute(index + 1);
-                });
-              });
-
-            } else {
-              callback(routeListArray)
-            }
-          }
-          //callback(routeListArray)
-          processRoute(0);
-
-
-        },
         _setRoutes: function(routeListArray) {
           var self = this;
           self._imported_routes = routeListArray;
@@ -636,17 +553,6 @@
           setTimeout(function() {
             self.$.saveOperationResultModal.close();
           }, 2000);
-          // this._setKmlFiles(routeListArray,function(newRouteListArray){
-          //   self._imported_routes = routeListArray;
-          //   console.log('Final Routes array after processing KML files');
-          //   console.log(self._imported_routes);
-          //   self.selectedTab = 1;
-          //   self.$.saveOperationResultModal.close();
-          //   self._showOperationResultModal(true,"Route list data loaded, please verify route list data after that you can click on Batch Import to update database ");
-          //   setTimeout(function(){
-          //      self.$.saveOperationResultModal.close();
-          //   }, 2000);
-          // })
 
         },
         _readStops: function(opt_startByte, opt_stopByte) {
@@ -811,15 +717,11 @@
                       a: {
                         stops: [],
                         videoGeoPoints: {},
-                        originalVideoGeoPoints: {},
-                        videoId: null,
                         videoUrl: null
                       },
                       b: {
                         stops: [],
                         videoGeoPoints: {},
-                        originalVideoGeoPoints: {},
-                        videoId: null,
                         videoUrl: null
                       }
                     }
@@ -827,12 +729,10 @@
 
                   if (rawRouteObject.direction) {
                     routeObject.directionAName = rawRouteObject.direction;
-                    routeObject.originalDirectionAName = rawRouteObject.direction;
                   }
 
                   if (rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.direction) {
                     routeObject.directionBName = rawRouteObjectOtherDirection.direction;
-                    routeObject.originalDirectionBName = rawRouteObjectOtherDirection.direction;
                   }
 
                   var routesStopsArray = [];
@@ -895,7 +795,6 @@
                     var geoPointsArrayString = "[" + rawRouteObject.routeshape + "]";
                     var geoPointsArray = eval(geoPointsArrayString);
                     routeObject.routeDetails.a.videoGeoPoints = objectifyLatLon(geoPointsArray);
-                    routeObject.routeDetails.a.originalVideoGeoPoints = objectifyLatLon(geoPointsArray);
                     if (geoPointsArray && geoPointsArray.length) {
                       //console.log('check important below');
                       console.log(geoPointsArray[0]);
@@ -907,7 +806,6 @@
                     var geoPointsArrayString = "[" + rawRouteObjectOtherDirection.routeshape + "]";
                     var geoPointsArray = eval(geoPointsArrayString);
                     routeObject.routeDetails.b.videoGeoPoints = objectifyLatLon(geoPointsArray);
-                    routeObject.routeDetails.b.originalVideoGeoPoints = objectifyLatLon(geoPointsArray);
                   }
 
                   if (routeObject.code) {
@@ -935,15 +833,11 @@
                       a: {
                         stops: [],
                         videoGeoPoints: {},
-                        originalVideoGeoPoints: {},
-                        videoId: null,
                         videoUrl: null
                       },
                       b: {
                         stops: [],
                         videoGeoPoints: {},
-                        originalVideoGeoPoints: {},
-                        videoId: null,
                         videoUrl: null
                       }
                     }
@@ -951,12 +845,10 @@
 
                   if (rawRouteObject.direction) {
                     routeObject.directionAName = rawRouteObject.direction;
-                    routeObject.originalDirectionAName = rawRouteObject.direction;
                   }
 
                   if (rawRouteObjectOtherDirection && rawRouteObjectOtherDirection.direction) {
                     routeObject.directionBName = rawRouteObjectOtherDirection.direction;
-                    routeObject.originalDirectionBName = rawRouteObjectOtherDirection.direction;
                   }
 
                   var routesStopsArray = [];
@@ -1018,7 +910,6 @@
                     var geoPointsArrayString = "[" + rawRouteObject.routeshape + "]";
                     var geoPointsArray = eval(geoPointsArrayString);
                     routeObject.routeDetails.b.videoGeoPoints = objectifyLatLon(geoPointsArray);
-                    routeObject.routeDetails.b.originalVideoGeoPoints = objectifyLatLon(geoPointsArray);
                     if (geoPointsArray && geoPointsArray.length) {
                       //console.log('check important below');
                       console.log(geoPointsArray[0]);
@@ -1148,173 +1039,54 @@
           self.$.routeDetails.getStoredValue('/routes/' + code)
             .then(function(routeInfoFromDb) {
 
-              routeInfo.originalDeparture = routeInfo.departure;
-              if(routeInfoFromDb.departure){
-                routeInfo.departure = routeInfoFromDb.departure;
-              }
+              var routeDetailsOriginal = {};
 
-              routeInfo.originalDestination = routeInfo.destination;
-              if(routeInfoFromDb.destination){
-                routeInfo.destination = routeInfoFromDb.destination;
-              }
-
-              routeInfo.originalName = routeInfo.name;
-              if(routeInfoFromDb.name){
+              routeDetailsOriginal.name = routeInfo.name;
+              if(routeInfoFromDb && routeInfoFromDb.name){
                 routeInfo.name = routeInfoFromDb.name;
               }
 
-              self.$.routeDetails.getStoredValue('/route-details/' + code)
-                .then(function(data) {
-                  if (data && data.latestResources) {
-                    routeDetails.latestResources = data.latestResources;
-                  }
-                  if (data && data.latestResourcesLowResolution) {
-                    routeDetails.latestResourcesLowResolution = data.latestResourcesLowResolution;
-                  }
-                  if (data && data.a) {
-                    if (data.a.videoGeoPoints) {
-                      routeDetails.a.videoGeoPoints = data.a.videoGeoPoints;
-                    }
-                    if (data.a.videoGeoPointsLowRes) {
-                      routeDetails.a.videoGeoPointsLowRes = data.a.videoGeoPointsLowRes;
-                    }
-                    if (data.a.videoGeoPointsLeft) {
-                      routeDetails.a.videoGeoPointsLeft = data.a.videoGeoPointsLeft;
-                    }
-                    if (data.a.videoGeoPointsLeftLowRes) {
-                      routeDetails.a.videoGeoPointsLeftLowRes = data.a.videoGeoPointsLeftLowRes;
-                    }
-                    if (data.a.videoGeoPointsRight) {
-                      routeDetails.a.videoGeoPointsRight = data.a.videoGeoPointsRight;
-                    }
-                    if (data.a.videoGeoPointsRightLowRes) {
-                      routeDetails.a.videoGeoPointsRightLowRes = data.a.videoGeoPointsRightLowRes;
-                    }
-                    if (data.a.videoGeoPointsBack) {
-                      routeDetails.a.videoGeoPointsBack = data.a.videoGeoPointsBack;
-                    }
-                    if (data.a.videoGeoPointsBackLowRes) {
-                      routeDetails.a.videoGeoPointsBackLowRes = data.a.videoGeoPointsBackLowRes;
-                    }
-                    routeDetails.a.videoUrl = data.a.videoUrl || "";
-                    routeDetails.a.videoLeftUrl = data.a.videoLeftUrl || "";
-                    routeDetails.a.videoRightUrl = data.a.videoRightUrl || "";
-                    routeDetails.a.videoBackUrl = data.a.videoBackUrl || "";
-                    routeDetails.a.videoNightUrl = data.a.videoNightUrl || "";
-                    routeDetails.a.videoUrlLowRes = data.a.videoUrlLowRes || "";
-                    routeDetails.a.videoLeftUrlLowRes = data.a.videoLeftUrlLowRes || "";
-                    routeDetails.a.videoRightUrlLowRes = data.a.videoRightUrlLowRes || "";
-                    routeDetails.a.videoBackUrlLowRes = data.a.videoBackUrlLowRes || "";
-                    routeDetails.a.videoNightUrlLowRes = data.a.videoNightUrlLowRes || "";
+              routeDetailsOriginal.departure = routeInfo.departure;
+              if(routeInfoFromDb && routeInfoFromDb.departure){
+                routeInfo.departure = routeInfoFromDb.departure;
+              }
 
+              routeDetailsOriginal.destination = routeInfo.destination;
+              if(routeInfoFromDb && routeInfoFromDb.destination){
+                routeInfo.destination = routeInfoFromDb.destination;
+              }
 
-                    if (routeDetails.a && routeDetails.a.stops && routeDetails.a.stops.length) {
-                      for (var a = 0; a < routeDetails.a.stops.length; a++) {
-                        var tempStopObject = routeDetails.a.stops[a];
-                        var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.a.videoGeoPoints);
-                        routeDetails.a.stops[a].sec = parseInt(point.key);
-                      }
-                    }
-                    routeDetails.a.originalStops = routeDetails.a.stops;
-                    if(data.a.stops && data.a.stops.length){
-                      routeDetails.a.stops = data.a.stops;
-                    }
-                  }
-                  if (data && data.b) {
-                    if (data.b.videoGeoPoints) {
-                      routeDetails.b.videoGeoPoints = data.b.videoGeoPoints;
-                    }
-                    if (data.b.videoGeoPointsLowRes) {
-                      routeDetails.b.videoGeoPointsLowRes = data.b.videoGeoPointsLowRes;
-                    }
-                    if (data.b.videoGeoPointsLeft) {
-                      routeDetails.b.videoGeoPointsLeft = data.b.videoGeoPointsLeft;
-                    }
-                    if (data.b.videoGeoPointsLeftLowRes) {
-                      routeDetails.b.videoGeoPointsLeftLowRes = data.b.videoGeoPointsLeftLowRes;
-                    }
+              routeDetailsOriginal.directionAName = routeInfo.directionAName;
+              if(routeInfoFromDb && routeInfoFromDb.directionAName){
+                routeInfo.directionAName = routeInfoFromDb.directionAName;
+              }
 
-                    if (data.b.videoGeoPointsRight) {
-                      routeDetails.b.videoGeoPointsRight = data.b.videoGeoPointsRight;
-                    }
-                    if (data.b.videoGeoPointsRightLowRes) {
-                      routeDetails.b.videoGeoPointsRightLowRes = data.b.videoGeoPointsRightLowRes;
-                    }
+              routeDetailsOriginal.directionBName = routeInfo.directionBName;
+              if(routeInfoFromDb && routeInfoFromDb.directionBName){
+                routeInfo.directionBName = routeInfoFromDb.directionBName;
+              }
 
-                    if (data.b.videoGeoPointsBack) {
-                      routeDetails.b.videoGeoPointsBack = data.b.videoGeoPointsBack;
-                    }
-                    if (data.b.videoGeoPointsBackLowRes) {
-                      routeDetails.b.videoGeoPointsBackLowRes = data.b.videoGeoPointsBackLowRes;
-                    }
-                    routeDetails.b.videoUrl = data.b.videoUrl || "";
-                    routeDetails.b.videoLeftUrl = data.b.videoLeftUrl || "";
-                    routeDetails.b.videoRightUrl = data.b.videoRightUrl || "";
-                    routeDetails.b.videoBackUrl = data.b.videoBackUrl || "";
-                    routeDetails.b.videoNightUrl = data.b.videoNightUrl || "";
-                    routeDetails.b.videoUrlLowRes = data.b.videoUrlLowRes || "";
-                    routeDetails.b.videoLeftUrlLowRes = data.b.videoLeftUrlLowRes || "";
-                    routeDetails.b.videoRightUrlLowRes = data.b.videoRightUrlLowRes || "";
-                    routeDetails.b.videoBackUrlLowRes = data.b.videoBackUrlLowRes || "";
-                    routeDetails.b.videoNightUrlLowRes = data.b.videoNightUrlLowRes || "";
-                    if (routeDetails.b && routeDetails.b.stops && routeDetails.b.stops.length) {
-                      for (var b = 0; b < routeDetails.b.stops.length; b++) {
-                        var tempStopObject = routeDetails.b.stops[b];
-                        var point = self.$.mapsUtils.getClosestPoint(tempStopObject.lat, tempStopObject.lng, routeDetails.b.videoGeoPoints);
-                        routeDetails.b.stops[b].sec = parseInt(point.key);
-                      }
-                    }
-                    routeDetails.b.originalStops = routeDetails.b.stops;
-                    if(data.b.stops && data.b.stops.length){
-                      routeDetails.b.stops = data.b.stops;
-                    }
-                  }
-                  update['routes/' + code] = routeInfo;
-                  update['route-details/' + code] = routeDetails;
-                  console.log('check below update deep path');
-                  console.log(update)
-                  firebaseDbRef.update(update, function(error) {
-                    if (error) {
-                      console.log("Error updating data:", error);
-                    } else {
-                      console.log('Write Success');
-                    }
-                    return callback(null, true);
-                  });
+              routeDetailsOriginal.a = routeDetails.a;
+              routeDetailsOriginal.b = routeDetails.b;
+              update['routes/' + code] = routeInfo;
+              update['route-details-original/' + code] = routeDetailsOriginal;
+              console.log('check below update deep path');
+              console.log(update);
 
-                }).catch(function(error) {
-                  console.log(error);
-                  return callback(null, true);
-                });
+              //return callback(null, true);
+
+              firebaseDbRef.update(update, function(error) {
+                if (error) {
+                  console.log("Error updating data:", error);
+                } else {
+                  console.log('Write Success');
+                }
+                return callback(null, true);
+              });
             }).catch(function(error) {
               console.log(error);
               return callback(null, true);
             });
-
-
-          // self._routeInfoOrigin = routeInfo;
-          // self._routeDetailsOrigin = routeDetails;
-          // console.log(self.$.routeInfo);
-          // console.log(self.$.routeDetails);
-          // setTimeout(function(){
-          //   console.log('code: '+code);
-          //   console.log('final route info');
-          //   console.log(self._routeInfoOrigin);
-          //   console.log('final route details');
-          //   console.log(self._routeDetailsOrigin);
-          //   self.$.routeInfo.save('/routes', code)
-          //     .then(function() {
-          //       return self.$.routeDetails.save('/route-details', code);
-          //     }).then(function() {
-          //       console.log('Route data + route details saving success');
-          //       console.log('Next item will start after 500ms');
-          //          return callback(null,true);
-          //     }).catch(function(error) {
-          //       console.log('must check below error if any');
-          //       console.log(error);
-          //       //return callback(error,null)
-          //     });
-          // }, 1000);
         },
         _saveStop: function(fullStopData, callback) {
           var self = this;
@@ -1355,11 +1127,23 @@
         },
         _batchImportStopListData:function(){
           //this._imported_stops
+          if(!this._imported_stops){
+            alert('Please load valid stop list file');
+            return false;
+          }
+          if(!this._imported_stops.length){
+            alert('Please load valid stop list file');
+            return false;
+          }
+          if (!confirm('Are you sure? This action will update new stop list in database, Notice: It will overwrite existing stops.')) {
+            return false;
+          }
+
           var self = this;
           var update = {};
           //return callback(null,true);
           //firebase.database().ref().update(update);
-          self._showOperationResultModal(true, "Starting Stop List update in firebase");
+          self._showOperationResultModal(false, "Starting Stop List update in firebase");
           var firebaseDb = this.$.routeInfo.db;
           var firebaseDbRef = firebaseDb.ref();
           update['stops'] = null;
@@ -1398,19 +1182,10 @@
               }
             }
             startUpdate(0);
-
-            // setTimeout(function(){
-            //    self.$.saveOperationResultModal.close();
-            // }, 2000);
           });
         },
         _batchImportRoutesListData: function(e) {
           //return this._batchImportStopListData();
-
-          if (!confirm('Are you sure? This action will update new routes in database, Notice: It will overwrite existing routes.')) {
-            return false;
-          }
-
 
           var self = this;
 
@@ -1424,6 +1199,13 @@
             alert('Please load a route list!');
             return;
           }
+
+          if (!confirm('Are you sure? This action will update new routes in database, Notice: It will overwrite existing routes.')) {
+            return false;
+          }
+
+
+
           this._showOperationResultModal(false, "Route list data getting updated in firebase db, it will take a while, please wait...");
 
           var updateAble = 0;
@@ -1443,39 +1225,12 @@
                 console.log('Success: ' + success);
                 startUpdate(index + 1);
               });
-              // self.$.routeInfo.getStoredValue('/routes/' + code)
-              //   .then(function(data) {
-              //
-              //     if(data && data.code){
-              //       alreadyHadRouteInfoData = true;
-              //     }
-              //     return self.$.routeDetails.getStoredValue('/route-details/' + code);
-              //   }).then(function(data) {
-              //     if(data && data.a && data.a.stops.length && data.a.videoUrl){
-              //       alreadyHadRouteDetailsData = true;
-              //     }
-              //     if(alreadyHadRouteDetailsData){
-              //       startUpdate(index+1);
-              //     }else{
-              //       self._saveRoute(fullRouteDetails,function(err,success){
-              //           if(err){
-              //             console.log('There is a error to check')
-              //             console.log(err);
-              //           }
-              //           console.log('Success: '+success);
-              //           startUpdate(index+1);
-              //       })
-              //     }
-              //
-              //   }).catch(function(error) {
-              //     console.log(error);
-              //   });
             } else {
               self._showOperationResultModal(true, "All routes updated in firebase db");
               setTimeout(function() {
                 self.$.saveOperationResultModal.close();
 
-                self._batchImportStopListData();
+                //self._batchImportStopListData();
 
               }, 2000);
               return;
