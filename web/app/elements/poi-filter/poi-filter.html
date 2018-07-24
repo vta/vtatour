@@ -13,88 +13,472 @@
         <template is="dom-repeat" items="{{_poisTypes}}">
           <paper-item value="[[item.id]]">[[item.name]]</paper-item>
         </template>
-      </paper-listbox>
-    </paper-dropdown-menu>
+  </paper-listbox>
+  </paper-dropdown-menu>
   </template>
   <script>
-  (function() {
-    'use strict';
+    (function() {
+      'use strict';
 
-    Polymer({
-      is: 'poi-filter',
+      Polymer({
+        is: 'poi-filter',
 
-      properties: {
-        label: {
-          type: String
+        properties: {
+          label: {
+            type: String
+          },
+          pois: {
+            type: Array,
+            observer: '_poisChange'
+          },
+          selectedFilter: {
+            type: String,
+            notify: true
+          },
+          _poisTypes: {
+            type: Array
+          },
+          _customPoisTypes: {
+            type: Array,
+            value: [
+              {
+                id: '',
+                name: 'All'
+              },
+              {
+                "id": "accounting",
+                "name": "Accounting"
+              },
+              {
+                "id": "airport",
+                "name": "Airport"
+              },
+              {
+                "id": "amusement_park",
+                "name": "Amusement Park"
+              },
+              {
+                "id": "aquarium",
+                "name": "Aquarium"
+              },
+              {
+                "id": "art_gallery",
+                "name": "Art gallery"
+              },
+              {
+                "id": "atm",
+                "name": "Atm"
+              },
+              {
+                "id": "bakery",
+                "name": "Bakery"
+              },
+              {
+                "id": "bank",
+                "name": "Bank"
+              },
+              {
+                "id": "bar",
+                "name": "Bar"
+              },
+              {
+                "id": "beauty_salon",
+                "name": "Beauty Salon"
+              },
+              {
+                "id": "bicycle_store",
+                "name": "Bicycle Store"
+              },
+              {
+                "id": "book_store",
+                "name": "Book Store"
+              },
+              {
+                "id": "bowling_alley",
+                "name": "Bowling Alley"
+              },
+              {
+                "id": "bus_station",
+                "name": "Bus Station"
+              },
+              {
+                "id": "cafe",
+                "name": "Cafe"
+              },
+              {
+                "id": "campground",
+                "name": "Campground"
+              },
+              {
+                "id": "car_dealer",
+                "name": "Car Dealer"
+              },
+              {
+                "id": "car_rental",
+                "name": "Car Rental"
+              },
+              {
+                "id": "car_repair",
+                "name": "Car Repair"
+              },
+              {
+                "id": "car_wash",
+                "name": "Car Wash"
+              },
+              {
+                "id": "casino",
+                "name": "Casino"
+              },
+              {
+                "id": "cemetery",
+                "name": "Cemetery"
+              },
+              {
+                "id": "church",
+                "name": "Church"
+              },
+              {
+                "id": "city_hall",
+                "name": "City Hall"
+              },
+              {
+                "id": "clothing_store",
+                "name": "Clothing store"
+              },
+              {
+                "id": "convenience_store",
+                "name": "Convenience Store"
+              },
+              {
+                "id": "courthouse",
+                "name": "Courthouse"
+              },
+              {
+                "id": "dentist",
+                "name": "Dentist"
+              },
+              {
+                "id": "department_store",
+                "name": "Department Store"
+              },
+              {
+                "id": "doctor",
+                "name": "Doctor"
+              },
+              {
+                "id": "electrician",
+                "name": "Electrician"
+              },
+              {
+                "id": "electronics_store",
+                "name": "Electronics Store"
+              },
+              {
+                "id": "embassy",
+                "name": "Embassy"
+              },
+              {
+                "id": "fire_station",
+                "name": "Fire Station"
+              },
+              {
+                "id": "florist",
+                "name": "Florist"
+              },
+              {
+                "id": "funeral_home",
+                "name": "Funeral Home"
+              },
+              {
+                "id": "furniture_store",
+                "name": "Furniture Store"
+              },
+              {
+                "id": "gas_station",
+                "name": "Gas Station"
+              },
+              {
+                "id": "gym",
+                "name": "Gym"
+              },
+              {
+                "id": "hair_care",
+                "name": "Hair Care"
+              },
+              {
+                "id": "hardware_store",
+                "name": "Hardware Store"
+              },
+              {
+                "id": "hindu_temple",
+                "name": "Hindu Temple"
+              },
+              {
+                "id": "home_goods_store",
+                "name": "Home Goods Store"
+              },
+              {
+                "id": "hospital",
+                "name": "Hospital"
+              },
+              {
+                "id": "insurance_agency",
+                "name": "Insurance Agency"
+              },
+              {
+                "id": "jewelry_store",
+                "name": "Jewelry Store"
+              },
+              {
+                "id": "laundry",
+                "name": "Laundry"
+              },
+              {
+                "id": "lawyer",
+                "name": "Lawyer"
+              },
+              {
+                "id": "library",
+                "name": "Library"
+              },
+              {
+                "id": "liquor_store",
+                "name": "Liquor Store"
+              },
+              {
+                "id": "local_government_office",
+                "name": "Local Government Office"
+              },
+              {
+                "id": "locksmith",
+                "name": "Locksmith"
+              },
+              {
+                "id": "lodging",
+                "name": "Lodging"
+              },
+              {
+                "id": "meal_delivery",
+                "name": "Meal Delivery"
+              },
+              {
+                "id": "meal_takeaway",
+                "name": "Meal Takeaway"
+              },
+              {
+                "id": "mosque",
+                "name": "Mosque"
+              },
+              {
+                "id": "movie_rental",
+                "name": "Movie Rental"
+              },
+              {
+                "id": "movie_theater",
+                "name": "Movie Theater"
+              },
+              {
+                "id": "moving_company",
+                "name": "Moving Company"
+              },
+              {
+                "id": "museum",
+                "name": "Museum"
+              },
+              {
+                "id": "night_club",
+                "name": "Night Club"
+              },
+              {
+                "id": "painter",
+                "name": "Painter"
+              },
+              {
+                "id": "park",
+                "name": "Park"
+              },
+              {
+                "id": "parking",
+                "name": "Parking"
+              },
+              {
+                "id": "pet_store",
+                "name": "Pet Store"
+              },
+              {
+                "id": "pharmacy",
+                "name": "Pharmacy"
+              },
+              {
+                "id": "physiotherapist",
+                "name": "Physiotherapist"
+              },
+              {
+                "id": "plumber",
+                "name": "Plumber"
+              },
+              {
+                "id": "police",
+                "name": "Police"
+              },
+              {
+                "id": "post_office",
+                "name": "Post Office"
+              },
+              {
+                "id": "real_estate_agency",
+                "name": "Real Estate Agency"
+              },
+              {
+                "id": "restaurant",
+                "name": "Restaurant"
+              },
+              {
+                "id": "roofing_contractor",
+                "name": "Roofing Contractor"
+              },
+              {
+                "id": "rv_park",
+                "name": "RV Park"
+              },
+              {
+                "id": "school",
+                "name": "School"
+              },
+              {
+                "id": "shoe_store",
+                "name": "Shoe Store"
+              },
+              {
+                "id": "shopping_mall",
+                "name": "Shopping Mall"
+              },
+              {
+                "id": "spa",
+                "name": "Spa"
+              },
+              {
+                "id": "stadium",
+                "name": "Stadium"
+              },
+              {
+                "id": "storage",
+                "name": "Storage"
+              },
+              {
+                "id": "store",
+                "name": "Store"
+              },
+              {
+                "id": "subway_station",
+                "name": "Subway Station"
+              },
+              {
+                "id": "supermarket",
+                "name": "Supermarket"
+              },
+              {
+                "id": "synagogue",
+                "name": "Synagogue"
+              },
+              {
+                "id": "taxi_stand",
+                "name": "Taxi Stand"
+              },
+              {
+                "id": "train_station",
+                "name": "Train Station"
+              },
+              {
+                "id": "transit_station",
+                "name": "Transit Station"
+              },
+              {
+                "id": "travel_agency",
+                "name": "Travel Agency"
+              },
+              {
+                "id": "veterinary_care",
+                "name": "Veterinary Care"
+              },
+              {
+                "id": "zoo",
+                "name": "Zoo"
+              }
+            ]
+          }
         },
-        pois: {
-          type: Array,
-          observer: '_poisChange'
+
+        clearFilter: function() {
+          this.$.poisFilter._setSelectedItem();
+          this.$.poisFilterDropdownListBox.selected = -1;
         },
-        selectedFilter: {
-          type: String,
-          notify: true
-        },
-        _poisTypes: {
-          type: Array
-        }
-      },
 
-      clearFilter: function() {
-        this.$.poisFilter._setSelectedItem();
-        this.$.poisFilterDropdownListBox.selected = -1;
-      },
-      
-      _poisChange: function(newPois) {
-        if (newPois && newPois.length > 0) {
-          var poiTypesMap = {};
-          var actualPoiTypes;
+        _poisChange: function(newPois) {
+          if (newPois && newPois.length > 0) {
+            var poiTypesMap = {};
+            var currentPois = [];
+            var actualPoiTypes;
 
-          this._poisTypes = [];
-          this.push('_poisTypes', {id: '', name: 'All'});
+            this._poisTypes = [];
+            this.push('_poisTypes', {
+              id: '',
+              name: 'All'
+            });
 
-          for (var indexPoi = 0; indexPoi < newPois.length; indexPoi++) {
-            if (newPois[indexPoi].types && newPois[indexPoi].types.length > 0) {
-              actualPoiTypes = newPois[indexPoi].types;
+            for (var indexPoi = 0; indexPoi < newPois.length; indexPoi++) {
+              if (newPois[indexPoi].types && newPois[indexPoi].types.length > 0) {
+                actualPoiTypes = newPois[indexPoi].types;
+                for (var indexType = 0; indexType < actualPoiTypes.length; indexType++) {
+                  if(currentPois.indexOf(actualPoiTypes[indexType])<0){
+                    var poiType = this._getPoiTypeObj(actualPoiTypes[indexType]);
+                    poiTypesMap[poiType.id] = poiType.name;
+                    this.push('_poisTypes', poiType);
+                    currentPois.push(actualPoiTypes[indexType])
+                  }
 
-              for (var indexType = 0; indexType < actualPoiTypes.length; indexType++) {
-                if (!poiTypesMap[actualPoiTypes[indexType]]) {
-                  var poiType = this._getPoiTypeObj(actualPoiTypes[indexType]);
-                  poiTypesMap[poiType.id] = poiType.name;
-                  this.push('_poisTypes', poiType);
                 }
+
+                // for (var indexType = 0; indexType < actualPoiTypes.length; indexType++) {
+                //   if (!poiTypesMap[actualPoiTypes[indexType]]) {
+                //     var poiType = this._getPoiTypeObj(actualPoiTypes[indexType]);
+                //     poiTypesMap[poiType.id] = poiType.name;
+                //     console.log('Must check below');
+                //     console.log(poiType.id);
+                //     this.push('_poisTypes', poiType);
+                //   }
+                // }
               }
             }
           }
+        },
+
+        _getPoiTypeObj: function(poiType) {
+          var poiTypeDivision = poiType.split('_');
+          var poiName = '';
+
+          for (var indexWord = 0; indexWord < poiTypeDivision.length; indexWord++) {
+            poiName += poiTypeDivision[indexWord][0].toUpperCase() + poiTypeDivision[indexWord].substring(1) + ' ';
+          }
+
+          poiName = poiName.substring(0, poiName.length - 1);
+
+          return {
+            id: poiType,
+            name: poiName
+          };
+        },
+
+        _typeDropdownSelect: function(event) {
+          var selectedItem = event.target.selectedItem;
+          var selectedFilterId;
+
+          if (selectedItem) {
+            this.selectedFilter = selectedItem.value;
+            console.log(this.selectedFilter);
+          }
         }
-      },
-
-      _getPoiTypeObj: function(poiType) {
-        var poiTypeDivision = poiType.split('_');
-        var poiName = '';
-
-        for (var indexWord = 0; indexWord < poiTypeDivision.length; indexWord++) {
-          poiName += poiTypeDivision[indexWord][0].toUpperCase() + poiTypeDivision[indexWord].substring(1) + ' ';
-        }
-
-        poiName = poiName.substring(0, poiName.length - 1);
-
-        return {
-          id: poiType,
-          name: poiName
-        };
-      },
-
-      _typeDropdownSelect: function(event) {
-        var selectedItem = event.target.selectedItem;
-        var selectedFilterId;
-
-        if (selectedItem) {
-          this.selectedFilter = selectedItem.value;
-          console.log(this.selectedFilter);
-        }
-      }
-    });
-  })();
+      });
+    })();
   </script>
 </dom-module>

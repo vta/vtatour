@@ -4,143 +4,241 @@
     </style>
   </template>
   <script>
-  (function() {
-    'use strict';
+    (function() {
+      'use strict';
 
-    Polymer({
-      is: 'maps-utils',
+      Polymer({
+        is: 'maps-utils',
 
-      properties: {
-      },
+        properties: {},
 
-      /**
-       * Method to get the closest point in the point list to given latLng object.
-       *
-       * @param latLng Object containing the latitude and longitude
-       * @param points Source on geo points to fix the result point
-       */
-      getClosestPoint : function(lat, lng, points) {
-        var distances = new Array();
-        var distance_keys = new Array();
-        var R = 6371; // Earth radio in km
-        var rLat = this._toRad(lat);
-        var rLng = this._toRad(lng);
-        var minDistance;
-        var minKey;
+        /**
+         * Method to get the closest point in the point list to given latLng object.
+         *
+         * @param latLng Object containing the latitude and longitude
+         * @param points Source on geo points to fix the result point
+         */
+        getClosestPoint: function(lat, lng, points) {
+          var distances = new Array();
+          var distance_keys = new Array();
+          var R = 6371; // Earth radio in km
+          var rLat = this._toRad(lat);
+          var rLng = this._toRad(lng);
+          var minDistance;
+          var minKey;
 
-        for (var key in points) {
-          var point = points[key];
-          var dLat = this._toRad(point.lat-lat);
-          var dLng = this._toRad(point.lng-lng);
-          var pLat = this._toRad(point.lat);
+          for (var key in points) {
+            var point = points[key];
+            var dLat = this._toRad(point.lat - lat);
+            var dLng = this._toRad(point.lng - lng);
+            var pLat = this._toRad(point.lat);
 
-          var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.sin(dLng/2) * Math.sin(dLng/2) * Math.cos(rLat) * Math.cos(pLat);
-          var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-          var d = R * c;
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.sin(dLng / 2) * Math.sin(dLng / 2) * Math.cos(rLat) * Math.cos(pLat);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c;
 
-          if (!minDistance || d < minDistance) {
-            minDistance = d;
-            minKey = key;
+            if (!minDistance || d < minDistance) {
+              minDistance = d;
+              minKey = key;
+            }
           }
-        }
-        return { key : minKey, latLng : points[minKey] };
-      },
+          return {
+            key: minKey,
+            latLng: points[minKey]
+          };
+        },
 
-      /**
-       * Method to convert the degrees to radians
-       */
-      _toRad : function(degrees){
-        return degrees * Math.PI / 180;
-      },
+        /**
+         * Method to convert the degrees to radians
+         */
+        _toRad: function(degrees) {
+          return degrees * Math.PI / 180;
+        },
 
-      /**
-       * Method to get the POIs from the given map and location.
-       * 
-       * @param latitude Actual latitude
-       * @param longitude Actual longitude
-       * @param map Actual Google Map
-       *
-       * @return Array of POIs from Google Places       
-       */
-      getPoisFromLocation: function(latitude, longitude, map) {
-        var location = new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude));
-        var request = {
-          location: location,
-          rankBy : google.maps.places.RankBy.DISTANCE,
-          types: ['bank', 'hospital', 'food', 'police', 'home_goods_store', 'library', 'airport', 'art_gallery', 'bar', 'church', 'casino', 'park', 'school', 'shopping_mall', 'stadium', 'store', 'university', 'zoo', 'health', 'subway_station', 'gym']
-        };
+        /**
+         * Method to get the POIs from the given map and location.
+         *
+         * @param latitude Actual latitude
+         * @param longitude Actual longitude
+         * @param map Actual Google Map
+         *
+         * @return Array of POIs from Google Places
+         */
+        getPoisFromLocation: function(latitude, longitude, map) {
+          var location = new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude));
+          var request = {
+            location: location,
+            radious:500,
+            rankBy: google.maps.places.RankBy.DISTANCE,
+            types: [
+              'point_of_interest'
+              // 'accounting',
+              // 'airport',
+              // 'amusement_park',
+              // 'aquarium',
+              // 'art_gallery',
+              // 'atm',
+              // 'bakery',
+              // 'bank',
+              // 'bar',
+              // 'beauty_salon',
+              // 'bicycle_store',
+              // 'book_store',
+              // 'bowling_alley',
+              // 'bus_station',
+              // 'cafe',
+              // 'campground',
+              // 'car_dealer',
+              // 'car_rental',
+              // 'car_repair',
+              // 'car_wash',
+              // 'casino',
+              // 'cemetery',
+              // 'church',
+              // 'city_hall',
+              // 'clothing_store',
+              // 'convenience_store',
+              // 'courthouse',
+              // 'dentist',
+              // 'department_store',
+              // 'doctor',
+              // 'electrician',
+              // 'electronics_store',
+              // 'embassy',
+              // 'fire_station',
+              // 'florist',
+              // 'funeral_home',
+              // 'furniture_store',
+              // 'gas_station',
+              // 'gym',
+              // 'hair_care',
+              // 'hardware_store',
+              // 'hindu_temple',
+              // 'home_goods_store',
+              // 'hospital',
+              // 'insurance_agency',
+              // 'jewelry_store',
+              // 'laundry',
+              // 'lawyer',
+              // 'library',
+              // 'liquor_store',
+              // 'local_government_office',
+              // 'locksmith',
+              // 'lodging',
+              // 'meal_delivery',
+              // 'meal_takeaway',
+              // 'mosque',
+              // 'movie_rental',
+              // 'movie_theater',
+              // 'moving_company',
+              // 'museum',
+              // 'night_club',
+              // 'painter',
+              // 'park',
+              // 'parking',
+              // 'pet_store',
+              // 'pharmacy',
+              // 'physiotherapist',
+              // 'plumber',
+              // 'police',
+              // 'post_office',
+              // 'real_estate_agency',
+              // 'restaurant',
+              // 'roofing_contractor',
+              // 'rv_park',
+              // 'school',
+              // 'shoe_store',
+              // 'shopping_mall',
+              // 'spa',
+              // 'stadium',
+              // 'storage',
+              // 'store',
+              // 'subway_station',
+              // 'supermarket',
+              // 'synagogue',
+              // 'taxi_stand',
+              // 'train_station',
+              // 'transit_station',
+              // 'travel_agency',
+              // 'veterinary_care',
+              // 'zoo',
+            ]
+          };
 
-        var service = new google.maps.places.PlacesService(map);
-        var results;
-        var self = this;
-        var mapCounter = 1;
+          var service = new google.maps.places.PlacesService(map);
+          var results;
+          var self = this;
+          var mapCounter = 1;
 
-        service.nearbySearch(request, function(results, status) {
-          console.log(results);
-          results = results.map(function(result) {
-            result.latitude = result.geometry.location.lat();
-            result.longitude = result.geometry.location.lng();
+          service.nearbySearch(request, function(results, status) {
+            console.log(results);
+            results = results.map(function(result) {
+              result.latitude = result.geometry.location.lat();
+              result.longitude = result.geometry.location.lng();
 
-            if (result.photos && result.photos.length > 0) {
-              result.imageUrl = result.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100});
-            }
+              if (result.photos && result.photos.length > 0) {
+                result.imageUrl = result.photos[0].getUrl({
+                  'maxWidth': 100,
+                  'maxHeight': 100
+                });
+              }
 
-            if (mapCounter === results.length) {
-              self.fire('pois-loaded', results);
-            }
+              if (mapCounter === results.length) {
+                self.fire('pois-loaded', results);
+              }
 
-            mapCounter++;
+              mapCounter++;
+            });
           });
-        });
-      },
+        },
 
-      /**
-       * Method to load a POI details.
-       * 
-       * @param placeId ID of the place to get the details
-       * @param map Google Map object
-       *
-       * @return POI details
-       */
-      getPoiDetails: function(placeId, map) {
-        var service = new google.maps.places.PlacesService(map);
-        var self = this;
+        /**
+         * Method to load a POI details.
+         *
+         * @param placeId ID of the place to get the details
+         * @param map Google Map object
+         *
+         * @return POI details
+         */
+        getPoiDetails: function(placeId, map) {
+          var service = new google.maps.places.PlacesService(map);
+          var self = this;
 
-        service.getDetails({
-          placeId: placeId
-        }, function(place, status) {
-          if (status === google.maps.places.PlacesServiceStatus.OK) {
-            self.fire('poi-details-loaded', place);
-          }
-        });
-      },
+          service.getDetails({
+            placeId: placeId
+          }, function(place, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+              self.fire('poi-details-loaded', place);
+            }
+          });
+        },
 
-      /**
-       * Method to return a LatLng Google Map object.
-       *
-       * @param latitude Latitud to use
-       * @param longitude Longitude to use
-       *
-       * @return LatLng object
-       */
-      getLatLngObj: function(latitude, longitude) {
-        return new google.maps.LatLng(latitude, longitude);
-      },
+        /**
+         * Method to return a LatLng Google Map object.
+         *
+         * @param latitude Latitud to use
+         * @param longitude Longitude to use
+         *
+         * @return LatLng object
+         */
+        getLatLngObj: function(latitude, longitude) {
+          return new google.maps.LatLng(latitude, longitude);
+        },
 
-      /**
-       * Method to return a marker info window object.
-       *
-       * @param content HTML content of the marker
-       *
-       * @return InfoWindow object
-       */
-      getMarkerObj: function(content) {
-        return new google.maps.InfoWindow({
-          content: content
-        });
-      }
-    });
-  })();
+        /**
+         * Method to return a marker info window object.
+         *
+         * @param content HTML content of the marker
+         *
+         * @return InfoWindow object
+         */
+        getMarkerObj: function(content) {
+          return new google.maps.InfoWindow({
+            content: content
+          });
+        }
+      });
+    })();
   </script>
 </dom-module>

@@ -328,6 +328,8 @@ app.post('/api/route-details/:resolution/:route_code/:direction/:view', (req, re
         update['route-details-resources/'+route_code+'/'+resolutionPath+'/'+direction+'/KmlUrlRight'] = KmlUrlRight;
       }
 
+        update['route-details-resources/'+ route_code + '/isProcessed'] = false;
+
 
         const ref = firebaseApp.database().ref();
         ref.update(update, (error) => {

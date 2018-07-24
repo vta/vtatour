@@ -70,12 +70,18 @@
         width: 100%;
         height: 54px;
         margin: 0 0 25px 0;
-        background-color: var(--primary-color);
+        background-color: var(--primary-color) !important;
         color: white;
       }
 
       .paper-checkbox-wrapper {
         text-align: center;
+      }
+      .content-wrapper{
+        background-color: #FFFEFF;
+      }
+      .vta-login{
+        background-color: #FFFEFF;
       }
     </style>
 
@@ -91,7 +97,8 @@
       <div class="vertical-container">
         <div class="container">
           <iron-image src="{{logoUrl}}" preload sizing="contain"></iron-image>
-          <h1>Virtual Tour</h1>
+          <h1 style="font-size: 32px;
+margin-left: 5px;">Virtual Tour</h1>
         </div>
 
         <div class="fields-wrapper">
@@ -173,6 +180,13 @@
       },
       _computeSignedIn: function(user) {
         return !!user;
+      },
+      ready:function(){
+        $('body').css('backgroundColor','#FFFEFF');
+        setTimeout(function(){
+           $('#sizedImgDiv').css('marginTop','60%')
+        },1000);
+
       }
     });
   </script>

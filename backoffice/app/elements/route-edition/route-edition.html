@@ -1103,6 +1103,10 @@
         this._routeDetailsOrigin = this._routeDetails;
         var code = this._routeInfo.code;
         var update = {};
+        if(this._routeDetails.a && this._routeDetails.a.videoGeoPoints){
+          update['route-details-video-geopoints-front/'+code+'/a'] = this._routeDetails.a.videoGeoPoints;
+        }
+
         if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsLeft){
           update['route-details-video-geopoints-left/'+code+'/a'] = this._routeDetails.a.videoGeoPointsLeft;
           delete this._routeDetails.a.videoGeoPointsLeft;
@@ -1119,6 +1123,10 @@
         if(this._routeDetails.a && this._routeDetails.a.videoGeoPointsNight){
           update['route-details-video-geopoints-night/'+code+'/a'] = this._routeDetails.a.videoGeoPointsNight;
           delete this._routeDetails.a.videoGeoPointsNight;
+        }
+
+        if(this._routeDetails.b && this._routeDetails.b.videoGeoPoints){
+          update['route-details-video-geopoints-front/'+code+'/b'] = this._routeDetails.b.videoGeoPoints;
         }
 
         if(this._routeDetails.b && this._routeDetails.b.videoGeoPointsLeft){

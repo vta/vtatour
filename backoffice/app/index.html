@@ -18,7 +18,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Polymer Starter Kit">
-  <title>VTA\Virtual Tour Backoffice</title>
+  <title>VTA - Virtual Tour Backend</title>
 
   <!-- Place favicon.ico in the `app/` directory -->
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -87,7 +87,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 	<firebase-app name="vta" auth-domain="vtavirtualtransit-7c904.firebaseapp.com" database-url="https://vtavirtualtransit-7c904.firebaseio.com" api-key="AIzaSyALqCogus7yIJJ0OE48RwBtmteqybWvZ6g"></firebase-app>
 
-    <vta-login hidden$="{{signedIn}}" user="{{user}}" signed-in={{signedIn}} logo-url="images/vta-logo.png"></vta-login>
+    <vta-login hidden$="{{signedIn}}" user="{{user}}" signed-in={{signedIn}} logo-url="images/vtavirtualtransit-logo.jpg"></vta-login>
 
 
     <template is="dom-if" if="{{signedIn}}">
@@ -121,7 +121,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <div class="middle middle-container">
             <div id="appName" class="app-name">
               <div id="appNameLogo">
-                <iron-image sizing="contain" src="images/vta-logo.png" alt="VTA Logo"></iron-image>
+                <iron-image sizing="contain" src="images/vtavirtualtransit-logo.jpg" alt="VTA Logo"></iron-image>
               </div>
               <div id="appNameCopy">Virtual Tour</div>
             </div>
