@@ -66,131 +66,101 @@
          * @return Array of POIs from Google Places
          */
         getPoisFromLocation: function(latitude, longitude, map) {
+          var typeGroups = [
+              {
+                type:1,
+                items:['airport','atm','bank','bus_station','car_rental','car_repair','car_wash',
+                'fire_station','gas_station','hospital','library','parking','pharmacy','post_office','school','subway_station','taxi_stand','train_station',
+                'transit_station'
+              ]
+              },
+              {
+                type:2,
+                items:['amusement_park','aquarium','art_gallery','church','city_hall',
+                'embassy','hindu_temple','local_government_office','mosque','movie_rental','movie_theater','museum','park','rv_park','stadium','zoo'
+
+              ]
+              },
+              {
+                type:3,
+                items:[
+                  'bakery','bar','cafe','restaurant','casino','convenience_store','department_store',
+                'home_goods_store','furniture_store','liquor_store','meal_delivery','meal_takeaway','night_club',
+                'clothing_store','pet_store','shoe_store','shopping_mall','spa','store','supermarket'
+              ]
+              },
+              {
+                type:4,
+                items:['accounting','book_store','car_dealer','courthouse','dentist','doctor','electrician',
+                'florist','lawyer','painter','physiotherapist','plumber','police','roofing_contractor'
+              ]
+              },
+              {
+                type:5,
+                items:['beauty_salon','bicycle_store','bowling_alley','campground','cemetery',
+                'electronics_store','funeral_home','gym','hair_care','hardware_store',
+                'jewelry_store','laundry','insurance_agency','locksmith','lodging','moving_company','real_estate_agency','storage','synagogue','travel_agency','veterinary_care'
+               ]
+              },
+          ]
+          var totalResults = [];
           var location = new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude));
-          var request = {
-            location: location,
-            radious:500,
-            rankBy: google.maps.places.RankBy.DISTANCE,
-            types: [
-              'point_of_interest'
-              // 'accounting',
-              // 'airport',
-              // 'amusement_park',
-              // 'aquarium',
-              // 'art_gallery',
-              // 'atm',
-              // 'bakery',
-              // 'bank',
-              // 'bar',
-              // 'beauty_salon',
-              // 'bicycle_store',
-              // 'book_store',
-              // 'bowling_alley',
-              // 'bus_station',
-              // 'cafe',
-              // 'campground',
-              // 'car_dealer',
-              // 'car_rental',
-              // 'car_repair',
-              // 'car_wash',
-              // 'casino',
-              // 'cemetery',
-              // 'church',
-              // 'city_hall',
-              // 'clothing_store',
-              // 'convenience_store',
-              // 'courthouse',
-              // 'dentist',
-              // 'department_store',
-              // 'doctor',
-              // 'electrician',
-              // 'electronics_store',
-              // 'embassy',
-              // 'fire_station',
-              // 'florist',
-              // 'funeral_home',
-              // 'furniture_store',
-              // 'gas_station',
-              // 'gym',
-              // 'hair_care',
-              // 'hardware_store',
-              // 'hindu_temple',
-              // 'home_goods_store',
-              // 'hospital',
-              // 'insurance_agency',
-              // 'jewelry_store',
-              // 'laundry',
-              // 'lawyer',
-              // 'library',
-              // 'liquor_store',
-              // 'local_government_office',
-              // 'locksmith',
-              // 'lodging',
-              // 'meal_delivery',
-              // 'meal_takeaway',
-              // 'mosque',
-              // 'movie_rental',
-              // 'movie_theater',
-              // 'moving_company',
-              // 'museum',
-              // 'night_club',
-              // 'painter',
-              // 'park',
-              // 'parking',
-              // 'pet_store',
-              // 'pharmacy',
-              // 'physiotherapist',
-              // 'plumber',
-              // 'police',
-              // 'post_office',
-              // 'real_estate_agency',
-              // 'restaurant',
-              // 'roofing_contractor',
-              // 'rv_park',
-              // 'school',
-              // 'shoe_store',
-              // 'shopping_mall',
-              // 'spa',
-              // 'stadium',
-              // 'storage',
-              // 'store',
-              // 'subway_station',
-              // 'supermarket',
-              // 'synagogue',
-              // 'taxi_stand',
-              // 'train_station',
-              // 'transit_station',
-              // 'travel_agency',
-              // 'veterinary_care',
-              // 'zoo',
-            ]
-          };
-
-          var service = new google.maps.places.PlacesService(map);
-          var results;
           var self = this;
-          var mapCounter = 1;
+          var getByCategory = function(index){
+            console.log('Index: '+index +' Group length: '+typeGroups.length);
+            if(index<typeGroups.length){
+              var request = {
+                location: location,
+                radious:500,
+                rankBy: google.maps.places.RankBy.DISTANCE,
+                types: typeGroups[index].items
+              };
+              var service = new google.maps.places.PlacesService(map);
+              var results;
 
-          service.nearbySearch(request, function(results, status) {
-            console.log(results);
-            results = results.map(function(result) {
-              result.latitude = result.geometry.location.lat();
-              result.longitude = result.geometry.location.lng();
+              var mapCounter = 1;
 
-              if (result.photos && result.photos.length > 0) {
-                result.imageUrl = result.photos[0].getUrl({
-                  'maxWidth': 100,
-                  'maxHeight': 100
-                });
-              }
+              service.nearbySearch(request, function(results, status) {
+                console.log('check pois')
+                console.log(results);
+                if(results){
+                  results = results.map(function(result) {
+                    result.latitude = result.geometry.location.lat();
+                    result.longitude = result.geometry.location.lng();
 
-              if (mapCounter === results.length) {
-                self.fire('pois-loaded', results);
-              }
+                    if (result.photos && result.photos.length > 0) {
+                      result.imageUrl = result.photos[0].getUrl({
+                        'maxWidth': 100,
+                        'maxHeight': 100
+                      });
+                    }
 
-              mapCounter++;
-            });
-          });
+                    // if (mapCounter === results.length) {
+                    //   self.fire('pois-loaded', results);
+                    // }
+
+                    mapCounter++;
+                    totalResults.push(result);
+                  });
+                  // if(totalResults && totalResults.length){
+                  //   //totalResults.push(results);
+                  //   self.fire('pois-loaded', totalResults);
+                  // }
+                }
+
+                setTimeout(function(){
+                  index = index+1;
+                   getByCategory(index);
+                }, 100);
+
+              });
+            }else{
+              console.log('Total results');
+              console.log(totalResults);
+              self.fire('pois-loaded', totalResults);
+            }
+          }
+          getByCategory(0);
         },
 
         /**
@@ -240,5 +210,97 @@
         }
       });
     })();
+
+
+    // 'accounting',
+    // 'airport',
+    // 'amusement_park',
+    // 'aquarium',
+    // 'art_gallery',
+    // 'atm',
+    // 'bakery',
+    // 'bank',
+    // 'bar',
+    // 'beauty_salon',
+    // 'bicycle_store',
+    // 'book_store',
+    // 'bowling_alley',
+    // 'bus_station',
+    // 'cafe',
+    // 'campground',
+    // 'car_dealer',
+    // 'car_rental',
+    // 'car_repair',
+    // 'car_wash',
+    // 'casino',
+    // 'cemetery',
+    // 'church',
+    // 'city_hall',
+    // 'clothing_store',
+    // 'convenience_store',
+    // 'courthouse',
+    // 'dentist',
+    // 'department_store',
+    // 'doctor',
+    // 'electrician',
+    // 'electronics_store',
+    // 'embassy',
+    // 'fire_station',
+    // 'florist',
+    // 'funeral_home',
+    // 'furniture_store',
+    // 'gas_station',
+    // 'gym',
+    // 'hair_care',
+    // 'hardware_store',
+    // 'hindu_temple',
+    // 'home_goods_store',
+    // 'hospital',
+    // 'insurance_agency',
+    // 'jewelry_store',
+    // 'laundry',
+    // 'lawyer',
+    // 'library',
+    // 'liquor_store',
+    // 'local_government_office',
+    // 'locksmith',
+    // 'lodging',
+    // 'meal_delivery',
+    // 'meal_takeaway',
+    // 'mosque',
+    // 'movie_rental',
+    // 'movie_theater',
+    // 'moving_company',
+    // 'museum',
+    // 'night_club',
+    // 'painter',
+    // 'park',
+    // 'parking',
+    // 'pet_store',
+    // 'pharmacy',
+    // 'physiotherapist',
+    // 'plumber',
+    // 'police',
+    // 'post_office',
+    // 'real_estate_agency',
+    // 'restaurant',
+    // 'roofing_contractor',
+    // 'rv_park',
+    // 'school',
+    // 'shoe_store',
+    // 'shopping_mall',
+    // 'spa',
+    // 'stadium',
+    // 'storage',
+    // 'store',
+    // 'subway_station',
+    // 'supermarket',
+    // 'synagogue',
+    // 'taxi_stand',
+    // 'train_station',
+    // 'transit_station',
+    // 'travel_agency',
+    // 'veterinary_care',
+    // 'zoo',
   </script>
 </dom-module>

@@ -785,10 +785,11 @@ var map;
                });
              }else{
 
-               $('.main-direction-data-display').append('<h5>Destination Reached</h5>');
+               //$('.main-direction-data-display').append('<h5 style="font-family: \'Open Sans\', sans-serif;">Destination Reached</h5>');
              }
            }
            processStop(0);
+           //$('.main-direction-data-display').append('<br/>');
         },
 
         _routeDetailsOriginChange: function(newRouteDetailsOrigin) {
@@ -1606,9 +1607,12 @@ var map;
                             console.log(step)
                             step.instructions = step.instructions.replace('Destination will be on the right','');
                             step.instructions = step.instructions.replace('Destination will be on the left','');
-                            $('.main-direction-data-display').append(step.instructions+'<br/>');
+                            if(i!==steps.length-1){
+                              step.instructions = step.instructions+'<br/>'
+                            }
+                            $('.main-direction-data-display').append(step.instructions);
                           }
-                            $('.main-direction-data-display').append('<hr/>');
+                          //$('.main-direction-data-display').append('<div style="clear:both;"><div>');
                           callback();
                           // var directionData = result.routes[0].legs[0].steps && result.routes[0].legs[0].steps[0];
                           // var instruction = directionData.instructions;
