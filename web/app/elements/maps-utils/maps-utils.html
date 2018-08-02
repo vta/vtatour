@@ -67,11 +67,15 @@
          */
         getPoisFromLocation: function(latitude, longitude, map) {
           var typeGroups = [
+            {
+              type:0,
+              items:['*']
+            },
               {
                 type:1,
                 items:['airport','atm','bank','bus_station','car_rental','car_repair','car_wash',
                 'fire_station','gas_station','hospital','library','parking','pharmacy','post_office','school','subway_station','taxi_stand','train_station',
-                'transit_station'
+                'transit_station','shopping_mall','supermarket',
               ]
               },
               {
@@ -86,24 +90,24 @@
                 items:[
                   'bakery','bar','cafe','restaurant','casino','convenience_store','department_store',
                 'home_goods_store','furniture_store','liquor_store','meal_delivery','meal_takeaway','night_club',
-                'clothing_store','pet_store','shoe_store','shopping_mall','spa','store','supermarket'
+                'clothing_store','pet_store','shoe_store','spa','store','gym','hair_care','beauty_salon',
               ]
               },
               {
                 type:4,
                 items:['accounting','book_store','car_dealer','courthouse','dentist','doctor','electrician',
-                'florist','lawyer','painter','physiotherapist','plumber','police','roofing_contractor'
+                'florist','lawyer','painter','physiotherapist','plumber','police','roofing_contractor','moving_company','real_estate_agency','travel_agency','insurance_agency'
               ]
               },
               {
                 type:5,
-                items:['beauty_salon','bicycle_store','bowling_alley','campground','cemetery',
-                'electronics_store','funeral_home','gym','hair_care','hardware_store',
-                'jewelry_store','laundry','insurance_agency','locksmith','lodging','moving_company','real_estate_agency','storage','synagogue','travel_agency','veterinary_care'
+                items:['bicycle_store','bowling_alley','campground','cemetery',
+                'electronics_store','funeral_home','hardware_store','jewelry_store','laundry','locksmith','lodging','storage','synagogue','veterinary_care'
                ]
               },
           ]
           var totalResults = [];
+          var ids = [];
           var location = new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude));
           var self = this;
           var getByCategory = function(index){
@@ -111,8 +115,8 @@
             if(index<typeGroups.length){
               var request = {
                 location: location,
-                radious:500,
-                rankBy: google.maps.places.RankBy.DISTANCE,
+                radius: 500,
+                //rankBy: google.maps.places.RankBy.DISTANCE,
                 types: typeGroups[index].items
               };
               var service = new google.maps.places.PlacesService(map);
@@ -140,7 +144,11 @@
                     // }
 
                     mapCounter++;
-                    totalResults.push(result);
+                    if(ids.indexOf(result.id) === -1){
+                      ids.push(result.id);
+                      totalResults.push(result);
+                    }
+
                   });
                   // if(totalResults && totalResults.length){
                   //   //totalResults.push(results);

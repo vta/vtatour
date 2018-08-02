@@ -318,7 +318,7 @@
     </div>
 
     <div class="map-wrapper">
-      <google-map-search id="search" map="[[_map]]" api-key="[[_google_api_key]]" radius="3000" results="{{_pois}}" mapType="satellite">
+      <google-map-search id="search" map="[[_map]]" api-key="[[_google_api_key]]" radius="500" results="{{_pois}}" mapType="satellite">
       </google-map-search>
 
       <google-map id="map" map="{{_map}}" api-key="[[_google_api_key]]" additional-map-options='{"zoomControl":"true"}' mapType="satellite" disable-zoom>
@@ -698,7 +698,9 @@
           }
           this._videoViewChange("");
           $('.SelectViewItems').hide();
+          $('.SelectQuality').hide();
           $('#viewSelectionText').text("VIEWS");
+          $('#QualitySelectionText').text("VIDEO QUALITY");
         },
 
         _initialPropertyChange: function() {
@@ -1005,6 +1007,10 @@
           }
           if (this._meetUps) {
             this._meetUps = null;
+          }
+
+          if(this._startedOnce && !this._isVideoPlaying){
+            this._pauseVideo();
           }
         },
 
